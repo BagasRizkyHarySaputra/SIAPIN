@@ -276,15 +276,11 @@ export function GuruCards({
   function goTo(p: number) {
     const next = Math.min(Math.max(1, p), totalPages);
     if (next === safePage) return;
+    // Tanpa auto-scroll: scrollIntoView membuat pagination & halaman
+    // "melompat" langsung. Biarkan posisi user tetap; daftar kartu berganti
+    // dengan animasi ringan (`.bimble-page-enter`).
     setPage(next);
     onPageChange?.();
-    // Scroll halus ke puncak daftar kartu SETELAH render halaman baru,
-    // supaya perubahan kartu terlihat jelas (animasi flip di `.bimble-page-enter`).
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
   }
 
   const navBtn: React.CSSProperties = {
@@ -311,7 +307,12 @@ export function GuruCards({
       <div
         key={`page-${safePage}`}
         className="bimble-page-enter flex flex-col"
-        style={{ gap: cq(34) }}
+        style={{
+          gap: cq(34),
+          // Jaga tinggi minimum = 7 kartu + 6 gap, supaya saat halaman 2
+          // (6 kartu) pagination tidak melompat naik.
+          minHeight: `calc(${cq(209)} * ${PAGE_SIZE} + ${cq(34)} * ${PAGE_SIZE - 1})`,
+        }}
       >
         {visible.map((t) => (
           <TeacherCard

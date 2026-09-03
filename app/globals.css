@@ -101,22 +101,18 @@
   color: #ffffff;
 }
 
-/* ===== Bimble: animasi saat halaman kartu berganti (flip/fade masuk) ===== */
+/* ===== Bimble: animasi ringan saat halaman kartu berganti ===== */
 .bimble-page-enter {
-  animation: bimblePageFlip 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  transform-style: preserve-3d;
+  animation: bimblePageIn 0.35s ease-out;
 }
-@keyframes bimblePageFlip {
+@keyframes bimblePageIn {
   0% {
-    opacity: 0;
-    transform: perspective(900px) rotateX(-8deg) translateY(14px) scale(0.985);
-  }
-  60% {
-    opacity: 1;
+    opacity: 0.4;
+    transform: translateY(10px);
   }
   100% {
     opacity: 1;
-    transform: perspective(900px) rotateX(0deg) translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
@@ -232,5 +228,16 @@
 @media (max-width: 767px) {
   .ai-scope {
     --pm: 1.3;
+  }
+}
+
+/* ===== Halaman soal: 1.9x HP (<768px), 1x desktop ===== */
+/* 2x penuh overflow 1px untuk 2 kartu sebaris; 1.9x pas (17px sisa). */
+.soal-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .soal-scope {
+    --pm: 1.9;
   }
 }
