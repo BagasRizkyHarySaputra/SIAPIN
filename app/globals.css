@@ -53,7 +53,7 @@
   }
 }
 
-/* ===== Profile: 2x di HP (<768px), 0.25x di desktop (≥768px) ===== */
+/* ===== Profile: 2x di HP (<768px), 0.3x di desktop (≥768px) ===== */
 .profile-scope {
   --pm: 1;
 }
@@ -64,7 +64,7 @@
 }
 @media (min-width: 768px) {
   .profile-scope {
-    --pm: 0.25;
+    --pm: 0.7;
   }
 }
 
@@ -259,13 +259,13 @@
   }
 }
 
-/* ===== Dashboard: desktop 1:1 Figma (--pm & --ds = 1), HP 2x (--pm) ===== */
+/* ===== Dashboard: desktop 0.75x (kecil 25%), HP 2x (--pm) ===== */
 /* --pm  : pengali utama (cqm) — font, box, padding, dll.
    --ds  : pengali utk nilai cqw mentah (gap/rounded kecil).
-   Desktop 1:1 → semua nilai Figma asli (cqm = px Figma di 1440). */
+   Desktop 0.75 → semua ukuran di dalam /dashboard 25% lebih kecil dari Figma. */
 .dashboard-scope {
-  --pm: 1;
-  --ds: 1;
+  --pm: 0.75;
+  --ds: 0.75;
 }
 @media (max-width: 767px) {
   .dashboard-scope {
@@ -277,8 +277,8 @@
 /* ===== Pilihan mapel: tetap 1 baris 3 kartu di HP → skala lokal 1.6x ===== */
 /* 2x tidak muat (butuh ~423px untuk ruang ~273px); 1.6x pas 1 baris. */
 .mapel-scope {
-  --pm: 1;
-  --ds: 1;
+  --pm: 0.75;
+  --ds: 0.75;
 }
 @media (max-width: 767px) {
   .mapel-scope {
@@ -290,8 +290,8 @@
 /* ===== AI diagnostic: tetap 1 baris 2 panel di HP → skala lokal 1.3x ===== */
 /* 2x butuh ~430px untuk ruang 344px; 1.3x maksimal yang muat sejajar. */
 .ai-scope {
-  --pm: 1;
-  --ds: 1;
+  --pm: 0.75;
+  --ds: 0.75;
 }
 @media (max-width: 767px) {
   .ai-scope {
