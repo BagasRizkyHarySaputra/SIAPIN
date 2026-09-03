@@ -11,16 +11,20 @@ import {
   TeacherPanel,
 } from "@/components/features/bimble/teacher-panel";
 import { cq } from "@/lib/cq";
+import { useIsDesktop } from "@/lib/use-media-query";
 
 export default function BimblePage() {
   // null = state normal (frame 333-496); terisi = state "click" (frame 333-1055)
   const [selected, setSelected] = useState<string | null>(null);
+  const isDesktop = useIsDesktop();
   const active = selected ? TEACHER_PANEL_DATA[selected] : undefined;
+
+  const handleSelect = (id: string) => setSelected(id === selected ? null : id);
 
   return (
     <main
       className="flex min-h-screen w-full flex-col bg-[#dbe9ea]"
-      style={{ minHeight: "100dvh" }}
+      style={{ minHeight: "100dvh", containerType: "inline-size" }}
     >
       <Navbar />
 
@@ -52,28 +56,45 @@ export default function BimblePage() {
           }}
         >
           {active ? (
-            /* State klik: kartu menyempit (738) di kiri + panel profil guru di kanan.
-               Figma: kartu x64..802, panel x854..1374, gap 52.
-               Band padding kiri 84 → marginLeft -20 agar mulai di 64. */
-            <div
-              className="flex items-start"
-              style={{ marginLeft: `calc(${cq(84)} * -1 + ${cq(64)})` }}
-            >
-              <div className="flex flex-col" style={{ width: cq(738) }}>
-                <GuruCards
-                  activeId={selected}
-                  slim
-                  onSelect={(id) => setSelected(id === selected ? null : id)}
-                  onPageChange={() => setSelected(null)}
-                />
+            isDesktop ? (
+              /* Desktop: kartu menyempit (738) di kiri + panel profil di kanan.
+                 Figma: kartu x64..802, panel x854..1374, gap 52.
+                 Band padding kiri 84 → marginLeft -20 agar mulai di 64. */
+              <div
+                className="flex items-start"
+                style={{ marginLeft: `calc(${cq(84)} * -1 + ${cq(64)})` }}
+              >
+                <div className="flex flex-col" style={{ width: cq(738) }}>
+                  <GuruCards
+                    activeId={selected}
+                    slim
+                    onSelect={handleSelect}
+                    onPageChange={() => setSelected(null)}
+                  />
+                </div>
+                <div style={{ width: cq(52), flexShrink: 0 }} />
+                <div style={{ width: cq(520), flexShrink: 0 }}>
+                  <TeacherPanel t={active} onClose={() => setSelected(null)} />
+                </div>
               </div>
-              <div style={{ width: cq(52) }} />
-              <TeacherPanel t={active} onClose={() => setSelected(null)} />
-            </div>
+            ) : (
+              /* Mobile/HP: panel disisipkan tepat di bawah kartu yang dipilih
+                 ("muncul dari card ke bawah card"). Kartu lain & arrow tetap
+                 full-width sehingga tetap bisa diketuk. */
+              <GuruCards
+                activeId={selected}
+                onSelect={handleSelect}
+                onPageChange={() => setSelected(null)}
+                detailNode={
+                  <TeacherPanel t={active} onClose={() => setSelected(null)} />
+                }
+                detailAfterId={selected}
+              />
+            )
           ) : (
             <GuruCards
               activeId={selected}
-              onSelect={(id) => setSelected(id === selected ? null : id)}
+              onSelect={handleSelect}
               onPageChange={() => setSelected(null)}
             />
           )}

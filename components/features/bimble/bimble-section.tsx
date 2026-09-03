@@ -180,12 +180,15 @@ function TeacherCard({
       style={{
         width: slim ? cq(738) : "100%",
         height: cq(209),
+        minHeight: cq(209),
         backgroundColor: t.bg,
         borderRadius: cq(80),
         boxShadow: `0 ${cq(4)} ${cq(4)} ${t.shadow}`,
         paddingLeft: cq(55),
         paddingRight: cq(64),
         cursor: "pointer",
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent",
         transition:
           "width 0.3s ease, transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease",
         outline: active ? `${cq(2)} solid rgba(28,20,81,0.45)` : "none",
@@ -258,12 +261,17 @@ export function GuruCards({
   onSelect,
   pageSize = PAGE_SIZE,
   onPageChange,
+  detailNode,
+  detailAfterId,
 }: {
   activeId?: string | null;
   slim?: boolean;
   onSelect?: (id: string) => void;
   pageSize?: number;
   onPageChange?: () => void;
+  /** (mobile) node yang disisipkan tepat setelah kartu dgn id === detailAfterId */
+  detailNode?: React.ReactNode;
+  detailAfterId?: string | null;
 }) {
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
@@ -306,13 +314,15 @@ export function GuruCards({
       <div ref={topRef} style={{ scrollMarginTop: cq(24) }} />
       <div key={`page-${safePage}`} className="flex flex-col" style={{ gap: cq(34) }}>
         {visible.map((t) => (
-          <TeacherCard
-            key={t.id}
-            t={t}
-            active={activeId === t.id}
-            slim={slim}
-            onSelect={onSelect}
-          />
+          <div key={t.id} className="flex flex-col" style={{ gap: cq(34) }}>
+            <TeacherCard
+              t={t}
+              active={activeId === t.id}
+              slim={slim}
+              onSelect={onSelect}
+            />
+            {detailNode && detailAfterId === t.id && detailNode}
+          </div>
         ))}
       </div>
 
