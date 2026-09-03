@@ -20,7 +20,7 @@ export function PilihPtn() {
           paddingInline: cqm(63),
         }}
       >
-        {/* Left text block */}
+        {/* Left text block — heading + (maskot beside bubble) */}
         <div style={{ maxWidth: cqm(520) }}>
           <h2
             className="font-bold"
@@ -28,23 +28,42 @@ export function PilihPtn() {
           >
             Siapkah anda memasuki ptn impian anda?
           </h2>
-          {/* bubble */}
+
+          {/* maskot + bubble row */}
           <div
-            className="mt-[calc(1.2cqw*var(--ds,1))] inline-flex items-center rounded-[calc(1.4cqw*var(--ds,1))] px-[calc(1.1cqw*var(--ds,1))] py-[calc(0.9cqw*var(--ds,1))]"
-            style={{
-              backgroundColor: "#e0f0cf",
-              borderStyle: "solid",
-              borderWidth: cqm(1),
-              borderColor: "rgba(104, 141, 55, 0.3)", // #688d37 @ 30%
-              borderRadius: cqm(20),
-            }}
+            className="mt-[calc(1.2cqw*var(--ds,1))] flex items-end"
+            style={{ gap: cqm(8) }}
           >
-            <span
-              className="font-normal"
-              style={{ fontSize: cqm(16), color: "#1c1451" }}
+            {/* Maskot (kura-kura) — from Figma at left of bubble */}
+            <img
+              src="/visual/maskot.png"
+              alt="Maskot"
+              className="pointer-events-none select-none"
+              style={{
+                width: cqm(140),
+                height: "auto",
+                marginBottom: cqm(-30),
+              }}
+            />
+            {/* bubble */}
+            <div
+              className="flex items-center rounded-[calc(1.4cqw*var(--ds,1))] px-[calc(1.5cqw*var(--ds,1))] py-[calc(1.2cqw*var(--ds,1))]"
+              style={{
+                backgroundColor: "#e0f0cf",
+                borderStyle: "solid",
+                borderWidth: cqm(1),
+                borderColor: "rgba(104, 141, 55, 0.3)", // #688d37 @ 30%
+                borderRadius: cqm(20),
+              }}
             >
-              Yuk mulai memasukan data nilai anda dan pilih universitas impianmu
-            </span>
+              <span
+                className="font-normal"
+                style={{ fontSize: cqm(16), color: "#1c1451", lineHeight: 1.4 }}
+              >
+                Yuk mulai memasukan data nilai anda dan pilih universitas
+                impianmu
+              </span>
+            </div>
           </div>
         </div>
 
@@ -82,21 +101,6 @@ export function PilihPtn() {
             Mulai Iput Nilai →
           </button>
         </div>
-
-        {/* Maskot illustration (right-ish, from design at x~126 y~1813 w161 h164) */}
-        <img
-          src="/visual/maskot.png"
-          alt="Maskot"
-          className="pointer-events-none select-none"
-          style={{
-            position: "absolute",
-            right: cqm(20),
-            bottom: 0,
-            width: cqm(161),
-            height: "auto",
-            opacity: 0,
-          }}
-        />
       </div>
 
       {/* popup input nilai */}
