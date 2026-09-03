@@ -1,6 +1,6 @@
 "use client";
 
-import { cq } from "@/lib/cq";
+import { cqm } from "@/lib/cq";
 
 const STATS = [
   {
@@ -31,62 +31,59 @@ const STATS = [
 
 export function StatCards() {
   return (
-    <div className="flex w-full" style={{ gap: cq(40) }}>
-      {STATS.map((s) => (
+    <div className="grid w-full grid-cols-2 md:grid-cols-3" style={{ gap: cqm(40) }}>
+      {STATS.map((s, i) => (
         <div
           key={s.label}
-          className="relative"
+          className={`flex flex-col items-center justify-center py-[calc(2.7778cqw*var(--pm,1))] md:flex-row md:justify-start md:py-0${i === 2 ? " col-span-2 md:col-span-1" : ""}`}
           style={{
-            width: cq(404),
-            height: cq(170),
-            borderRadius: cq(20),
+            minHeight: cqm(170),
+            borderRadius: cqm(20),
             backgroundColor: s.cardBg,
-            border: `${cq(2)} solid ${s.border}`,
-            boxShadow: `0 ${cq(4)} ${cq(16)} rgba(28,20,81,0.08)`,
+            border: `${cqm(2)} solid ${s.border}`,
+            boxShadow: `0 ${cqm(4)} ${cqm(16)} rgba(28,20,81,0.08)`,
+            paddingLeft: cqm(35),
+            paddingRight: cqm(24),
           }}
         >
           {/* icon dalam lingkaran (crop 100x100) */}
           <img
             src={s.icon}
             alt={s.label}
+            className="shrink-0"
             style={{
-              position: "absolute",
-              left: cq(35), // area icon 100px: streak x108 → 108-73 = 35
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: cq(100),
-              height: cq(100),
+              width: cqm(100),
+              height: cqm(100),
               borderRadius: "50%",
             }}
           />
-          {/* judul */}
-          <p
-            className="font-bold"
-            style={{
-              position: "absolute",
-              left: cq(173), // 246-73
-              top: cq(51), // 524-473
-              fontSize: cq(24),
-              lineHeight: 1.25,
-              color: "#454545",
-            }}
+          {/* judul + nilai — center di HP, kiri di desktop */}
+          <div
+            className="flex min-w-0 flex-col items-center text-center mt-[calc(1.6667cqw*var(--pm,1))] md:ml-[2.6389cqw] md:mt-0 md:items-start md:text-left"
+            style={{ gap: cqm(8) }}
           >
-            {s.label}
-          </p>
-          {/* nilai */}
-          <p
-            className="font-bold"
-            style={{
-              position: "absolute",
-              left: cq(173),
-              top: cq(89), // 562-473
-              fontSize: cq(24),
-              lineHeight: 1.25,
-              color: s.valueColor,
-            }}
-          >
-            {s.value}
-          </p>
+            <p
+              className="font-bold"
+              style={{
+                fontSize: cqm(24),
+                lineHeight: 1.25,
+                color: "#454545",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {s.label}
+            </p>
+            <p
+              className="font-bold"
+              style={{
+                fontSize: cqm(24),
+                lineHeight: 1.25,
+                color: s.valueColor,
+              }}
+            >
+              {s.value}
+            </p>
+          </div>
         </div>
       ))}
     </div>

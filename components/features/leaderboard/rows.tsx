@@ -1,6 +1,6 @@
 "use client";
 
-import { cq } from "@/lib/cq";
+import { cqm } from "@/lib/cq";
 
 type Row = {
   rank: string;
@@ -37,14 +37,15 @@ export function LeaderboardRows() {
             key={i}
             style={{
               position: "relative",
-              width: cq(1088),
-              height: cq(128),
+              width: "100%",
+              maxWidth: cqm(1088),
+              height: cqm(128),
               marginInline: "auto",
-              marginTop: cq(marginTop),
-              borderRadius: cq(50),
+              marginTop: cqm(marginTop),
+              borderRadius: cqm(50),
               backgroundColor: "#ffffff",
               boxShadow: r.shadow
-                ? `0 ${cq(4)} ${cq(4)} rgba(0,0,0,0.25)`
+                ? `0 ${cqm(4)} ${cqm(4)} rgba(0,0,0,0.25)`
                 : "none",
             }}
           >
@@ -52,10 +53,10 @@ export function LeaderboardRows() {
             <div
               style={{
                 position: "absolute",
-                left: cq(44),
-                top: cq(39),
-                width: cq(50),
-                height: cq(50),
+                left: cqm(44),
+                top: cqm(39),
+                width: cqm(50),
+                height: cqm(50),
                 borderRadius: "50%",
                 backgroundColor: "#dbe9ea",
                 display: "flex",
@@ -65,7 +66,7 @@ export function LeaderboardRows() {
             >
               <span
                 className="font-bold"
-                style={{ fontSize: cq(24), color: "#272156", lineHeight: 1 }}
+                style={{ fontSize: cqm(24), color: "#272156", lineHeight: 1 }}
               >
                 {r.rank}
               </span>
@@ -77,10 +78,10 @@ export function LeaderboardRows() {
               alt={r.name}
               style={{
                 position: "absolute",
-                left: cq(143),
-                top: cq(22),
-                width: cq(83),
-                height: cq(83),
+                left: cqm(143),
+                top: cqm(22),
+                width: cqm(83),
+                height: cqm(83),
                 borderRadius: "50%",
                 objectFit: "cover",
               }}
@@ -91,9 +92,9 @@ export function LeaderboardRows() {
               className="font-bold"
               style={{
                 position: "absolute",
-                left: cq(311),
-                top: cq(29),
-                fontSize: cq(23),
+                left: cqm(311),
+                top: cqm(29),
+                fontSize: cqm(23),
                 color: "#2a235c",
                 lineHeight: 1.2,
                 margin: 0,
@@ -104,13 +105,13 @@ export function LeaderboardRows() {
 
             {/* icon union-1 (chart) 20×20 */}
             <svg
-              width={cq(20)}
-              height={cq(20)}
               viewBox="0 0 20 20"
               style={{
                 position: "absolute",
-                left: cq(310),
-                top: cq(76),
+                left: cqm(310),
+                top: cqm(76),
+                width: cqm(20),
+                height: cqm(20),
               }}
             >
               <rect x="3" y="10" width="3.5" height="7" rx="1" fill="#1c1451" />
@@ -123,11 +124,11 @@ export function LeaderboardRows() {
               className="font-bold"
               style={{
                 position: "absolute",
-                left: cq(341),
-                top: cq(74),
-                fontSize: cq(19),
+                left: cqm(341),
+                top: cqm(74),
+                fontSize: cqm(19),
                 color: "#2a235c",
-                lineHeight: cq(24),
+                lineHeight: cqm(24),
               }}
             >
               rata {r.accuracy}
@@ -138,11 +139,11 @@ export function LeaderboardRows() {
               className="font-bold"
               style={{
                 position: "absolute",
-                left: cq(468),
-                top: cq(74),
-                fontSize: cq(19),
+                left: cqm(468),
+                top: cqm(74),
+                fontSize: cqm(19),
                 color: "#2a235c",
-                lineHeight: cq(24),
+                lineHeight: cqm(24),
               }}
             >
               {r.points}

@@ -1,6 +1,6 @@
 "use client";
 
-import { cq } from "@/lib/cq";
+import { cqm } from "@/lib/cq";
 
 const ACHIEVEMENTS = [
   {
@@ -9,9 +9,6 @@ const ACHIEVEMENTS = [
     color: "#4b0a95",
     cardBg: "#e0e1ff",
     icon: "/visual/profile/ach-crown.png",
-    iconW: 100,
-    iconH: 98,
-    iconTop: 37, // 777 - 740
   },
   {
     title: "Never Give Up",
@@ -19,9 +16,6 @@ const ACHIEVEMENTS = [
     color: "#4c3100",
     cardBg: "#fff6bf",
     icon: "/visual/profile/ach-medal.png",
-    iconW: 100,
-    iconH: 100,
-    iconTop: 42, // 782 - 740
   },
   {
     title: "Streak Master",
@@ -29,9 +23,6 @@ const ACHIEVEMENTS = [
     color: "#28373f",
     cardBg: "#e3eff6",
     icon: "/visual/profile/ach-shield.png",
-    iconW: 94,
-    iconH: 127,
-    iconTop: 24, // 764 - 740
   },
 ];
 
@@ -40,72 +31,69 @@ export function Achievement() {
     <section>
       <h2
         className="font-bold"
-        style={{ fontSize: cq(32), lineHeight: 1.25, color: "#2a235c" }}
+        style={{ fontSize: cqm(32), lineHeight: 1.25, color: "#2a235c" }}
       >
         Achievment
       </h2>
 
-      <div className="flex w-full" style={{ gap: cq(40), marginTop: cq(25) }}>
+      {/* 1 container untuk semua achievement */}
+      <div
+        className="flex w-full flex-col"
+        style={{
+          gap: cqm(20),
+          marginTop: cqm(25),
+          borderRadius: cqm(20),
+          backgroundColor: "#ffffff",
+          border: `${cqm(2)} solid #e7e2f5`,
+          boxShadow: `0 ${cqm(4)} ${cqm(16)} rgba(28,20,81,0.08)`,
+          padding: cqm(24),
+        }}
+      >
         {ACHIEVEMENTS.map((a) => (
           <div
             key={a.title}
-            className="relative"
+            className="flex w-full items-center"
             style={{
-              width: cq(404),
-              height: cq(231),
-              borderRadius: cq(20),
+              gap: cqm(32),
+              borderRadius: cqm(16),
               backgroundColor: a.cardBg,
-              boxShadow: `0 ${cq(4)} ${cq(16)} rgba(28,20,81,0.08)`,
+              padding: `${cqm(20)} ${cqm(32)}`,
             }}
           >
-            {/* ikon achievement */}
+            {/* ikon */}
             <img
               src={a.icon}
               alt={a.title}
+              className="shrink-0"
               style={{
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)",
-                top: cq(a.iconTop),
-                width: cq(a.iconW),
-                height: cq(a.iconH),
+                width: cqm(88),
+                height: cqm(88),
                 objectFit: "contain",
               }}
             />
-            {/* judul */}
-            <p
-              className="font-bold"
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: cq(143), // 883 - 740
-                fontSize: cq(24),
-                lineHeight: 1.25,
-                color: a.color,
-                textAlign: "center",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {a.title}
-            </p>
-            {/* sub judul */}
-            <p
-              className="font-medium"
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: cq(177), // 917 - 740
-                fontSize: cq(12),
-                lineHeight: 1.25,
-                color: a.color,
-                textAlign: "center",
-                paddingInline: cq(20),
-              }}
-            >
-              {a.subtitle}
-            </p>
+            {/* judul + sub judul */}
+            <div className="flex min-w-0 flex-col" style={{ gap: cqm(8) }}>
+              <p
+                className="font-bold"
+                style={{
+                  fontSize: cqm(24),
+                  lineHeight: 1.25,
+                  color: a.color,
+                }}
+              >
+                {a.title}
+              </p>
+              <p
+                className="font-medium"
+                style={{
+                  fontSize: cqm(16),
+                  lineHeight: 1.4,
+                  color: a.color,
+                }}
+              >
+                {a.subtitle}
+              </p>
+            </div>
           </div>
         ))}
       </div>

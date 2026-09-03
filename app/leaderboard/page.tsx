@@ -4,11 +4,11 @@ import { Navbar } from "@/components/layout/navbar";
 import { LeaderboardHeader } from "@/components/features/leaderboard/header";
 import { Podium } from "@/components/features/leaderboard/podium";
 import { LeaderboardRows } from "@/components/features/leaderboard/rows";
-import { cq } from "@/lib/cq";
+import { cq, cqm } from "@/lib/cq";
 
 export default function LeaderboardPage() {
   return (
-    <main className="min-h-screen w-full bg-[#dbe9ea]">
+    <main className="leaderboard-scope min-h-screen w-full bg-[#dbe9ea]">
       <Navbar />
 
       {/* white sheet (Rectangle 159) — radius atas 70, full-bleed */}
@@ -24,7 +24,7 @@ export default function LeaderboardPage() {
           <h1
             className="font-bold"
             style={{
-              fontSize: cq(64),
+              fontSize: cqm(64),
               color: "#1c1451",
               lineHeight: 1.27,
               margin: 0,
