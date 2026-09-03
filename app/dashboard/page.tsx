@@ -6,57 +6,55 @@ import { PilihanMapel } from "@/components/features/dashboard/pilihan-mapel";
 import { AiDiagnostic } from "@/components/features/dashboard/ai-diagnostic";
 import { PilihPtn } from "@/components/features/dashboard/pilih-ptn";
 import { ReviewWeb } from "@/components/features/dashboard/review-web";
-import { cq, cqm } from "@/lib/cq";
+import { cqm } from "@/lib/cq";
 
 export default function DashboardPage() {
   return (
     <main className="min-h-screen w-full bg-[#dbe9ea]">
       <Navbar />
 
-      {/* Full-bleed white sheet — selebar layar (bukan max 1440), jadi
-          background putih terpakai 100% lebar desktop.
-          Konten di dalamnya diskalakan 50% khusus desktop via --pm
-          (lihat .dashboard-scope di globals.css). */}
+      {/* White sheet — max 1440 (Figma artboard), centered; <1440 full-bleed.
+          Konten di-inset 147px kiri/kanan mengikuti Figma (container x147–1313).
+          Desktop --pm:1 → 1:1 persis Figma; HP --pm:2 → proporsional. */}
       <div
-        className="dashboard-scope relative mx-auto w-full bg-white"
+        className="dashboard-scope relative mx-auto w-full max-w-[1440px] bg-white"
         style={{
           borderTopLeftRadius: cqm(70),
           borderTopRightRadius: cqm(70),
-          paddingInline: cqm(84),
+          paddingInline: cqm(147),
           paddingBottom: cqm(120),
         }}
       >
         {/* Hero */}
         <HeroSection />
 
-        {/* mapel section — gap antar div besar TIDAK ikut skala 50%,
-            pakai cq() utuh supaya tetap lapang & proporsional. */}
-        <div className="mt-[2.5cqw]">
+        {/* Pilihan mapel */}
+        <div style={{ marginTop: cqm(98) }}>
           <PilihanMapel />
         </div>
 
-        {/* AI Diagnostic — lavender band behind (Rectangle 160) */}
+        {/* AI Diagnostic — lavender band full-bleed (Rectangle 160) */}
         <div
           className="relative"
           style={{
             backgroundColor: "#f5eafb",
-            marginTop: cq(150),
-            marginInline: `calc(${cqm(84)} * -1)`,
-            paddingTop: cq(110),
-            paddingBottom: cq(120),
-            paddingInline: cqm(84), // sejajar dgn inset sheet
+            marginTop: cqm(98),
+            marginInline: `calc(${cqm(147)} * -1)`,
+            paddingTop: cqm(50),
+            paddingBottom: cqm(50),
+            paddingInline: cqm(147),
           }}
         >
           <AiDiagnostic />
         </div>
 
-        {/* PILIH PTN */}
-        <div style={{ marginTop: cq(170) }}>
+        {/* Pilih PTN */}
+        <div style={{ marginTop: cqm(60) }}>
           <PilihPtn />
         </div>
 
         {/* Review */}
-        <div style={{ marginTop: cq(150) }}>
+        <div style={{ marginTop: cqm(115) }}>
           <ReviewWeb />
         </div>
       </div>

@@ -22,47 +22,53 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+/**
+ * Urutan kartu mengikuti Figma (kiri → kanan): TKA SMP, TKA SMA, SNBT.
+ * modes[] global urut snbt/sma/smp — hanya tampilan yang diurutkan ulang.
+ */
+const figmaOrder = ["tka-smp", "tka-sma", "snbt"];
+
 export function PilihanMapel() {
   const router = useRouter();
 
+  const ordered = figmaOrder
+    .map((slug) => modes.find((m) => m.slug === slug))
+    .filter(Boolean) as typeof modes;
+
   return (
-    <section
-      className="mapel-scope relative flex w-full items-center justify-center rounded-[calc(4.86cqw*var(--ds,1))]"
-      style={{
-        paddingBlock: cqm(72),
-      }}
-    >
+    <section className="mapel-scope relative flex w-full items-center justify-center">
       {/* outer container — selalu 1 baris 3 kartu (HP + desktop) */}
       <div
-        className="flex w-full flex-row items-center justify-between rounded-[calc(4.86cqw*var(--ds,1))] px-[calc(1.5cqw*var(--ds,1))] py-[calc(4.8cqw*var(--ds,1))] md:px-[calc(3.3cqw*var(--ds,1))]"
+        className="flex w-full flex-row items-center justify-between rounded-[calc(4.86cqw*var(--ds,1))]"
         style={{
           borderStyle: "solid",
           borderWidth: cqm(2),
           borderColor: "rgba(108, 99, 99, 0.5)",
-          gap: cqm(24),
+          gap: cqm(142),
+          paddingBlock: cqm(16),
+          paddingInline: cqm(90),
         }}
       >
-        {modes.map((m) => {
+        {ordered.map((m) => {
           const s = cardStyle[m.slug] ?? cardStyle.snbt;
           return (
             <div
               key={m.slug}
               onClick={() => router.push(`/soal/${m.slug}`)}
-              className="flex max-w-none flex-1 cursor-pointer flex-col items-center justify-between rounded-[calc(1.4cqw*var(--ds,1))] transition hover:brightness-[0.97] md:max-w-[calc(18.0556cqw*var(--pm,1))] md:flex-none"
+              className="flex max-w-none flex-1 cursor-pointer flex-col items-center rounded-[calc(1.4cqw*var(--ds,1))] transition hover:brightness-[0.97] md:max-w-[calc(16.3194cqw*var(--pm,1))] md:flex-none"
               style={{
                 width: "100%",
-                height: cqm(380),
+                height: cqm(313),
                 backgroundColor: s.bg,
                 borderStyle: "solid",
                 borderWidth: cqm(1),
                 borderColor: withAlpha(s.border, 0.5),
                 boxShadow: `0 ${cqm(4)} ${cqm(16)} rgba(28, 20, 81, 0.1), 0 ${cqm(2)} ${cqm(6)} rgba(28, 20, 81, 0.06)`,
-                paddingTop: cqm(64),
-                paddingBottom: cqm(38),
+                paddingTop: cqm(128),
               }}
             >
               <span
-                className="text-center font-bold"
+                className="text-center font-bold leading-[1.2]"
                 style={{ fontSize: cqm(36), color: s.text }}
               >
                 {m.name}
@@ -70,12 +76,12 @@ export function PilihanMapel() {
               <Link
                 href={`/soal/${m.slug}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90"
+                className="mt-[calc(6.1806cqw*var(--ds,1))] flex items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90"
                 style={{
                   width: cqm(101),
-                  height: cqm(36),
+                  height: cqm(30),
                   backgroundColor: s.btn,
-                  fontSize: cqm(16),
+                  fontSize: cqm(15),
                 }}
               >
                 Mulai

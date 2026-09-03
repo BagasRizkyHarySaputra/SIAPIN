@@ -43,7 +43,7 @@ export function AiDiagnostic() {
         <div>
           <h2
             className="font-bold"
-            style={{ fontSize: cqm(36), color: "#1c1451" }}
+            style={{ fontSize: cqm(24), color: "#1c1451" }}
           >
             Diagnostic AI
           </h2>
@@ -149,7 +149,7 @@ export function AiDiagnostic() {
         <div className="flex flex-wrap items-center justify-between gap-[calc(1cqw*var(--ds,1))]">
           <h3
             className="font-bold"
-            style={{ fontSize: cqm(36), color: "#1c1451" }}
+            style={{ fontSize: cqm(24), color: "#1c1451" }}
           >
             Grafik Diagnostic
           </h3>
