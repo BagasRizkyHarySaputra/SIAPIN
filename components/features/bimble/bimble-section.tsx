@@ -170,10 +170,40 @@ function TeacherCard({
   onSelect?: (id: string) => void;
 }) {
   const gradId = useId().replace(/:/g, "");
+  // Fallback HP: sebagian browser mobile (mis. Firefox) gagal synthesize
+  // click setelah tap → tangani langsung di pointerup. Track posisi awal utk
+  // membedakan tap (buka popup) vs scroll (jangan buka). Karena onSelect
+  // bersifat toggle, click sintetik yang menyusul di-suppress (anti dobel).
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const suppressClick = useRef(false);
   return (
     <button
       type="button"
-      onClick={() => onSelect?.(t.id)}
+      onClick={() => {
+        if (suppressClick.current) {
+          suppressClick.current = false;
+          return;
+        }
+        onSelect?.(t.id);
+      }}
+      onPointerDown={(e) => {
+        touchStart.current = { x: e.clientX, y: e.clientY };
+      }}
+      onPointerUp={(e) => {
+        if (e.pointerType !== "touch") return;
+        const s = touchStart.current;
+        const dist = s
+          ? Math.hypot(e.clientX - s.x, e.clientY - s.y)
+          : Infinity;
+        if (dist <= 10) {
+          suppressClick.current = true;
+          onSelect?.(t.id);
+        }
+        touchStart.current = null;
+      }}
+      onPointerCancel={() => {
+        touchStart.current = null;
+      }}
       className="flex items-center rounded-[5.56cqw] text-left transition hover:brightness-[0.92] active:brightness-[0.85]"
       style={{
         width: "100%",
