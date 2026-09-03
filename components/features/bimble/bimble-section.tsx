@@ -341,6 +341,11 @@ export function GuruCards({
             aria-label="Halaman sebelumnya"
             disabled={safePage === 1}
             onClick={() => goTo(safePage - 1)}
+            onPointerUp={(e) => {
+              // Fallback HP: sebagian browser mobile (mis. Firefox) gagal
+              // synthesize click setelah tap → tangani langsung di pointerup.
+              if (e.pointerType === "touch" && safePage > 1) goTo(safePage - 1);
+            }}
             style={{
               ...navBtn,
               opacity: safePage === 1 ? 0.4 : 1,
@@ -390,6 +395,9 @@ export function GuruCards({
                   key={n}
                   type="button"
                   onClick={() => goTo(n)}
+                  onPointerUp={(e) => {
+                    if (e.pointerType === "touch") goTo(n);
+                  }}
                   aria-current={n === safePage ? "page" : undefined}
                   aria-label={`Halaman ${n}`}
                   style={{
@@ -425,6 +433,10 @@ export function GuruCards({
             aria-label="Halaman berikutnya"
             disabled={safePage === totalPages}
             onClick={() => goTo(safePage + 1)}
+            onPointerUp={(e) => {
+              if (e.pointerType === "touch" && safePage < totalPages)
+                goTo(safePage + 1);
+            }}
             style={{
               ...navBtn,
               opacity: safePage === totalPages ? 0.4 : 1,

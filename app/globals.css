@@ -71,7 +71,6 @@
   transition:
     background-color 0.15s ease,
     box-shadow 0.15s ease,
-    transform 0.1s ease,
     color 0.15s ease,
     border-color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
@@ -83,7 +82,7 @@
 }
 .bimble-nav-btn:active:not(:disabled) {
   background-color: #1c1451;
-  transform: scale(0.92);
+  box-shadow: 0 2px 0 rgba(28, 20, 81, 0.35);
 }
 .bimble-nav-btn:active:not(:disabled) svg {
   stroke: #ffffff;
@@ -100,7 +99,6 @@
 .bimble-page-btn:active {
   background-color: #1c1451;
   color: #ffffff;
-  transform: scale(0.9);
 }
 
 /* ===== Bimble: animasi saat halaman kartu berganti (flip/fade masuk) ===== */
