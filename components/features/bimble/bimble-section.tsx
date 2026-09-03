@@ -163,12 +163,10 @@ function Star({ value, gradId }: { value: number; gradId: string }) {
 function TeacherCard({
   t,
   active,
-  slim,
   onSelect,
 }: {
   t: (typeof TEACHERS)[number];
   active?: boolean;
-  slim?: boolean;
   onSelect?: (id: string) => void;
 }) {
   const gradId = useId().replace(/:/g, "");
@@ -178,7 +176,7 @@ function TeacherCard({
       onClick={() => onSelect?.(t.id)}
       className="flex items-center rounded-[5.56cqw] text-left transition hover:brightness-[0.92] active:brightness-[0.85]"
       style={{
-        width: slim ? cq(738) : "100%",
+        width: "100%",
         height: cq(209),
         minHeight: cq(209),
         backgroundColor: t.bg,
@@ -257,21 +255,14 @@ function getPageNumbers(current: number, total: number): (number | "…")[] {
 /** Daftar kartu guru + pagination — 7 max per page, panah kiri/kanan putih. */
 export function GuruCards({
   activeId,
-  slim,
   onSelect,
   pageSize = PAGE_SIZE,
   onPageChange,
-  detailNode,
-  detailAfterId,
 }: {
   activeId?: string | null;
-  slim?: boolean;
   onSelect?: (id: string) => void;
   pageSize?: number;
   onPageChange?: () => void;
-  /** (mobile) node yang disisipkan tepat setelah kartu dgn id === detailAfterId */
-  detailNode?: React.ReactNode;
-  detailAfterId?: string | null;
 }) {
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
@@ -287,8 +278,12 @@ export function GuruCards({
     if (next === safePage) return;
     setPage(next);
     onPageChange?.();
+    // Scroll halus ke puncak daftar kartu SETELAH render halaman baru,
+    // supaya perubahan kartu terlihat jelas (animasi flip di `.bimble-page-enter`).
     requestAnimationFrame(() => {
-      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      requestAnimationFrame(() => {
+        topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
   }
 
@@ -297,6 +292,7 @@ export function GuruCards({
     height: cq(84),
     minWidth: 44,
     minHeight: 44,
+    flexShrink: 0,
     borderRadius: 9999,
     backgroundColor: "#ffffff",
     border: `${cq(3)} solid #c9cef4`,
@@ -312,17 +308,18 @@ export function GuruCards({
   return (
     <div>
       <div ref={topRef} style={{ scrollMarginTop: cq(24) }} />
-      <div key={`page-${safePage}`} className="flex flex-col" style={{ gap: cq(34) }}>
+      <div
+        key={`page-${safePage}`}
+        className="bimble-page-enter flex flex-col"
+        style={{ gap: cq(34) }}
+      >
         {visible.map((t) => (
-          <div key={t.id} className="flex flex-col" style={{ gap: cq(34) }}>
-            <TeacherCard
-              t={t}
-              active={activeId === t.id}
-              slim={slim}
-              onSelect={onSelect}
-            />
-            {detailNode && detailAfterId === t.id && detailNode}
-          </div>
+          <TeacherCard
+            key={t.id}
+            t={t}
+            active={activeId === t.id}
+            onSelect={onSelect}
+          />
         ))}
       </div>
 
@@ -330,11 +327,12 @@ export function GuruCards({
         <div
           className="flex items-center justify-center"
           style={{
-            gap: cq(18),
+            gap: `max(${cq(18)}, 16px)`,
             marginTop: cq(72),
+            marginBottom: cq(8),
             position: "relative",
             zIndex: 10,
-            flexWrap: "wrap",
+            flexWrap: "nowrap",
           }}
         >
           {/* panah kiri */}
@@ -348,7 +346,7 @@ export function GuruCards({
               opacity: safePage === 1 ? 0.4 : 1,
               cursor: safePage === 1 ? "not-allowed" : "pointer",
             }}
-            className="transition hover:brightness-[0.94]"
+            className="bimble-nav-btn"
           >
             <svg
               viewBox="0 0 16 16"
@@ -368,11 +366,12 @@ export function GuruCards({
           <div
             className="flex items-center"
             style={{
-              gap: cq(16),
+              gap: `max(${cq(16)}, 12px)`,
+              flexShrink: 0,
               backgroundColor: "#ffffff",
               border: `${cq(3)} solid #c9cef4`,
               borderRadius: 9999,
-              paddingInline: cq(28),
+              paddingInline: `max(${cq(28)}, 14px)`,
               height: cq(84),
               minHeight: 44,
             }}
@@ -394,15 +393,17 @@ export function GuruCards({
                   aria-current={n === safePage ? "page" : undefined}
                   aria-label={`Halaman ${n}`}
                   style={{
-                    minWidth: cq(64),
+                    minWidth: `max(${cq(64)}, 40px)`,
+                    minHeight: `max(${cq(64)}, 40px)`,
                     height: cq(64),
+                    flexShrink: 0,
                     borderRadius: 9999,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     paddingInline: cq(8),
-                    backgroundColor: n === safePage ? "#1c1451" : "transparent",
                     color: n === safePage ? "#ffffff" : "#1c1451",
+                    backgroundColor: n === safePage ? "#1c1451" : undefined,
                     border: "none",
                     fontSize: cq(54),
                     fontWeight: 700,
@@ -410,7 +411,7 @@ export function GuruCards({
                     cursor: "pointer",
                     touchAction: "manipulation",
                   }}
-                  className="transition hover:brightness-[0.94]"
+                  className="bimble-page-btn"
                 >
                   {n}
                 </button>
@@ -429,7 +430,7 @@ export function GuruCards({
               opacity: safePage === totalPages ? 0.4 : 1,
               cursor: safePage === totalPages ? "not-allowed" : "pointer",
             }}
-            className="transition hover:brightness-[0.94]"
+            className="bimble-nav-btn"
           >
             <svg
               viewBox="0 0 16 16"

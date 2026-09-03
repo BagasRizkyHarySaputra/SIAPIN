@@ -11,15 +11,14 @@ import {
   TeacherPanel,
 } from "@/components/features/bimble/teacher-panel";
 import { cq } from "@/lib/cq";
-import { useIsDesktop } from "@/lib/use-media-query";
 
 export default function BimblePage() {
   // null = state normal (frame 333-496); terisi = state "click" (frame 333-1055)
   const [selected, setSelected] = useState<string | null>(null);
-  const isDesktop = useIsDesktop();
   const active = selected ? TEACHER_PANEL_DATA[selected] : undefined;
 
   const handleSelect = (id: string) => setSelected(id === selected ? null : id);
+  const close = () => setSelected(null);
 
   return (
     <main
@@ -55,49 +54,32 @@ export default function BimblePage() {
             paddingInline: cq(84),
           }}
         >
-          {active ? (
-            isDesktop ? (
-              /* Desktop: kartu menyempit (738) di kiri + panel profil di kanan.
-                 Figma: kartu x64..802, panel x854..1374, gap 52.
-                 Band padding kiri 84 → marginLeft -20 agar mulai di 64. */
-              <div
-                className="flex items-start"
-                style={{ marginLeft: `calc(${cq(84)} * -1 + ${cq(64)})` }}
-              >
-                <div className="flex flex-col" style={{ width: cq(738) }}>
-                  <GuruCards
-                    activeId={selected}
-                    slim
-                    onSelect={handleSelect}
-                    onPageChange={() => setSelected(null)}
-                  />
-                </div>
-                <div style={{ width: cq(52), flexShrink: 0 }} />
-                <div style={{ width: cq(520), flexShrink: 0 }}>
-                  <TeacherPanel t={active} onClose={() => setSelected(null)} />
-                </div>
-              </div>
-            ) : (
-              /* Mobile/HP: panel disisipkan tepat di bawah kartu yang dipilih
-                 ("muncul dari card ke bawah card"). Kartu lain & arrow tetap
-                 full-width sehingga tetap bisa diketuk. */
+          {/*
+            SATU struktur untuk desktop & HP — layout diatur CSS murni
+            (.bimble-area di globals.css). Tidak ada branching JSX berbasis
+            media-query → tidak ada hydration mismatch → klik/state selalu jalan.
+
+            - Desktop (≥768px): .bimble-area--active = row → kartu menyempit
+              (51.25cqw ≈ 738) di kiri + panel (36.11cqw ≈ 520) di kanan (1:1 Figma).
+            - HP (<768px): .bimble-area--active = column → kartu full-width,
+              panel muncul di bawah area kartu.
+          */}
+          <div
+            className={active ? "bimble-area bimble-area--active" : "bimble-area"}
+          >
+            <div className="bimble-cards">
               <GuruCards
                 activeId={selected}
                 onSelect={handleSelect}
-                onPageChange={() => setSelected(null)}
-                detailNode={
-                  <TeacherPanel t={active} onClose={() => setSelected(null)} />
-                }
-                detailAfterId={selected}
+                onPageChange={close}
               />
-            )
-          ) : (
-            <GuruCards
-              activeId={selected}
-              onSelect={handleSelect}
-              onPageChange={() => setSelected(null)}
-            />
-          )}
+            </div>
+            {active && (
+              <div className="bimble-panel">
+                <TeacherPanel t={active} onClose={close} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </main>

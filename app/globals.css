@@ -1,26 +1,238 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===== SIAPIN design tokens (extracted from Figma "ITechno - Web Development") ===== */
+@theme {
+  /* Brand palette */
+  --color-primary: #1c1451;        /* deep indigo — dominant bg/sidebar */
+  --color-primary-700: #2a235c;    /* lighter indigo */
+  --color-primary-800: #272156;
+  --color-primary-900: #151040;
+
+  --color-accent: #f0f54b;         /* neon lime — primary CTA */
+  --color-accent-dark: #ccd22a;
+
+  --color-blush: #f5c3c2;          /* soft pink */
+  --color-blush-dark: #e3aec2;
+  --color-blush-pale: #f4e0df;
+  --color-magenta: #df5b97;        /* hot pink accent */
+
+  --color-lavender: #c9cef4;
+  --color-lilac: #cfb1ed;
+  --color-periwinkle: #5858b8;
+
+  --color-mint: #dbe9ea;
+  --color-amber: #ffce51;
+  --color-gold: #ffc500;
+  --color-orange: #ff7324;
+  --color-green: #688d37;
+
+  /* Fonts */
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-baloo), ui-sans-serif, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: #faf9ff;
+    color: var(--color-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* subtle card lift */
+  .card-shadow {
+    box-shadow: 0 2px 10px rgba(28, 20, 81, 0.06), 0 10px 30px -10px rgba(28, 20, 81, 0.12);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ===== Profile HP scale: 1x desktop, 2x HP (<768px) ===== */
+/* Dipakai bareng helper cqm() dari lib/cq. Semua ukuran di dalam
+   .profile-scope dikali --pm → proporsional, desktop tidak berubah. */
+.profile-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .profile-scope {
+    --pm: 2;
+  }
+}
+
+/* ===== Bimble pagination: hover/active jelas utk tombol panah & nomor ===== */
+.bimble-nav-btn,
+.bimble-page-btn {
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.bimble-nav-btn:hover:not(:disabled) {
+  background-color: #e9e6fb;
+  border-color: #1c1451;
+  box-shadow: 0 2px 8px rgba(28, 20, 81, 0.25);
+}
+.bimble-nav-btn:active:not(:disabled) {
+  background-color: #1c1451;
+  transform: scale(0.92);
+}
+.bimble-nav-btn:active:not(:disabled) svg {
+  stroke: #ffffff;
+}
+.bimble-nav-btn:disabled {
+  cursor: not-allowed;
+}
+.bimble-page-btn {
+  background-color: transparent;
+}
+.bimble-page-btn:hover {
+  background-color: #ece9f8;
+}
+.bimble-page-btn:active {
+  background-color: #1c1451;
+  color: #ffffff;
+  transform: scale(0.9);
+}
+
+/* ===== Bimble: animasi saat halaman kartu berganti (flip/fade masuk) ===== */
+.bimble-page-enter {
+  animation: bimblePageFlip 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+@keyframes bimblePageFlip {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) rotateX(-8deg) translateY(14px) scale(0.985);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(900px) rotateX(0deg) translateY(0) scale(1);
+  }
+}
+
+/* ===== Leaderboard rows HP scale: 1x desktop, 2x HP (<768px) ===== */
+/* Sama seperti .profile-scope tapi khusus list peringkat 4–10. */
+.leaderboard-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .leaderboard-scope {
+    --pm: 2;
+  }
+}
+
+/* ===== Bimble popup layout: desktop row / HP column (CSS murni) =====
+   Satu struktur JSX (app/bimble/page.tsx) — layout diatur di sini sehingga
+   tidak ada hydration mismatch & klik/state selalu jalan di semua perangkat.
+
+   .bimble-area       : container normal (hanya daftar kartu, full-width).
+   .bimble-area--active: state popup terbuka.
+   Nilai pakai cqw terhadap <main> (container-type: inline-size) = % dari
+   viewport (main full-width). */
+.bimble-area {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.bimble-area > .bimble-cards {
+  width: 100%;
+}
+.bimble-area > .bimble-panel {
+  display: none;
+}
+
+/* Popup terbuka: kartu list biasa (full) — panel disembunyikan di belakang
+   state; dipakai juga sebagai "kosong". */
+.bimble-area--active {
+  gap: calc(5.5556cqw * var(--pm, 1));
+}
+
+/* Desktop: kartu menyempit 51.25cqw (≈738px di 1440) + panel 36.11cqw (≈520px).
+   Sesuai Figma frame 333-1055: kartu x64..802, gap 52, panel x854..1374.
+   Band padding kiri 84cqw -> margin kiri -4.4444cqw agar mulai di x64. */
+@media (min-width: 768px) {
+  .bimble-area--active {
+    flex-direction: row;
+    align-items: flex-start;
+    margin-left: calc(4.4444cqw * -1 + 4.4444cqw); /* 0 — kartu tetap di x84 */
+  }
+  .bimble-area--active > .bimble-cards {
+    width: 51.25cqw; /* 738 */
+    flex-shrink: 0;
+  }
+  .bimble-area--active > .bimble-panel {
+    display: block;
+    width: 36.1111cqw; /* 520 */
+    flex-shrink: 0;
+    margin-left: 3.6111cqw; /* 52 */
+  }
+}
+
+/* HP (<768px): popup muncul di bawah daftar kartu ("dari card ke bawah").
+   Kartu tetap full-width sehingga arrow & kartu lain selalu bisa diketuk. */
+@media (max-width: 767px) {
+  .bimble-area--active {
+    flex-direction: column;
+  }
+  .bimble-area--active > .bimble-panel {
+    display: block;
+    width: 100%;
+    margin-top: calc(2.3611cqw * 2); /* ruang antar kartu ~34px */
+  }
+}
+
+/* ===== Navbar HP scale: 1x desktop, 2x HP (<768px) ===== */
+/* Navbar dipakai semua halaman; di HP tampil 2 baris (logo+streak, menu). */
+.nav-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .nav-scope {
+    --pm: 2;
+  }
+}
+
+/* ===== Dashboard HP scale: 1x desktop, 2x HP (<768px) ===== */
+/* Satu scope untuk hero, mapel, AI diagnostic, PTN, dan review. */
+.dashboard-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .dashboard-scope {
+    --pm: 2;
+  }
+}
+
+/* ===== Pilihan mapel: tetap 1 baris 3 kartu di HP → skala lokal 1.6x ===== */
+/* 2x tidak muat (butuh ~423px untuk ruang ~273px); 1.6x pas 1 baris. */
+.mapel-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .mapel-scope {
+    --pm: 1.6;
+  }
+}
+
+/* ===== AI diagnostic: tetap 1 baris 2 panel di HP → skala lokal 1.3x ===== */
+/* 2x butuh ~430px untuk ruang 344px; 1.3x maksimal yang muat sejajar. */
+.ai-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .ai-scope {
+    --pm: 1.3;
+  }
 }
