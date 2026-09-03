@@ -178,16 +178,47 @@
   }
 }
 
-/* HP (<768px): popup muncul di bawah daftar kartu ("dari card ke bawah").
-   Kartu tetap full-width sehingga arrow & kartu lain selalu bisa diketuk. */
+/* HP (<768px): panel detail disisipkan (panelNode) tepat di bawah kartu aktif,
+   menimpa kartu-kartu di bawahnya — seperti membuka lembaran dari belakang kartu.
+   Kartu tetap bisa diketuk; panel di-absolute sehingga tidak menggeser layout. */
 @media (max-width: 767px) {
   .bimble-area--active {
     flex-direction: column;
   }
   .bimble-area--active > .bimble-panel {
-    display: block;
+    /* panel kanan (desktop) tidak dipakai di HP — panel ada di dalam daftar */
+    display: none;
+  }
+  .bimble-mobile-panel {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 2.3611cqw); /* 34px Figma — rapat di bawah kartu */
     width: 100%;
-    margin-top: calc(2.3611cqw * 2); /* ruang antar kartu ~34px */
+    z-index: 3;
+    transform-origin: top center;
+    animation: bimblePanelOpen 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 1.3889cqw; /* ikut sudut TeacherPanel */
+    /* Shadow tegas: memberi kesan panel "terangkat" menimpa kartu bawah */
+    box-shadow: 0 1.1111cqw 2.7778cqw rgba(28, 20, 81, 0.22);
+  }
+  .bimble-mobile-panel > * {
+    width: 100%;
+  }
+  @keyframes bimblePanelOpen {
+    0% {
+      opacity: 0;
+      transform: translateY(-12px) scaleY(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scaleY(1);
+    }
+  }
+}
+/* Desktop: panel mobile disembunyikan — pakai .bimble-panel di kanan. */
+@media (min-width: 768px) {
+  .bimble-mobile-panel {
+    display: none;
   }
 }
 
@@ -275,6 +306,16 @@
   .soal-popup-backdrop,
   .soal-popup-panel {
     animation: none;
+  }
+}
+
+/* ===== Auth popup: skala lokal 3x di HP (sebelumnya 2x, +50%) ===== */
+.auth-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .auth-scope {
+    --pm: 3;
   }
 }
 

@@ -288,11 +288,15 @@ export function GuruCards({
   onSelect,
   pageSize = PAGE_SIZE,
   onPageChange,
+  panelNode,
 }: {
   activeId?: string | null;
   onSelect?: (id: string) => void;
   pageSize?: number;
   onPageChange?: () => void;
+  /** Panel detail guru utk HP — disisipkan tepat setelah kartu aktif
+      (menimpa kartu di bawahnya). Desktop memakai `.bimble-panel` di kanan. */
+  panelNode?: React.ReactNode;
 }) {
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
@@ -344,14 +348,27 @@ export function GuruCards({
           minHeight: `calc(${cq(209)} * ${PAGE_SIZE} + ${cq(34)} * ${PAGE_SIZE - 1})`,
         }}
       >
-        {visible.map((t) => (
-          <TeacherCard
-            key={t.id}
-            t={t}
-            active={activeId === t.id}
-            onSelect={onSelect}
-          />
-        ))}
+        {visible.map((t) => {
+          const isActive = activeId === t.id;
+          return (
+            <div
+              key={t.id}
+              className="relative"
+              style={{ zIndex: isActive ? 2 : 1 }}
+            >
+              <TeacherCard
+                t={t}
+                active={isActive}
+                onSelect={onSelect}
+              />
+              {/* HP: panel detail disisipkan tepat di bawah kartu aktif,
+                  menimpa kartu di bawahnya (lihat .bimble-mobile-panel). */}
+              {isActive && panelNode && (
+                <div className="bimble-mobile-panel">{panelNode}</div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {totalPages > 1 && (

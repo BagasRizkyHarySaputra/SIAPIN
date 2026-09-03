@@ -61,8 +61,9 @@ export default function BimblePage() {
 
             - Desktop (≥768px): .bimble-area--active = row → kartu menyempit
               (51.25cqw ≈ 738) di kiri + panel (36.11cqw ≈ 520) di kanan (1:1 Figma).
-            - HP (<768px): .bimble-area--active = column → kartu full-width,
-              panel muncul di bawah area kartu.
+            - HP (<768px): panel detail disisipkan tepat di bawah kartu aktif
+              (panelNode → .bimble-mobile-panel), menimpa kartu di bawahnya;
+              .bimble-panel kanan disembunyikan.
           */}
           <div
             className={active ? "bimble-area bimble-area--active" : "bimble-area"}
@@ -72,6 +73,11 @@ export default function BimblePage() {
                 activeId={selected}
                 onSelect={handleSelect}
                 onPageChange={close}
+                panelNode={
+                  active ? (
+                    <TeacherPanel t={active} onClose={close} />
+                  ) : undefined
+                }
               />
             </div>
             {active && (
