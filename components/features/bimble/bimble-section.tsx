@@ -1,39 +1,148 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useRef, useState } from "react";
 import { cq } from "@/lib/cq";
 
-/** Data 3 guru — 1:1 dari Figma BIMBLE (frame 333-496). */
+/** Pagination: 7 card max per page. Total pages = ceil(TEACHERS.length / PAGE_SIZE). */
+const PAGE_SIZE = 7;
+
+/** Data 13 guru — 3 asli Figma + 10 dummy. */
 const TEACHERS = [
   {
+    id: "pudjo",
     name: "Mr. Pudjo",
     subject: "Matematika  - SNBT - TKA",
     siswa: "(130 Siswa)",
     bg: "#e3aec2",
+    shadow: "#d77d9f",
     avatar: "/visual/bimble/guru-pudjo.png",
-    stars: [1, 1, 1, 1, 0.5], // 4 gold + 1 half
+    stars: [1, 1, 1, 1, 0.5] as number[], // 4 gold + 1 half
   },
   {
+    id: "nisa",
     name: "Miss. Nisa",
     subject: "Kimia - TKA SMA",
     siswa: "(100 Siswa)",
     bg: "#c9cef4",
+    shadow: "#939ded",
     avatar: "/visual/bimble/guru-nisa.png",
-    stars: [1, 1, 1, 1, 0], // 4 gold + 1 gray
+    stars: [1, 1, 1, 1, 0] as number[], // 4 gold + 1 gray
   },
   {
+    id: "nur",
     name: "Miss. Nur",
     subject: "Fisika - SNBT - TKA",
     siswa: "(70 Siswa)",
     bg: "#cfedc0",
+    shadow: "#aae38d",
     avatar: "/visual/bimble/guru-nur.png",
-    stars: [1, 1, 1, 0, 0], // 3 gold + 2 gray
+    stars: [1, 1, 1, 0, 0] as number[], // 3 gold + 2 gray
+  },
+  {
+    id: "budi",
+    name: "Mr. Budi",
+    subject: "Matematika - TKA SMA",
+    siswa: "(85 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 1, 0] as number[],
+  },
+  {
+    id: "sari",
+    name: "Miss. Sari",
+    subject: "Biologi - SNBT",
+    siswa: "(95 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0.5] as number[],
+  },
+  {
+    id: "agus",
+    name: "Mr. Agus",
+    subject: "Fisika - TKA SMA",
+    siswa: "(60 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 0, 0] as number[],
+  },
+  {
+    id: "dewi",
+    name: "Miss. Dewi",
+    subject: "B. Inggris - SNBT",
+    siswa: "(110 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 1] as number[],
+  },
+  {
+    id: "rian",
+    name: "Mr. Rian",
+    subject: "Ekonomi - TKA SMA",
+    siswa: "(75 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 0.5, 0] as number[],
+  },
+  {
+    id: "putri",
+    name: "Miss. Putri",
+    subject: "Kimia - SNBT",
+    siswa: "(120 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0.5] as number[],
+  },
+  {
+    id: "dimas",
+    name: "Mr. Dimas",
+    subject: "B. Indonesia - TKA SMP",
+    siswa: "(65 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 0, 0] as number[],
+  },
+  {
+    id: "ayu",
+    name: "Miss. Ayu",
+    subject: "Matematika - SNBT",
+    siswa: "(90 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-nur.png",
+    stars: [1, 1, 1, 1, 0] as number[],
+  },
+  {
+    id: "fajar",
+    name: "Mr. Fajar",
+    subject: "Sejarah - TKA SMA",
+    siswa: "(55 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 0.5, 0, 0] as number[],
+  },
+  {
+    id: "intan",
+    name: "Miss. Intan",
+    subject: "PKN - SNBT",
+    siswa: "(80 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0] as number[],
   },
 ];
 
 function Star({ value, gradId }: { value: number; gradId: string }) {
   return (
-    <svg viewBox="0 0 18 17" style={{ width: cq(18), height: cq(17) }} aria-hidden>
+    <svg viewBox="0 0 18 17" style={{ width: cq(23.4), height: cq(22.1) }} aria-hidden>
       {value === 0.5 && (
         <defs>
           <linearGradient id={gradId}>
@@ -51,19 +160,36 @@ function Star({ value, gradId }: { value: number; gradId: string }) {
 }
 
 /** Satu kartu guru — 1:1 dari grup 'profile guru' (Rectangle 83 + image 27 + teks). */
-function TeacherCard({ t }: { t: (typeof TEACHERS)[number] }) {
+function TeacherCard({
+  t,
+  active,
+  slim,
+  onSelect,
+}: {
+  t: (typeof TEACHERS)[number];
+  active?: boolean;
+  slim?: boolean;
+  onSelect?: (id: string) => void;
+}) {
   const gradId = useId().replace(/:/g, "");
   return (
-    <div
-      className="flex items-center rounded-[5.56cqw]"
+    <button
+      type="button"
+      onClick={() => onSelect?.(t.id)}
+      className="flex items-center rounded-[5.56cqw] text-left transition hover:brightness-[0.92] active:brightness-[0.85]"
       style={{
-        width: "100%",
+        width: slim ? cq(738) : "100%",
         height: cq(209),
         backgroundColor: t.bg,
         borderRadius: cq(80),
-        boxShadow: `0 ${cq(4)} ${cq(4)} rgba(108, 99, 99, 0.35)`,
+        boxShadow: `0 ${cq(4)} ${cq(4)} ${t.shadow}`,
         paddingLeft: cq(55),
         paddingRight: cq(64),
+        cursor: "pointer",
+        transition:
+          "width 0.3s ease, transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease",
+        outline: active ? `${cq(2)} solid rgba(28,20,81,0.45)` : "none",
+        ...(active ? { transform: "scale(1.01)" } : {}),
       }}
     >
       {/* Avatar — crop 124x124; lingkaran foto di tengah, pojok = warna kartu (di-clip) */}
@@ -79,44 +205,237 @@ function TeacherCard({ t }: { t: (typeof TEACHERS)[number] }) {
       </div>
 
       {/* Teks nama / mapel / rating */}
-      <div className="flex min-w-0 flex-col justify-center" style={{ marginLeft: cq(56) }}>
+      <div className="flex min-w-0 flex-col justify-center" style={{ marginLeft: cq(72.8) }}>
         <span
           className="truncate font-bold"
-          style={{ fontSize: cq(32), color: "#1c1451", lineHeight: 1.26 }}
+          style={{ fontSize: cq(41.6), color: "#1c1451", lineHeight: 1.26 }}
         >
           {t.name}
         </span>
         <span
-          className="mt-[0.35cqw] truncate font-bold"
-          style={{ fontSize: cq(20), color: "#1c1451", lineHeight: 1.26 }}
+          className="mt-[0.455cqw] truncate font-bold"
+          style={{ fontSize: cq(26), color: "#1c1451", lineHeight: 1.26 }}
         >
           {t.subject}
         </span>
-        <div className="mt-[0.55cqw] flex items-center">
-          <div className="flex items-center" style={{ gap: cq(4) }}>
+        <div className="mt-[0.715cqw] flex items-center">
+          <div className="flex items-center" style={{ gap: cq(5.2) }}>
             {t.stars.map((v, i) => (
               <Star key={i} value={v} gradId={`${gradId}-s${i}`} />
             ))}
           </div>
           <span
             className="font-bold"
-            style={{ fontSize: cq(20), color: "#7e7e7e", marginLeft: cq(10) }}
+            style={{ fontSize: cq(26), color: "#7e7e7e", marginLeft: cq(13) }}
           >
             {t.siswa}
           </span>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
-/** Daftar 3 kartu guru — dirender di atas band lavender (Rectangle 160). */
-export function GuruCards() {
+export type BimbleTeacher = (typeof TEACHERS)[number];
+
+/** Nomor halaman: 1 … N, dengan "…" kalau halamannya banyak (mis. 1 … 10). */
+function getPageNumbers(current: number, total: number): (number | "…")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages = new Set<number>([1, total, current - 1, current, current + 1]);
+  const sorted = [...pages].filter((p) => p >= 1 && p <= total).sort((a, b) => a - b);
+  const out: (number | "…")[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    out.push(sorted[i]);
+    if (i < sorted.length - 1 && sorted[i + 1] - sorted[i] > 1) out.push("…");
+  }
+  return out;
+}
+
+/** Daftar kartu guru + pagination — 7 max per page, panah kiri/kanan putih. */
+export function GuruCards({
+  activeId,
+  slim,
+  onSelect,
+  pageSize = PAGE_SIZE,
+  onPageChange,
+}: {
+  activeId?: string | null;
+  slim?: boolean;
+  onSelect?: (id: string) => void;
+  pageSize?: number;
+  onPageChange?: () => void;
+}) {
+  const [page, setPage] = useState(1);
+  const topRef = useRef<HTMLDivElement>(null);
+  const totalPages = Math.max(1, Math.ceil(TEACHERS.length / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const start = (safePage - 1) * pageSize;
+  const visible = TEACHERS.slice(start, start + pageSize);
+  const numbers = getPageNumbers(safePage, totalPages);
+
+  /** Panah kanan → load 7 card lanjutan (replace), kiri → sebaliknya. */
+  function goTo(p: number) {
+    const next = Math.min(Math.max(1, p), totalPages);
+    if (next === safePage) return;
+    setPage(next);
+    onPageChange?.();
+    requestAnimationFrame(() => {
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  const navBtn: React.CSSProperties = {
+    width: cq(84),
+    height: cq(84),
+    minWidth: 44,
+    minHeight: 44,
+    borderRadius: 9999,
+    backgroundColor: "#ffffff",
+    border: `${cq(3)} solid #c9cef4`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    touchAction: "manipulation",
+    position: "relative",
+    zIndex: 10,
+  };
+
   return (
-    <div className="flex flex-col" style={{ gap: cq(34) }}>
-      {TEACHERS.map((t) => (
-        <TeacherCard key={t.name} t={t} />
-      ))}
+    <div>
+      <div ref={topRef} style={{ scrollMarginTop: cq(24) }} />
+      <div key={`page-${safePage}`} className="flex flex-col" style={{ gap: cq(34) }}>
+        {visible.map((t) => (
+          <TeacherCard
+            key={t.id}
+            t={t}
+            active={activeId === t.id}
+            slim={slim}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div
+          className="flex items-center justify-center"
+          style={{
+            gap: cq(18),
+            marginTop: cq(72),
+            position: "relative",
+            zIndex: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* panah kiri */}
+          <button
+            type="button"
+            aria-label="Halaman sebelumnya"
+            disabled={safePage === 1}
+            onClick={() => goTo(safePage - 1)}
+            style={{
+              ...navBtn,
+              opacity: safePage === 1 ? 0.4 : 1,
+              cursor: safePage === 1 ? "not-allowed" : "pointer",
+            }}
+            className="transition hover:brightness-[0.94]"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              style={{ width: cq(45), height: cq(45) }}
+              fill="none"
+              stroke="#1c1451"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M10 3L5 8l5 5" />
+            </svg>
+          </button>
+
+          {/* nomor halaman dalam 1 div putih */}
+          <div
+            className="flex items-center"
+            style={{
+              gap: cq(16),
+              backgroundColor: "#ffffff",
+              border: `${cq(3)} solid #c9cef4`,
+              borderRadius: 9999,
+              paddingInline: cq(28),
+              height: cq(84),
+              minHeight: 44,
+            }}
+          >
+            {numbers.map((n, i) =>
+              n === "…" ? (
+                <span
+                  key={`ellipsis-${i}`}
+                  className="font-bold"
+                  style={{ fontSize: cq(36), color: "#7e7e7e" }}
+                >
+                  …
+                </span>
+              ) : (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => goTo(n)}
+                  aria-current={n === safePage ? "page" : undefined}
+                  aria-label={`Halaman ${n}`}
+                  style={{
+                    minWidth: cq(64),
+                    height: cq(64),
+                    borderRadius: 9999,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingInline: cq(8),
+                    backgroundColor: n === safePage ? "#1c1451" : "transparent",
+                    color: n === safePage ? "#ffffff" : "#1c1451",
+                    border: "none",
+                    fontSize: cq(54),
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    cursor: "pointer",
+                    touchAction: "manipulation",
+                  }}
+                  className="transition hover:brightness-[0.94]"
+                >
+                  {n}
+                </button>
+              ),
+            )}
+          </div>
+
+          {/* panah kanan */}
+          <button
+            type="button"
+            aria-label="Halaman berikutnya"
+            disabled={safePage === totalPages}
+            onClick={() => goTo(safePage + 1)}
+            style={{
+              ...navBtn,
+              opacity: safePage === totalPages ? 0.4 : 1,
+              cursor: safePage === totalPages ? "not-allowed" : "pointer",
+            }}
+            className="transition hover:brightness-[0.94]"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              style={{ width: cq(45), height: cq(45) }}
+              fill="none"
+              stroke="#1c1451"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M6 3l5 5-5 5" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -147,15 +466,15 @@ export function BimbleSection() {
           className="flex shrink-0 items-center"
           style={{
             backgroundColor: "#e0f0cf",
-            border: `${cq(1)} solid #688d37`,
-            borderRadius: cq(15),
-            height: cq(35),
-            paddingInline: cq(18),
+            border: `${cq(1.3)} solid #688d37`,
+            borderRadius: cq(19.5),
+            height: cq(50),
+            paddingInline: cq(23.4),
           }}
         >
           <span
             className="whitespace-nowrap font-normal"
-            style={{ fontSize: cq(16), color: "rgba(28, 20, 81, 0.8)", lineHeight: 1.26 }}
+            style={{ fontSize: cq(20.8), color: "rgba(28, 20, 81, 0.8)", lineHeight: 1.26 }}
           >
             Ayo tingkatkan dan jangan mudah menyerah!
           </span>
