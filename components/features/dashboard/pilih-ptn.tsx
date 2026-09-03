@@ -1,13 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import { cqm } from "@/lib/cq";
+import { PtnPopup } from "./ptn-popup";
 
 export function PilihPtn() {
+  const [popupOpen, setPopupOpen] = useState(false);
+
   return (
     <section className="w-full">
       <div
-        className="relative flex w-full flex-col gap-[calc(2.7778cqw*var(--pm,1))] overflow-hidden rounded-[4.86cqw] py-[calc(2.7778cqw*var(--pm,1))] md:flex-row md:items-center md:justify-between md:gap-0 md:py-0"
+        className="relative flex w-full flex-col gap-[calc(2.7778cqw*var(--pm,1))] overflow-hidden rounded-[calc(4.86cqw*var(--ds,1))] py-[calc(2.7778cqw*var(--pm,1))] md:flex-row md:items-center md:justify-between md:gap-0 md:py-0"
         style={{
           borderStyle: "solid",
           borderWidth: cqm(2),
@@ -27,7 +30,7 @@ export function PilihPtn() {
           </h2>
           {/* bubble */}
           <div
-            className="mt-[1.2cqw] inline-flex items-center rounded-[1.4cqw] px-[1.1cqw] py-[0.9cqw]"
+            className="mt-[calc(1.2cqw*var(--ds,1))] inline-flex items-center rounded-[calc(1.4cqw*var(--ds,1))] px-[calc(1.1cqw*var(--ds,1))] py-[calc(0.9cqw*var(--ds,1))]"
             style={{
               backgroundColor: "#e0f0cf",
               borderStyle: "solid",
@@ -47,7 +50,7 @@ export function PilihPtn() {
 
         {/* Right text + button */}
         <div
-          className="ml-0 flex flex-col items-start md:ml-[2.7778cqw]"
+          className="ml-0 flex flex-col items-start md:ml-[calc(2.7778cqw*var(--ds,1))]"
         >
           <span
             className="font-bold"
@@ -61,9 +64,10 @@ export function PilihPtn() {
           >
             Hitung peluangmu masuk PTN!
           </span>
-          <Link
-            href="/peluang-ptn"
-            className="mt-[0.9cqw] flex items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90"
+          <button
+            type="button"
+            onClick={() => setPopupOpen(true)}
+            className="mt-[calc(0.9cqw*var(--ds,1))] flex cursor-pointer items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90"
             style={{
               height: cqm(67),
               paddingInline: cqm(30),
@@ -72,10 +76,11 @@ export function PilihPtn() {
               borderWidth: cqm(1),
               borderColor: "rgba(108, 99, 99, 0.2)", // #6c6363 @ 20% — samar agar tidak menonjol di atas fill pink
               fontSize: cqm(24),
+              fontFamily: "inherit",
             }}
           >
             Mulai Iput Nilai →
-          </Link>
+          </button>
         </div>
 
         {/* Maskot illustration (right-ish, from design at x~126 y~1813 w161 h164) */}
@@ -93,6 +98,9 @@ export function PilihPtn() {
           }}
         />
       </div>
+
+      {/* popup input nilai */}
+      {popupOpen && <PtnPopup onClose={() => setPopupOpen(false)} />}
     </section>
   );
 }

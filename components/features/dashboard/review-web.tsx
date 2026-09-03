@@ -36,7 +36,7 @@ const REVIEWS = [
 
 function Stars() {
   return (
-    <div className="flex gap-[0.2cqw]">
+    <div className="flex gap-[calc(0.2cqw*var(--ds,1))]">
       {Array.from({ length: 5 }).map((_, i) => (
         <svg key={i} viewBox="0 0 24 24" style={{ width: cqm(21), height: cqm(21) }} fill="#f0f54b">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -193,7 +193,7 @@ export function ReviewWeb() {
         {items.map((r, i) => (
           <div
             key={i}
-            className="flex flex-col rounded-[2.08cqw] px-[1.8cqw] py-[2cqw]"
+            className="flex flex-col rounded-[calc(2.08cqw*var(--ds,1))] px-[calc(1.8cqw*var(--ds,1))] py-[calc(2cqw*var(--ds,1))]"
             style={{
               width: cqm(392),
               minWidth: cqm(392),
@@ -221,7 +221,7 @@ export function ReviewWeb() {
             </p>
             <div className="mt-auto">
               <Stars />
-              <div className="mt-[1cqw] flex items-center gap-[0.9cqw]">
+              <div className="mt-[calc(1cqw*var(--ds,1))] flex items-center gap-[calc(0.9cqw*var(--ds,1))]">
                 <div
                   className="flex items-center justify-center rounded-full"
                   style={{

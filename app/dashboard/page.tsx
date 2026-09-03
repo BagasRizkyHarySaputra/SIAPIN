@@ -6,16 +6,19 @@ import { PilihanMapel } from "@/components/features/dashboard/pilihan-mapel";
 import { AiDiagnostic } from "@/components/features/dashboard/ai-diagnostic";
 import { PilihPtn } from "@/components/features/dashboard/pilih-ptn";
 import { ReviewWeb } from "@/components/features/dashboard/review-web";
-import { cqm } from "@/lib/cq";
+import { cq, cqm } from "@/lib/cq";
 
 export default function DashboardPage() {
   return (
     <main className="min-h-screen w-full bg-[#dbe9ea]">
       <Navbar />
 
-      {/* white rounded container (Rectangle 159) */}
+      {/* Full-bleed white sheet — selebar layar (bukan max 1440), jadi
+          background putih terpakai 100% lebar desktop.
+          Konten di dalamnya diskalakan 50% khusus desktop via --pm
+          (lihat .dashboard-scope di globals.css). */}
       <div
-        className="dashboard-scope relative mx-auto w-full max-w-[1440px] bg-white"
+        className="dashboard-scope relative mx-auto w-full bg-white"
         style={{
           borderTopLeftRadius: cqm(70),
           borderTopRightRadius: cqm(70),
@@ -23,10 +26,12 @@ export default function DashboardPage() {
           paddingBottom: cqm(120),
         }}
       >
+        {/* Hero */}
         <HeroSection />
 
-        {/* mapel section */}
-        <div className="mt-[1cqw]">
+        {/* mapel section — gap antar div besar TIDAK ikut skala 50%,
+            pakai cq() utuh supaya tetap lapang & proporsional. */}
+        <div className="mt-[2.5cqw]">
           <PilihanMapel />
         </div>
 
@@ -35,23 +40,23 @@ export default function DashboardPage() {
           className="relative"
           style={{
             backgroundColor: "#f5eafb",
-            marginTop: cqm(40),
+            marginTop: cq(150),
             marginInline: `calc(${cqm(84)} * -1)`,
-            paddingTop: cqm(80),
-            paddingBottom: cqm(90),
-            paddingInline: cqm(84),
+            paddingTop: cq(110),
+            paddingBottom: cq(120),
+            paddingInline: cqm(84), // sejajar dgn inset sheet
           }}
         >
           <AiDiagnostic />
         </div>
 
         {/* PILIH PTN */}
-        <div style={{ marginTop: cqm(90) }}>
+        <div style={{ marginTop: cq(170) }}>
           <PilihPtn />
         </div>
 
         {/* Review */}
-        <div style={{ marginTop: cqm(40) }}>
+        <div style={{ marginTop: cq(150) }}>
           <ReviewWeb />
         </div>
       </div>

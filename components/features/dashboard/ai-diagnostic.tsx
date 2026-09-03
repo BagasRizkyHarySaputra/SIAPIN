@@ -23,7 +23,7 @@ const chartSubjects = [
 export function AiDiagnostic() {
   return (
     <div
-      className="ai-scope flex w-full flex-row items-stretch overflow-hidden rounded-[4.86cqw] bg-white"
+      className="ai-scope flex w-full flex-row items-stretch overflow-hidden rounded-[calc(4.86cqw*var(--ds,1))] bg-white"
       style={{
         border: `${cqm(2)} solid rgba(108, 99, 99, 0.5)`,
         borderRadius: cqm(70),
@@ -48,16 +48,16 @@ export function AiDiagnostic() {
             Diagnostic AI
           </h2>
           <p
-            className="mt-[0.6cqw] font-bold"
+            className="mt-[calc(0.6cqw*var(--ds,1))] font-bold"
             style={{ fontSize: cqm(16), color: "#1c1451" }}
           >
             Temukan Kelemahanmu dan perbaiki!
           </p>
 
           {/* progress list */}
-          <div className="mt-[2.6cqw] flex flex-col gap-[1.7cqw]">
+          <div className="mt-[calc(2.6cqw*var(--ds,1))] flex flex-col gap-[calc(1.7cqw*var(--ds,1))]">
             {progress.map((p) => (
-              <div key={p.label} className="flex items-center gap-[1cqw]">
+              <div key={p.label} className="flex items-center gap-[calc(1cqw*var(--ds,1))]">
                 <span
                   className="font-bold"
                   style={{ width: cqm(104), fontSize: cqm(24), color: p.color, whiteSpace: "nowrap" }}
@@ -96,7 +96,7 @@ export function AiDiagnostic() {
 
         {/* mascot motivation bubble */}
         <div
-          className="flex items-center gap-[0.9cqw]"
+          className="flex items-center gap-[calc(0.9cqw*var(--ds,1))]"
           style={{ marginTop: cqm(20) }}
         >
           <img
@@ -105,7 +105,7 @@ export function AiDiagnostic() {
             style={{ width: cqm(70), height: cqm(71), objectFit: "contain" }}
           />
           <div
-            className="flex items-center rounded-[1.04cqw] px-[1.4cqw] py-[0.9cqw]"
+            className="flex items-center rounded-[calc(1.04cqw*var(--ds,1))] px-[calc(1.4cqw*var(--ds,1))] py-[calc(0.9cqw*var(--ds,1))]"
             style={{
               backgroundColor: "#e0f0cf",
               border: `${cqm(1)} solid #688d37`,
@@ -146,7 +146,7 @@ export function AiDiagnostic() {
           paddingBlock: cqm(54),
         }}
       >
-        <div className="flex flex-wrap items-center justify-between gap-[1cqw]">
+        <div className="flex flex-wrap items-center justify-between gap-[calc(1cqw*var(--ds,1))]">
           <h3
             className="font-bold"
             style={{ fontSize: cqm(36), color: "#1c1451" }}
@@ -154,7 +154,7 @@ export function AiDiagnostic() {
             Grafik Diagnostic
           </h3>
           {/* mode pills */}
-          <div className="flex gap-[0.9cqw]">
+          <div className="flex gap-[calc(0.9cqw*var(--ds,1))]">
             {[
               { t: "TKA SMP", c: "#cfedc0" },
               { t: "TKA SMA", c: "#5858b8" },
@@ -178,7 +178,7 @@ export function AiDiagnostic() {
 
         {/* radar: labels left, chart right */}
         <div className="flex items-center" style={{ gap: cqm(20), marginTop: cqm(40) }}>
-          <div className="flex flex-col gap-[0.8cqw]">
+          <div className="flex flex-col gap-[calc(0.8cqw*var(--ds,1))]">
             {chartSubjects.map((s) => (
               <span
                 key={s}

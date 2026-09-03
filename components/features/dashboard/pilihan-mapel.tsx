@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cqm } from "@/lib/cq";
 import { modes } from "@/lib/data/modes";
 
@@ -22,16 +23,18 @@ function withAlpha(hex: string, alpha: number): string {
 }
 
 export function PilihanMapel() {
+  const router = useRouter();
+
   return (
     <section
-      className="mapel-scope relative flex w-full items-center justify-center rounded-[4.86cqw]"
+      className="mapel-scope relative flex w-full items-center justify-center rounded-[calc(4.86cqw*var(--ds,1))]"
       style={{
         paddingBlock: cqm(72),
       }}
     >
       {/* outer container — selalu 1 baris 3 kartu (HP + desktop) */}
       <div
-        className="flex w-full flex-row items-center justify-between rounded-[4.86cqw] px-[1.5cqw] py-[4.8cqw] md:px-[3.3cqw]"
+        className="flex w-full flex-row items-center justify-between rounded-[calc(4.86cqw*var(--ds,1))] px-[calc(1.5cqw*var(--ds,1))] py-[calc(4.8cqw*var(--ds,1))] md:px-[calc(3.3cqw*var(--ds,1))]"
         style={{
           borderStyle: "solid",
           borderWidth: cqm(2),
@@ -44,7 +47,8 @@ export function PilihanMapel() {
           return (
             <div
               key={m.slug}
-              className="flex max-w-none flex-1 flex-col items-center justify-between rounded-[1.4cqw] md:max-w-[calc(18.0556cqw*var(--pm,1))] md:flex-none"
+              onClick={() => router.push(`/soal/${m.slug}`)}
+              className="flex max-w-none flex-1 cursor-pointer flex-col items-center justify-between rounded-[calc(1.4cqw*var(--ds,1))] transition hover:brightness-[0.97] md:max-w-[calc(18.0556cqw*var(--pm,1))] md:flex-none"
               style={{
                 width: "100%",
                 height: cqm(380),
@@ -65,6 +69,7 @@ export function PilihanMapel() {
               </span>
               <Link
                 href={`/soal/${m.slug}`}
+                onClick={(e) => e.stopPropagation()}
                 className="flex items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90"
                 style={{
                   width: cqm(101),

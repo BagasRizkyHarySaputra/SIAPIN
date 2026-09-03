@@ -155,7 +155,8 @@
 
 /* Desktop: kartu menyempit 51.25cqw (≈738px di 1440) + panel 36.11cqw (≈520px).
    Sesuai Figma frame 333-1055: kartu x64..802, gap 52, panel x854..1374.
-   Band padding kiri 84cqw -> margin kiri -4.4444cqw agar mulai di x64. */
+   Band padding kiri 84cqw -> margin kiri -4.4444cqw agar mulai di x64.
+   Semua dikali var(--pm, 1) → ikut skala desktop 0.75x (.bimble-scope). */
 @media (min-width: 768px) {
   .bimble-area--active {
     flex-direction: row;
@@ -164,17 +165,17 @@
        Gap bawaan (5.5556cqw) di-nol-kan supaya tidak dobel (total ~117px)
        yang mendorong panel keluar viewport. */
     gap: 0;
-    margin-left: calc(4.4444cqw * -1 + 4.4444cqw); /* 0 — kartu tetap di x84 */
+    margin-left: calc((4.4444cqw * var(--pm, 1)) * -1 + (4.4444cqw * var(--pm, 1))); /* 0 — kartu tetap di x84 */
   }
   .bimble-area--active > .bimble-cards {
-    width: 51.25cqw; /* 738 */
+    width: calc(51.25cqw * var(--pm, 1)); /* 738 */
     flex-shrink: 0;
   }
   .bimble-area--active > .bimble-panel {
     display: block;
-    width: 36.1111cqw; /* 520 */
+    width: calc(36.1111cqw * var(--pm, 1)); /* 520 */
     flex-shrink: 0;
-    margin-left: 3.6111cqw; /* 52 */
+    margin-left: calc(3.6111cqw * var(--pm, 1)); /* 52 */
   }
 }
 
@@ -233,36 +234,58 @@
   }
 }
 
-/* ===== Dashboard HP scale: 1x desktop, 2x HP (<768px) ===== */
-/* Satu scope untuk hero, mapel, AI diagnostic, PTN, dan review. */
-.dashboard-scope {
+/* ===== Bimble desktop scale: 1x HP, 0.35x konten + 0.56x navbar (≥768px) ===== */
+.bimble-scope {
   --pm: 1;
+}
+@media (min-width: 768px) {
+  .bimble-scope {
+    --pm: 0.35;
+  }
+  /* Navbar /bimble ikut dipotong 30% juga (0.8 → 0.56). */
+  .bimble-page .nav-scope {
+    --pm: 0.56;
+  }
+}
+
+/* ===== Dashboard scale: desktop 50% (--pm & --ds = 0.5), HP 2x (--pm) ===== */
+/* --pm  : pengali utama (cqm) — font, box, padding, dll.
+   --ds  : pengali utk nilai cqw mentah (gap/rounded kecil) supaya ikut
+           mengecil di desktop tapi TETAP 1x di HP (tidak mengubah HP). */
+.dashboard-scope {
+  --pm: 0.5;
+  --ds: 0.5;
 }
 @media (max-width: 767px) {
   .dashboard-scope {
     --pm: 2;
+    --ds: 1;
   }
 }
 
 /* ===== Pilihan mapel: tetap 1 baris 3 kartu di HP → skala lokal 1.6x ===== */
 /* 2x tidak muat (butuh ~423px untuk ruang ~273px); 1.6x pas 1 baris. */
 .mapel-scope {
-  --pm: 1;
+  --pm: 0.5;
+  --ds: 0.5;
 }
 @media (max-width: 767px) {
   .mapel-scope {
     --pm: 1.6;
+    --ds: 1;
   }
 }
 
 /* ===== AI diagnostic: tetap 1 baris 2 panel di HP → skala lokal 1.3x ===== */
 /* 2x butuh ~430px untuk ruang 344px; 1.3x maksimal yang muat sejajar. */
 .ai-scope {
-  --pm: 1;
+  --pm: 0.5;
+  --ds: 0.5;
 }
 @media (max-width: 767px) {
   .ai-scope {
     --pm: 1.3;
+    --ds: 1;
   }
 }
 

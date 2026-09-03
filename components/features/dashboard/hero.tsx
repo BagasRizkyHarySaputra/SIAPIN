@@ -43,7 +43,7 @@ export function HeroSection() {
         >
           RAIH KAMPUS IMPIANMU!
         </h1>
-        <div className="mt-[0.4cqw] flex items-center gap-[1cqw]">
+        <div className="mt-[calc(0.4cqw*var(--ds,1))] flex items-center gap-[calc(1cqw*var(--ds,1))]">
           <span
             className="font-bold"
             style={{ fontSize: cqm(64), color: "#cfb1ed", lineHeight: 1.26 }}
@@ -51,7 +51,7 @@ export function HeroSection() {
             SIAP
           </span>
           <span
-            className="inline-flex items-center rounded-[1.74cqw] px-[0.9cqw] font-bold text-white"
+            className="inline-flex items-center rounded-[calc(1.74cqw*var(--ds,1))] px-[calc(0.9cqw*var(--ds,1))] font-bold text-white"
             style={{
               backgroundColor: "#cfb1ed",
               borderRadius: cqm(25),
