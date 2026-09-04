@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { cqm } from "@/lib/cq";
 import type { Mode } from "@/lib/types";
+import { SoalPopup } from "./soal-popup";
 
 /** Palet pill SNBT 1:1 dari Figma (frame 299-1225). */
 const SNBT_PILLS: Record<string, { text: string; bg: string }> = {
@@ -23,6 +25,23 @@ function pastel(hex: string, t = 0.78): string {
   return `rgb(${m(r)}, ${m(g)}, ${m(b)})`;
 }
 
+/** hex (#rrggbb) -> rgba string dengan alpha tertentu. */
+function withAlpha(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Teks yang terbaca di atas bg aksen (putih, kecuali aksen terang → navy). */
+function inkOn(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return L > 0.6 ? "#1c1451" : "#ffffff";
+}
+
 function pillStyle(modeSlug: string, accent: string) {
   if (modeSlug === "snbt") {
     const p = SNBT_PILLS[accent];
@@ -37,13 +56,13 @@ const PACKETS = Array.from({ length: 8 }, (_, i) => ({
   skor: 0,
 }));
 
-function RetryIcon() {
+function RetryIcon({ color }: { color: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
       style={{ width: cqm(20), height: cqm(20) }}
       fill="none"
-      stroke="#f5c3c2"
+      stroke={color}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -56,7 +75,23 @@ function RetryIcon() {
 }
 
 export function SoalBoard({ mode }: { mode: Mode }) {
+  const router = useRouter();
   const [selected, setSelected] = useState(0);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [packet, setPacket] = useState(1);
+
+  // Tema kartu paket mengikuti pill mapel yang aktif (semua mode).
+  const activeSub = mode.subtests[selected] ?? mode.subtests[0];
+  const theme = pillStyle(
+    mode.slug,
+    mode.slug === "snbt" ? activeSub.slug : activeSub.color,
+  );
+  const accent = theme.text;
+
+  function openPacket(no: number) {
+    setPacket(no);
+    setPopupOpen(true);
+  }
 
   return (
     <div className="w-full">
@@ -113,13 +148,15 @@ export function SoalBoard({ mode }: { mode: Mode }) {
         {PACKETS.map((c) => (
           <div
             key={c.no}
+            onClick={() => openPacket(c.no)}
+            className="cursor-pointer transition hover:brightness-[0.98]"
             style={{
               position: "relative",
               width: cqm(302),
               height: cqm(212),
               borderRadius: cqm(20),
-              backgroundColor: "#ffffff",
-              border: `${cqm(2)} solid #f4e0df`,
+              backgroundColor: theme.bg,
+              border: `${cqm(2)} solid ${accent}`,
               boxShadow: `0 ${cqm(4)} ${cqm(12)} rgba(28, 20, 81, 0.08)`,
             }}
           >
@@ -132,7 +169,7 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 top: cqm(8),
                 fontSize: cqm(96),
                 lineHeight: 1,
-                color: "#f5c3c2",
+                color: accent,
               }}
             >
               {c.no}
@@ -147,7 +184,7 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 top: cqm(130),
                 fontSize: cqm(32),
                 lineHeight: 1.1,
-                color: "#f5c3c2",
+                color: accent,
               }}
             >
               {c.skor}
@@ -160,7 +197,7 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 top: cqm(169),
                 fontSize: cqm(24),
                 lineHeight: 1.1,
-                color: "#f4e0df",
+                color: withAlpha(accent, 0.65),
               }}
             >
               Skor
@@ -169,6 +206,7 @@ export function SoalBoard({ mode }: { mode: Mode }) {
             {/* tombol Mulai */}
             <button
               type="button"
+              onClick={() => openPacket(c.no)}
               className="cursor-pointer transition hover:brightness-[0.96]"
               style={{
                 position: "absolute",
@@ -177,9 +215,9 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 width: cqm(84),
                 height: cqm(30),
                 borderRadius: cqm(20),
-                backgroundColor: "#f4e0df",
-                border: `${cqm(2)} solid #f5c3c2`,
-                color: "#ffffff",
+                backgroundColor: accent,
+                border: `${cqm(2)} solid ${accent}`,
+                color: inkOn(accent),
                 fontSize: cqm(16),
                 fontWeight: 700,
                 fontFamily: "inherit",
@@ -206,11 +244,22 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 display: "flex",
               }}
             >
-              <RetryIcon />
+              <RetryIcon color={accent} />
             </button>
           </div>
         ))}
       </div>
+
+      {/* Popup kesiapan — judul mengikuti pill subtes yang aktif */}
+      {popupOpen && (
+        <SoalPopup
+          title={mode.subtests[selected]?.name ?? mode.name}
+          onClose={() => setPopupOpen(false)}
+          onPick={(tipe) =>
+            router.push(`/soal/${mode.slug}/pengerjaan/${activeSub.slug}/${packet}/${tipe}`)
+          }
+        />
+      )}
     </div>
   );
 }

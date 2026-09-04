@@ -1,0 +1,269 @@
+// Prisma schema — Ekosistem database SIAPIN
+// SQLite (file lokal, aman demo offline) + Prisma ORM 7
+//
+// 5 domain dalam 1 ekosistem:
+//   1. Bank Soal   (mode: TKA SMA / TKA SMP / SNBT)
+//   2. User & Profil + AI Diagnostic + grafik + hasil input nilai
+//   3. Guru (halaman /bimble)
+//   4. Leaderboard
+//   5. Backup & sistem data
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============================================================
+// ENUM
+// ============================================================
+
+/// Pilihan mode belajar / jenis soal
+enum Mode {
+  TKA_SMA
+  TKA_SMP
+  SNBT
+}
+
+/// Peran user
+enum Role {
+  SISWA
+  GURU
+  ADMIN
+}
+
+// ============================================================
+// 1. BANK SOAL  — soal per mapel per mode
+// ============================================================
+
+/// Mapel (mata pelajaran) — contoh: Matematika, Bahasa Indonesia, ...
+model Mapel {
+  id        String   @id @default(cuid())
+  mode      Mode
+  slug      String // "matematika", "fisika" ...
+  nama      String // "Matematika"
+  deskripsi String?
+  icon      String? // path ikon
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  paketSoal PaketSoal[]
+  @@unique([mode, slug])
+}
+
+/// Satu paket latihan (20 soal). Di UI: pilihan paket saat mengerjakan.
+model PaketSoal {
+  id        String   @id @default(cuid())
+  mapelId   String
+  mapel     Mapel    @relation(fields: [mapelId], references: [id], onDelete: Cascade)
+  nama      String // "Paket 1", "Try Out 1" ...
+  tipe      String? // "latihan" | "tryout" | null
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  soal      Soal[]
+  riwayat   RiwayatPengerjaan[]
+  @@unique([mapelId, nama])
+}
+
+/// Satu butir soal
+model Soal {
+  id        String   @id @default(cuid())
+  paketId   String
+  paket     PaketSoal @relation(fields: [paketId], references: [id], onDelete: Cascade)
+  no        Int
+  stimulus  String? // teks stimulus/cerita (JSON string kalau multi-baris) — disimpan String
+  prompt    String // JSON: array segmen [{t,b}]
+  options   String // JSON: [{key,text}]
+  answer    String // "A"|"B"|"C"|"D"
+  explanationTitle String?
+  explanation       String? // JSON: array segmen
+  createdAt DateTime @default(now())
+
+  jawaban   JawabanUser[]
+  @@unique([paketId, no])
+}
+
+// ============================================================
+// 2. USER + PROFIL + AI DIAGNOSTIC + INPUT NILAI
+// ============================================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String // hashed (saat ini mock, pakai bcrypt/plain utk demo)
+  phone     String?
+  avatar    String? // data URL / path
+  role      Role     @default(SISWA)
+  joinedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile        UserProfile?
+  diagnostic     AiDiagnostic?
+  inputNilai     InputNilai[]
+  riwayat        RiwayatPengerjaan[]
+  leaderboard    Leaderboard?
+  achievements   UserAchievement[]
+  backups        BackupLog[]
+}
+
+/// Profil tambahan user (data statistik belajar)
+model UserProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  namaLengkap String? // bisa beda dari login name
+  streakDays  Int      @default(0)
+  totalSoal   Int      @default(0)
+  akurasi     Float?   // 0-100
+  aiDiagnosticProgress Json? // simpan progress AI Diagnostic (opsional denormalisasi)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Hasil AI Diagnostic user per mapel (grafik radar & progress)
+model AiDiagnostic {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // nilai per mapel (0-100) — dipakai radar chart
+  tkaSmp    Float    @default(0)
+  tkaSma    Float    @default(0)
+  snbt      Float    @default(0)
+  // progress tambahan (label "+10%" dll)
+  progressTkaSmp Int @default(0)
+  progressTkaSma Int @default(0)
+  progressSnbt   Int @default(0)
+  // data mentah per mapel (JSON) kalau perlu breakdown
+  rawData   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Hasil "Mulai Input Nilai" (popup PTN) — rekomendasi PTN
+model InputNilai {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // nilai yang diinput user
+  nilaiTkaSmp Float?
+  nilaiTkaSma Float?
+  nilaiSnbt   Float?
+  // hasil rekomendasi (disimpan JSON)
+  hasil       Json?
+  createdAt DateTime @default(now())
+}
+
+/// Riwayat pengerjaan soal (skor, benar/salah)
+model RiwayatPengerjaan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paketId   String
+  paket     PaketSoal @relation(fields: [paketId], references: [id], onDelete: Cascade)
+  skor      Int
+  benar     Int
+  salah     Int
+  total     Int
+  waktu     Int? // detik
+  createdAt DateTime @default(now())
+
+  jawaban   JawabanUser[]
+}
+
+/// Jawaban per butir soal dalam satu sesi pengerjaan
+model JawabanUser {
+  id        String   @id @default(cuid())
+  riwayatId String
+  riwayat   RiwayatPengerjaan @relation(fields: [riwayatId], references: [id], onDelete: Cascade)
+  soalId    String
+  soal      Soal     @relation(fields: [soalId], references: [id], onDelete: Cascade)
+  jawaban   String // "A"|"B"|"C"|"D"
+  benar     Boolean
+  @@unique([riwayatId, soalId])
+}
+
+// ============================================================
+// 3. GURU (halaman /bimble)
+// ============================================================
+
+model Guru {
+  id         String   @id @default(cuid())
+  nama       String
+  bidang     String // "Matematika", "Fisika" ...
+  mode       Mode? // mapel yang diampu (optional)
+  foto       String?
+  deskripsi  String?
+  rating     Float    @default(0)
+  jumlahUlasan Int    @default(0)
+  harga      Float?   // harga sesi (kalau ada)
+  jadwal     Json?    // JSON: [{hari, jam}]
+  // --- presentasi kartu GuruCards (1:1 komponen) ---
+  bg         String? // warna kartu, mis "#e3aec2"
+  shadow     String? // warna shadow, mis "#d77d9f"
+  avatarPath String? // "/visual/bimble/guru-pudjo.png"
+  stars      String? // JSON array mis "[1,1,1,1,0.5]"
+  siswaLabel String? // "(130 Siswa)"
+  panelData  String? // JSON lengkap panel (reviews dll)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// 4. LEADERBOARD
+// ============================================================
+
+model Leaderboard {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mode      Mode     @default(SNBT) // leaderboard per mode (TKA_SMP / TKA_SMA / SNBT)
+  totalPoin Int      @default(0)
+  streak    Int      @default(0)
+  peringkat Int?     // posisi dalam mode-nya (bisa dihitung dinamis)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// 5. ACHIEVEMENT + BACKUP SYSTEM
+// ============================================================
+
+model Achievement {
+  id        String   @id @default(cuid())
+  kode      String   @unique // "top-performer", "never-give-up", "streak-master"
+  nama      String
+  deskripsi String?
+  ikon      String?
+  syarat    Json? // JSON: {type:"total_soal", min:100}
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt DateTime @default(now())
+  @@unique([userId, achievementId])
+}
+
+/// Log / backup data — untuk sistem backup & restore
+model BackupLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  nama      String // "manual", "otomatis-harian"
+  tipe      String // "full" | "user"
+  filePath  String
+  ukuran    Int
+  status    String  @default("success") // success | failed
+  createdAt DateTime @default(now())
+}

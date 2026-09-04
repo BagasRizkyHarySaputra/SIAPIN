@@ -1,13 +1,13 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
-import { cq } from "@/lib/cq";
+import { useEffect, useId, useRef, useState } from "react";
+import { cqm } from "@/lib/cq";
 
 /** Pagination: 7 card max per page. Total pages = ceil(TEACHERS.length / PAGE_SIZE). */
 const PAGE_SIZE = 7;
 
-/** Data 13 guru — 3 asli Figma + 10 dummy. */
-const TEACHERS = [
+/** Data 13 guru — 3 asli Figma + 10 dummy. (export utk fallback di BimbleClient) */
+export const TEACHERS = [
   {
     id: "pudjo",
     name: "Mr. Pudjo",
@@ -142,7 +142,7 @@ const TEACHERS = [
 
 function Star({ value, gradId }: { value: number; gradId: string }) {
   return (
-    <svg viewBox="0 0 18 17" style={{ width: cq(23.4), height: cq(22.1) }} aria-hidden>
+    <svg viewBox="0 0 18 17" style={{ width: cqm(23.4), height: cqm(22.1) }} aria-hidden>
       {value === 0.5 && (
         <defs>
           <linearGradient id={gradId}>
@@ -207,26 +207,26 @@ function TeacherCard({
       className="flex items-center rounded-[5.56cqw] text-left transition hover:brightness-[0.92] active:brightness-[0.85]"
       style={{
         width: "100%",
-        height: cq(209),
-        minHeight: cq(209),
+        height: cqm(209),
+        minHeight: cqm(209),
         backgroundColor: t.bg,
-        borderRadius: cq(80),
-        boxShadow: `0 ${cq(4)} ${cq(4)} ${t.shadow}`,
-        paddingLeft: cq(55),
-        paddingRight: cq(64),
+        borderRadius: cqm(80),
+        boxShadow: `0 ${cqm(4)} ${cqm(4)} ${t.shadow}`,
+        paddingLeft: cqm(55),
+        paddingRight: cqm(64),
         cursor: "pointer",
         touchAction: "manipulation",
         WebkitTapHighlightColor: "transparent",
         transition:
           "width 0.3s ease, transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease",
-        outline: active ? `${cq(2)} solid rgba(28,20,81,0.45)` : "none",
+        outline: active ? `${cqm(2)} solid rgba(28,20,81,0.45)` : "none",
         ...(active ? { transform: "scale(1.01)" } : {}),
       }}
     >
       {/* Avatar — crop 124x124; lingkaran foto di tengah, pojok = warna kartu (di-clip) */}
       <div
         className="shrink-0 overflow-hidden rounded-full"
-        style={{ width: cq(124), height: cq(124) }}
+        style={{ width: cqm(124), height: cqm(124) }}
       >
         <img
           src={t.avatar}
@@ -236,28 +236,28 @@ function TeacherCard({
       </div>
 
       {/* Teks nama / mapel / rating */}
-      <div className="flex min-w-0 flex-col justify-center" style={{ marginLeft: cq(72.8) }}>
+      <div className="flex min-w-0 flex-col justify-center" style={{ marginLeft: cqm(72.8) }}>
         <span
           className="truncate font-bold"
-          style={{ fontSize: cq(41.6), color: "#1c1451", lineHeight: 1.26 }}
+          style={{ fontSize: cqm(41.6), color: "#1c1451", lineHeight: 1.26 }}
         >
           {t.name}
         </span>
         <span
           className="mt-[0.455cqw] truncate font-bold"
-          style={{ fontSize: cq(26), color: "#1c1451", lineHeight: 1.26 }}
+          style={{ fontSize: cqm(26), color: "#1c1451", lineHeight: 1.26 }}
         >
           {t.subject}
         </span>
         <div className="mt-[0.715cqw] flex items-center">
-          <div className="flex items-center" style={{ gap: cq(5.2) }}>
+          <div className="flex items-center" style={{ gap: cqm(5.2) }}>
             {t.stars.map((v, i) => (
               <Star key={i} value={v} gradId={`${gradId}-s${i}`} />
             ))}
           </div>
           <span
             className="font-bold"
-            style={{ fontSize: cq(26), color: "#7e7e7e", marginLeft: cq(13) }}
+            style={{ fontSize: cqm(26), color: "#7e7e7e", marginLeft: cqm(13) }}
           >
             {t.siswa}
           </span>
@@ -289,6 +289,9 @@ export function GuruCards({
   pageSize = PAGE_SIZE,
   onPageChange,
   panelNode,
+  teachers,
+  closingId,
+  emptyState,
 }: {
   activeId?: string | null;
   onSelect?: (id: string) => void;
@@ -297,13 +300,25 @@ export function GuruCards({
   /** Panel detail guru utk HP — disisipkan tepat setelah kartu aktif
       (menimpa kartu di bawahnya). Desktop memakai `.bimble-panel` di kanan. */
   panelNode?: React.ReactNode;
+  /** Guru dari database (server component). Kalau kosong, fallback ke TEACHERS statis. */
+  teachers?: BimbleTeacher[];
+  /** id kartu yang panelnya sedang animasi keluar (tetap render sementara). */
+  closingId?: string | null;
+  /** Node "tidak ada hasil" — dirender saat `teachers` ada tapi kosong & prop ini diisi.
+      Dipakai BimbleClient ketika filter search/mapel tidak mencocokkan guru apa pun. */
+  emptyState?: React.ReactNode;
 }) {
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
-  const totalPages = Math.max(1, Math.ceil(TEACHERS.length / pageSize));
+  // Kalau teachers TIDAK di-set sama sekali (undefined) → fallback statis.
+  // Kalau teachers di-set (termasuk []) dan ada emptyState → tampilkan emptyState.
+  const useFallback = teachers === undefined;
+  const list = useFallback ? TEACHERS : teachers;
+  const showEmpty = !useFallback && list.length === 0 && !!emptyState;
+  const totalPages = Math.max(1, Math.ceil(list.length / pageSize));
   const safePage = Math.min(Math.max(1, page), totalPages);
   const start = (safePage - 1) * pageSize;
-  const visible = TEACHERS.slice(start, start + pageSize);
+  const visible = list.slice(start, start + pageSize);
   const numbers = getPageNumbers(safePage, totalPages);
 
   /** Panah kanan → load 7 card lanjutan (replace), kiri → sebaliknya. */
@@ -318,14 +333,14 @@ export function GuruCards({
   }
 
   const navBtn: React.CSSProperties = {
-    width: cq(84),
-    height: cq(84),
+    width: cqm(84),
+    height: cqm(84),
     minWidth: 44,
     minHeight: 44,
     flexShrink: 0,
     borderRadius: 9999,
     backgroundColor: "#ffffff",
-    border: `${cq(3)} solid #c9cef4`,
+    border: `${cqm(3)} solid #c9cef4`,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -337,47 +352,55 @@ export function GuruCards({
 
   return (
     <div>
-      <div ref={topRef} style={{ scrollMarginTop: cq(24) }} />
+      <div ref={topRef} style={{ scrollMarginTop: cqm(24) }} />
       <div
         key={`page-${safePage}`}
         className="bimble-page-enter flex flex-col"
         style={{
-          gap: cq(34),
+          gap: cqm(34),
           // Jaga tinggi minimum = 7 kartu + 6 gap, supaya saat halaman 2
           // (6 kartu) pagination tidak melompat naik.
-          minHeight: `calc(${cq(209)} * ${PAGE_SIZE} + ${cq(34)} * ${PAGE_SIZE - 1})`,
+          minHeight: `calc(${cqm(209)} * ${PAGE_SIZE} + ${cqm(34)} * ${PAGE_SIZE - 1})`,
         }}
       >
-        {visible.map((t) => {
-          const isActive = activeId === t.id;
-          return (
-            <div
-              key={t.id}
-              className="relative"
-              style={{ zIndex: isActive ? 2 : 1 }}
-            >
-              <TeacherCard
-                t={t}
-                active={isActive}
-                onSelect={onSelect}
-              />
-              {/* HP: panel detail disisipkan tepat di bawah kartu aktif,
-                  menimpa kartu di bawahnya (lihat .bimble-mobile-panel). */}
-              {isActive && panelNode && (
-                <div className="bimble-mobile-panel">{panelNode}</div>
-              )}
-            </div>
-          );
-        })}
+        {showEmpty && emptyState ? (
+          emptyState
+        ) : (
+          visible.map((t) => {
+            const isActive = activeId === t.id;
+            return (
+              <div
+                key={t.id}
+                className="relative"
+                style={{ zIndex: isActive ? 2 : 1 }}
+              >
+                <TeacherCard
+                  t={t}
+                  active={isActive}
+                  onSelect={onSelect}
+                />
+                {/* HP: panel detail ikut flow di bawah kartu aktif,
+                    mendorong kartu + pagination ke bawah (lihat .bimble-mobile-panel). */}
+                {((isActive || closingId === t.id) && panelNode) && (
+                  <div
+                    className={`bimble-mobile-panel${closingId === t.id ? " bimble-mobile-closing" : ""}`}
+                  >
+                    <div className="bimble-mobile-body">{panelNode}</div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
       {totalPages > 1 && (
         <div
           className="flex items-center justify-center"
           style={{
-            gap: `max(${cq(18)}, 16px)`,
-            marginTop: cq(72),
-            marginBottom: cq(8),
+            gap: `max(${cqm(18)}, 16px)`,
+            marginTop: cqm(72),
+            marginBottom: cqm(8),
             position: "relative",
             zIndex: 10,
             flexWrap: "nowrap",
@@ -403,7 +426,7 @@ export function GuruCards({
           >
             <svg
               viewBox="0 0 16 16"
-              style={{ width: cq(45), height: cq(45) }}
+              style={{ width: cqm(45), height: cqm(45) }}
               fill="none"
               stroke="#1c1451"
               strokeWidth={2.5}
@@ -419,13 +442,13 @@ export function GuruCards({
           <div
             className="flex items-center"
             style={{
-              gap: `max(${cq(16)}, 12px)`,
+              gap: `max(${cqm(16)}, 12px)`,
               flexShrink: 0,
               backgroundColor: "#ffffff",
-              border: `${cq(3)} solid #c9cef4`,
+              border: `${cqm(3)} solid #c9cef4`,
               borderRadius: 9999,
-              paddingInline: `max(${cq(28)}, 14px)`,
-              height: cq(84),
+              paddingInline: `max(${cqm(28)}, 14px)`,
+              height: cqm(84),
               minHeight: 44,
             }}
           >
@@ -434,7 +457,7 @@ export function GuruCards({
                 <span
                   key={`ellipsis-${i}`}
                   className="font-bold"
-                  style={{ fontSize: cq(36), color: "#7e7e7e" }}
+                  style={{ fontSize: cqm(36), color: "#7e7e7e" }}
                 >
                   …
                 </span>
@@ -449,19 +472,19 @@ export function GuruCards({
                   aria-current={n === safePage ? "page" : undefined}
                   aria-label={`Halaman ${n}`}
                   style={{
-                    minWidth: `max(${cq(64)}, 40px)`,
-                    minHeight: `max(${cq(64)}, 40px)`,
-                    height: cq(64),
+                    minWidth: `max(${cqm(64)}, 40px)`,
+                    minHeight: `max(${cqm(64)}, 40px)`,
+                    height: cqm(64),
                     flexShrink: 0,
                     borderRadius: 9999,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    paddingInline: cq(8),
+                    paddingInline: cqm(8),
                     color: n === safePage ? "#ffffff" : "#1c1451",
                     backgroundColor: n === safePage ? "#1c1451" : undefined,
                     border: "none",
-                    fontSize: cq(54),
+                    fontSize: cqm(54),
                     fontWeight: 700,
                     lineHeight: 1,
                     cursor: "pointer",
@@ -494,7 +517,7 @@ export function GuruCards({
           >
             <svg
               viewBox="0 0 16 16"
-              style={{ width: cq(45), height: cq(45) }}
+              style={{ width: cqm(45), height: cqm(45) }}
               fill="none"
               stroke="#1c1451"
               strokeWidth={2.5}
@@ -511,41 +534,75 @@ export function GuruCards({
   );
 }
 
-/** Area putih atas: heading, pill motivasi, search, dropdown, maskot. */
-export function BimbleSection() {
+/** Area putih atas: heading, pill motivasi, search, dropdown, maskot.
+ *  `query`/`subject` dikontrol dari BimbleClient (filter daftar guru). */
+export function BimbleSection({
+  query,
+  onQueryChange,
+  subject,
+  onSubjectChange,
+  subjects,
+}: {
+  query: string;
+  onQueryChange: (v: string) => void;
+  subject: string;
+  onSubjectChange: (v: string) => void;
+  /** Daftar mapel unik (segmen pertama dari subject guru) utk dropdown — "Semua Mapel" otomatis pertama. */
+  subjects: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ddRef = useRef<HTMLDivElement>(null);
+
+  // Tutup dropdown saat klik di luar area dropdown.
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ddRef.current && !ddRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
     <section className="w-full">
       {/* Heading + subtitle (kiri) & pill motivasi (kanan, sejajar subtitle) */}
       <h1
         className="font-bold"
-        style={{ fontSize: cq(64), color: "#1c1451", lineHeight: 1.26 }}
+        style={{ fontSize: cqm(64), color: "#1c1451", lineHeight: 1.26 }}
       >
         Bimbel / Guru
       </h1>
       <div
         className="flex items-center justify-between"
-        style={{ marginTop: cq(34) }}
+        style={{ marginTop: cqm(34) }}
       >
         <p
           className="font-bold"
-          style={{ fontSize: cq(32), color: "#1c1451", lineHeight: 1.26 }}
+          style={{ fontSize: cqm(32), color: "#1c1451", lineHeight: 1.26 }}
         >
           Temukan guru yang tepat untukmu
         </p>
         {/* Pill hijau motivasi (Group 15) */}
         <div
-          className="flex shrink-0 items-center"
+          className="bimble-pill-scope flex shrink-0 items-center"
           style={{
             backgroundColor: "#e0f0cf",
-            border: `${cq(1.3)} solid #688d37`,
-            borderRadius: cq(19.5),
-            height: cq(50),
-            paddingInline: cq(23.4),
+            border: `${cqm(1.3)} solid #688d37`,
+            borderRadius: cqm(19.5),
+            height: cqm(50),
+            paddingInline: cqm(23.4),
           }}
         >
           <span
             className="whitespace-nowrap font-normal"
-            style={{ fontSize: cq(20.8), color: "rgba(28, 20, 81, 0.8)", lineHeight: 1.26 }}
+            style={{ fontSize: cqm(20.8), color: "rgba(28, 20, 81, 0.8)", lineHeight: 1.26 }}
           >
             Ayo tingkatkan dan jangan mudah menyerah!
           </span>
@@ -555,23 +612,23 @@ export function BimbleSection() {
       {/* Search + dropdown (kiri) & maskot (kanan) */}
       <div
         className="flex items-start justify-between"
-        style={{ marginTop: cq(47) }}
+        style={{ marginTop: cqm(47) }}
       >
-        <div className="flex flex-col" style={{ width: cq(724) }}>
-          {/* Search box */}
+        <div className="flex flex-col" style={{ width: cqm(724) }}>
+          {/* Search box — input teks sungguhan, style identik dengan placeholder */}
           <div
             className="flex items-center rounded-full bg-white"
             style={{
               width: "100%",
-              height: cq(82),
-              border: `${cq(2)} solid #cfb1ed`,
-              borderRadius: cq(50),
-              paddingInline: cq(34),
+              height: cqm(82),
+              border: `${cqm(2)} solid #cfb1ed`,
+              borderRadius: cqm(50),
+              paddingInline: cqm(34),
             }}
           >
             <svg
               viewBox="0 0 32 32"
-              style={{ width: cq(32), height: cq(32), flexShrink: 0 }}
+              style={{ width: cqm(32), height: cqm(32), flexShrink: 0 }}
               fill="none"
               stroke="#454545"
               strokeWidth={2}
@@ -581,43 +638,116 @@ export function BimbleSection() {
               <circle cx="14" cy="14" r="9" />
               <path d="M21 21l6 6" />
             </svg>
-            <span
-              className="ml-[1.2cqw] truncate font-medium"
-              style={{ fontSize: cq(32), color: "#454545", lineHeight: 1.26 }}
-            >
-              Cari Guru / Mata Pelajaran
-            </span>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder="Cari Guru / Mata Pelajaran"
+              aria-label="Cari guru atau mata pelajaran"
+              className="ml-[1.2cqw] w-full truncate bg-transparent font-medium outline-none"
+              style={{
+                fontSize: cqm(32),
+                color: "#454545",
+                lineHeight: 1.26,
+                border: "none",
+                padding: 0,
+              }}
+            />
           </div>
 
-          {/* Dropdown Semua Mapel */}
+          {/* Dropdown Semua Mapel — tombol interaktif (jarak 2.4cqw sama persis dgn asli) */}
           <div
-            className="mt-[2.4cqw] flex items-center justify-between rounded-[1.11cqw] bg-white"
-            style={{
-              width: cq(317),
-              height: cq(82),
-              border: `${cq(2)} solid #c9cef4`,
-              borderRadius: cq(16),
-              paddingInline: cq(28),
-            }}
+            className="relative mt-[2.4cqw]"
+            style={{ width: cqm(317) }}
+            ref={ddRef}
           >
-            <span
-              className="font-bold"
-              style={{ fontSize: cq(32), color: "#1c1451", lineHeight: 1.26 }}
+            <button
+              type="button"
+              aria-haspopup="listbox"
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+              className="flex items-center justify-between rounded-[1.11cqw] bg-white"
+              style={{
+                width: "100%",
+                height: cqm(82),
+                border: `${cqm(2)} solid #c9cef4`,
+                borderRadius: cqm(16),
+                paddingInline: cqm(28),
+                cursor: "pointer",
+                fontFamily: "inherit",
+                textAlign: "left",
+              }}
             >
-              Semua Mapel
-            </span>
-            <svg
-              viewBox="0 0 20 10"
-              style={{ width: cq(20), height: cq(10), flexShrink: 0 }}
-              fill="none"
-              stroke="#000"
-              strokeWidth={3}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M1 1l9 8 9-8" />
-            </svg>
+              <span
+                className="font-bold"
+                style={{ fontSize: cqm(32), color: "#1c1451", lineHeight: 1.26 }}
+              >
+                {subject}
+              </span>
+              <svg
+                viewBox="0 0 20 10"
+                style={{
+                  width: cqm(20),
+                  height: cqm(10),
+                  flexShrink: 0,
+                  transition: "transform 0.2s ease",
+                  transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+                fill="none"
+                stroke="#000"
+                strokeWidth={3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M1 1l9 8 9-8" />
+              </svg>
+            </button>
+
+            {/* Menu pilihan mapel */}
+            {open && (
+              <div
+                role="listbox"
+                aria-label="Pilih mapel"
+                className="absolute left-0 top-full z-50 overflow-hidden bg-white"
+                style={{
+                  width: "100%",
+                  marginTop: cqm(10),
+                  border: `${cqm(2)} solid #c9cef4`,
+                  borderRadius: cqm(16),
+                  boxShadow: `0 ${cqm(12)} ${cqm(28)} rgba(28,20,81,0.18)`,
+                }}
+              >
+                {["Semua Mapel", ...subjects].map((s) => {
+                  const active = s === subject;
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      onClick={() => {
+                        onSubjectChange(s);
+                        setOpen(false);
+                      }}
+                      className="block w-full text-left font-medium"
+                      style={{
+                        fontSize: cqm(26),
+                        color: active ? "#ffffff" : "#1c1451",
+                        backgroundColor: active ? "#2a235c" : "#ffffff",
+                        paddingBlock: cqm(16),
+                        paddingInline: cqm(24),
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        border: "none",
+                      }}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -625,7 +755,7 @@ export function BimbleSection() {
         <img
           src="/visual/bimble/maskot-bimble.png"
           alt="Maskot SIAPIN"
-          style={{ width: cq(203), height: cq(207), objectFit: "contain" }}
+          style={{ width: cqm(203), height: cqm(207), objectFit: "contain" }}
         />
       </div>
     </section>

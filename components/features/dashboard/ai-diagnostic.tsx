@@ -23,7 +23,7 @@ const chartSubjects = [
 export function AiDiagnostic() {
   return (
     <div
-      className="ai-scope flex w-full flex-row items-stretch overflow-hidden rounded-[calc(4.86cqw*var(--ds,1))] bg-white"
+      className="ai-scope flex w-full flex-col items-stretch gap-[calc(4.5139cqw*var(--pm,1))] overflow-hidden rounded-[calc(4.86cqw*var(--ds,1))] bg-white md:flex-row md:gap-0"
       style={{
         border: `${cqm(2)} solid rgba(108, 99, 99, 0.5)`,
         borderRadius: cqm(70),
@@ -122,9 +122,10 @@ export function AiDiagnostic() {
         </div>
       </div>
 
-      {/* Vertical divider — #6C6363 100%, positioned per design (x=711, inset top 54 / bottom 37) */}
+      {/* Vertical divider (desktop saja; HP pakai gap) */}
       <div
         aria-hidden
+        className="hidden md:block"
         style={{
           // min 1px agar tetap terlihat di layar sempit (sub-pixel < 1px di-render 0 oleh browser)
           width: `clamp(1px, ${cqm(2)}, 2px)`,

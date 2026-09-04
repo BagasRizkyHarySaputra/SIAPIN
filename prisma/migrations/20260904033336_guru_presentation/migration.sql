@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Guru" ADD COLUMN "avatarPath" TEXT;
+ALTER TABLE "Guru" ADD COLUMN "bg" TEXT;
+ALTER TABLE "Guru" ADD COLUMN "panelData" TEXT;
+ALTER TABLE "Guru" ADD COLUMN "shadow" TEXT;
+ALTER TABLE "Guru" ADD COLUMN "siswaLabel" TEXT;
+ALTER TABLE "Guru" ADD COLUMN "stars" TEXT;

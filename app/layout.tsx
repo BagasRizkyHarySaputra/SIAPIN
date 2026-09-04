@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/store/auth";
+import { PageTransitionProvider } from "@/components/layout/page-transition";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -32,7 +33,9 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${baloo.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <PageTransitionProvider>{children}</PageTransitionProvider>
+        </AuthProvider>
       </body>
     </html>
   );

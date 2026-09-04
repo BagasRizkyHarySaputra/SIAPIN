@@ -1,63 +1,85 @@
 "use client";
 
+import { useState } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { HeroSection } from "@/components/features/dashboard/hero";
 import { PilihanMapel } from "@/components/features/dashboard/pilihan-mapel";
 import { AiDiagnostic } from "@/components/features/dashboard/ai-diagnostic";
 import { PilihPtn } from "@/components/features/dashboard/pilih-ptn";
+import { PtnPopup, type PtnData } from "@/components/features/dashboard/ptn-popup";
+import { PtnResult } from "@/components/features/dashboard/ptn-result";
 import { ReviewWeb } from "@/components/features/dashboard/review-web";
 import { cqm } from "@/lib/cq";
 
 export default function DashboardPage() {
+  const [ptnOpen, setPtnOpen] = useState(false);
+  const [ptn, setPtn] = useState<PtnData | null>(null);
+
   return (
     <main className="min-h-screen w-full bg-[#dbe9ea]">
       <Navbar />
 
-      {/* White sheet — max 1440 (Figma artboard), centered; <1440 full-bleed.
-          Konten di-inset 147px kiri/kanan mengikuti Figma (container x147–1313).
-          Desktop --pm:1 → 1:1 persis Figma; HP --pm:2 → proporsional. */}
+      {/* white rounded container (Rectangle 159) */}
       <div
-        className="dashboard-scope relative mx-auto w-full max-w-[1440px] bg-white"
+        className="dashboard-scope relative mx-auto w-full bg-white"
         style={{
           borderTopLeftRadius: cqm(70),
           borderTopRightRadius: cqm(70),
-          paddingInline: cqm(147),
+          paddingInline: cqm(52),
           paddingBottom: cqm(120),
         }}
       >
-        {/* Hero */}
         <HeroSection />
 
-        {/* Pilihan mapel */}
-        <div style={{ marginTop: cqm(98) }}>
+        {/* mapel section */}
+        <div className="mt-[1cqw]">
           <PilihanMapel />
         </div>
 
-        {/* AI Diagnostic — lavender band full-bleed (Rectangle 160) */}
+        {/* AI Diagnostic — lavender band behind (Rectangle 160) */}
         <div
           className="relative"
           style={{
             backgroundColor: "#f5eafb",
-            marginTop: cqm(98),
-            marginInline: `calc(${cqm(147)} * -1)`,
-            paddingTop: cqm(50),
-            paddingBottom: cqm(50),
-            paddingInline: cqm(147),
+            marginTop: cqm(40),
+            marginInline: `calc(${cqm(52)} * -1)`,
+            paddingTop: cqm(80),
+            paddingBottom: cqm(90),
+            paddingInline: cqm(52),
           }}
         >
           <AiDiagnostic />
         </div>
 
-        {/* Pilih PTN */}
-        <div style={{ marginTop: cqm(60) }}>
-          <PilihPtn />
+        {/* PILIH PTN */}
+        <div style={{ marginTop: cqm(90) }}>
+          <PilihPtn onOpen={() => setPtnOpen(true)} />
         </div>
 
+        {/* Hasil estimasi peluang — muncul setelah Simpan */}
+        {ptn && (
+          <div style={{ marginTop: cqm(60) }}>
+            <PtnResult data={ptn} onEdit={() => setPtnOpen(true)} />
+          </div>
+        )}
+
         {/* Review */}
-        <div style={{ marginTop: cqm(115) }}>
+        <div style={{ marginTop: cqm(40) }}>
           <ReviewWeb />
         </div>
       </div>
+
+      {/* popup input nilai */}
+      {ptnOpen && (
+        <PtnPopup
+          initial={ptn}
+          onClose={() => setPtnOpen(false)}
+          onSave={(d) => {
+            setPtn(d);
+            setPtnOpen(false);
+          }}
+        />
+      )}
     </main>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cqm } from "@/lib/cq";
 import { modes } from "@/lib/data/modes";
+import { useIsDesktop } from "@/lib/use-media-query";
 
 const cardStyle: Record<
   string,
@@ -30,23 +31,39 @@ const figmaOrder = ["tka-smp", "tka-sma", "snbt"];
 
 export function PilihanMapel() {
   const router = useRouter();
+  const isDesktop = useIsDesktop();
 
   const ordered = figmaOrder
     .map((slug) => modes.find((m) => m.slug === slug))
     .filter(Boolean) as typeof modes;
 
+  // DESKTOP (≥768px): gap antar kartu dipangkas setengah (71 = 142/2) dan
+  // border menyusut mengikuti kartu: lebar dihitung eksplisit =
+  // 3×lebar kartu + 2×gap + 2×padding + 2×border, supaya pas & tidak ada
+  // ruang kosong besar. (fit-content tidak dipakai: di sini ia mengabaikan
+  // gap & padding sehingga kartu overflow keluar border.)
+  // MOBILE (<768px): gap 40 + padding 24 — kartu ~81px, judul muat 1 baris.
+  const gap = isDesktop ? cqm(71) : cqm(16);
+  const paddingInline = isDesktop ? cqm(71) : cqm(12);
+  const cardWidth = isDesktop ? cqm(235) : undefined;
+  // border 2px kiri+kanan ikut dijumlah agar border pas membungkus (box-sizing: border-box)
+  const outerWidth = isDesktop
+    ? `calc((${cqm(235)} * 3) + (${gap} * 2) + (${paddingInline} * 2) + 4px)`
+    : "100%";
+
   return (
     <section className="mapel-scope relative flex w-full items-center justify-center">
-      {/* outer container — selalu 1 baris 3 kartu (HP + desktop) */}
       <div
-        className="flex w-full flex-row items-center justify-between rounded-[calc(4.86cqw*var(--ds,1))]"
+        className="flex flex-row items-center rounded-[calc(4.86cqw*var(--ds,1))]"
         style={{
           borderStyle: "solid",
           borderWidth: cqm(2),
           borderColor: "rgba(108, 99, 99, 0.5)",
-          gap: cqm(142),
+          gap,
           paddingBlock: cqm(16),
-          paddingInline: cqm(90),
+          paddingInline,
+          width: outerWidth,
+          justifyContent: isDesktop ? "center" : "space-between",
         }}
       >
         {ordered.map((m) => {
@@ -55,9 +72,11 @@ export function PilihanMapel() {
             <div
               key={m.slug}
               onClick={() => router.push(`/soal/${m.slug}`)}
-              className="flex max-w-none flex-1 cursor-pointer flex-col items-center rounded-[calc(1.4cqw*var(--ds,1))] transition hover:brightness-[0.97] md:max-w-[calc(16.3194cqw*var(--pm,1))] md:flex-none"
+              className="flex max-w-none cursor-pointer flex-col items-center rounded-[calc(1.4cqw*var(--ds,1))] transition hover:brightness-[0.97]"
               style={{
                 width: "100%",
+                maxWidth: cardWidth,
+                flex: isDesktop ? "0 0 auto" : "1 1 0%",
                 height: cqm(313),
                 backgroundColor: s.bg,
                 borderStyle: "solid",

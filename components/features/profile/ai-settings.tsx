@@ -1,14 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { cqm } from "@/lib/cq";
+import { useAuth } from "@/lib/store/auth";
+import { ConfirmPopup } from "@/components/features/profile/confirm-popup";
 
 const PROGRESS_BARS = [
-  { label: "TKA SMP", value: "-", barBg: "#cfedc0", border: "#688d37", color: "#688d37" },
-  { label: "TKA SMA", value: "-", barBg: "#c9cef4", border: "#5858b8", color: "#5858b8" },
-  { label: "SNBT", value: "-", barBg: "#e3aec2", border: "#df5b97", color: "#df5b97" },
+  { label: "TKA SMP", barBg: "#cfedc0", border: "#688d37", color: "#688d37" },
+  { label: "TKA SMA", barBg: "#c9cef4", border: "#5858b8", color: "#5858b8" },
+  { label: "SNBT", barBg: "#e3aec2", border: "#df5b97", color: "#df5b97" },
 ];
 
 function AiDiagnostic() {
+  const { user } = useAuth();
+  const progress = user?.stats?.progress ?? [];
+
   return (
     <section className="w-full md:w-[40.2778cqw] md:shrink-0">
       <h2
@@ -52,48 +58,51 @@ function AiDiagnostic() {
             gap: cqm(20), // 1221-1175-26 = 20
           }}
         >
-          {PROGRESS_BARS.map((b) => (
-            <div
-              key={b.label}
-              className="relative"
-              style={{
-                width: "100%",
-                height: cqm(26),
-                borderRadius: cqm(20),
-                backgroundColor: b.barBg,
-                border: `${cqm(2)} solid ${b.border}`,
-              }}
-            >
-              <span
-                className="font-bold"
+          {PROGRESS_BARS.map((b) => {
+            const val = progress.find((p) => p.label === b.label)?.value ?? "-";
+            return (
+              <div
+                key={b.label}
+                className="relative"
                 style={{
-                  position: "absolute",
-                  left: cqm(18), // 137-119
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  fontSize: cqm(16),
-                  lineHeight: 1.25,
-                  color: b.color,
+                  width: "100%",
+                  height: cqm(26),
+                  borderRadius: cqm(20),
+                  backgroundColor: b.barBg,
+                  border: `${cqm(2)} solid ${b.border}`,
                 }}
               >
-                {b.label}
-              </span>
-              <span
-                className="font-bold"
-                style={{
-                  position: "absolute",
-                  right: cqm(14), // 585-518-... kira
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  fontSize: cqm(16),
-                  lineHeight: 1.25,
-                  color: b.color,
-                }}
-              >
-                {b.value}
-              </span>
-            </div>
-          ))}
+                <span
+                  className="font-bold"
+                  style={{
+                    position: "absolute",
+                    left: cqm(18), // 137-119
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    fontSize: cqm(16),
+                    lineHeight: 1.25,
+                    color: b.color,
+                  }}
+                >
+                  {b.label}
+                </span>
+                <span
+                  className="font-bold"
+                  style={{
+                    position: "absolute",
+                    right: cqm(14), // 585-518-... kira
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    fontSize: cqm(16),
+                    lineHeight: 1.25,
+                    color: b.color,
+                  }}
+                >
+                  {val}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -106,9 +115,20 @@ const MENU = [
   { label: "Log Out", icon: "logout" },
 ];
 
+type ConfirmKind = "logout" | "delete" | null;
+
 function Settings() {
+  const { logout, deleteAccount } = useAuth();
+  const [confirm, setConfirm] = useState<ConfirmKind>(null);
+
+  const handleClick = (label: string) => {
+    if (label === "Log Out") setConfirm("logout");
+    else if (label === "Hapus Akun") setConfirm("delete");
+  };
+
   return (
-    <section className="w-full md:w-[43.0556cqw] md:shrink-0">
+    <>
+      <section className="w-full md:w-[43.0556cqw] md:shrink-0">
       <h2
         className="font-bold"
         style={{ fontSize: cqm(32), lineHeight: 1.25, color: "#2a235c" }}
@@ -129,12 +149,30 @@ function Settings() {
         {MENU.map((m, i) => {
           const y = [30, 122, 214][i]; // 1098/1190/1282 - 1068
           return (
-            <div key={m.label} style={{ position: "absolute", left: 0, right: 0, top: cqm(y) }}>
-              {/* circle ikon */}
+            <div
+              key={m.label}
+              onClick={() => handleClick(m.label)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") handleClick(m.label);
+              }}
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                top: cqm(y),
+                height: cqm(92), // tinggi baris menu (jarak antar baris 92px)
+                cursor: m.label === "Log Out" ? "pointer" : "default",
+              }}
+            >
+              {/* circle ikon — center vertikal sejajar label & chevron */}
               <div
                 style={{
                   position: "absolute",
                   left: cqm(24), // 755-731
+                  top: "50%",
+                  transform: "translateY(-50%)",
                   width: cqm(40),
                   height: cqm(40),
                   borderRadius: "50%",
@@ -207,7 +245,33 @@ function Settings() {
           );
         })}
       </div>
-    </section>
+      </section>
+
+      {confirm === "logout" && (
+        <ConfirmPopup
+          title="Log Out"
+          message="Anda yakin ingin keluar dari akun anda?"
+          confirmLabel="Konfirmasi"
+          onConfirm={() => {
+            logout();
+            setConfirm(null);
+          }}
+          onClose={() => setConfirm(null)}
+        />
+      )}
+      {confirm === "delete" && (
+        <ConfirmPopup
+          title="Hapus Akun"
+          message="Anda yakin ingin menghapus akun anda?"
+          confirmLabel="Konfirmasi"
+          onConfirm={() => {
+            deleteAccount();
+            setConfirm(null);
+          }}
+          onClose={() => setConfirm(null)}
+        />
+      )}
+    </>
   );
 }
 

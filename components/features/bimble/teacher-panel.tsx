@@ -1,6 +1,7 @@
 "use client";
 
 import { cq } from "@/lib/cq";
+import { TEACHER_PANELS, type Teacher } from "@/lib/data/teacher-panels";
 
 /**
  * Panel profil guru ("PROFILE GURU OPEN", frame 333-1055).
@@ -15,124 +16,18 @@ import { cq } from "@/lib/cq";
 
 const PANEL_W = 520;
 
-/** Figma px (dalam kanvas panel 520) → % dari lebar panel (container query). */
+/** Figma px (dalam kanvas panel 520) → % dari lebar panel (container query).
+ *  Dikali var(--pqm, 1) agar isi panel bisa diskala (mis. 0.7x di popup desktop). */
 function pq(px: number): string {
-  return `${((px / PANEL_W) * 100).toFixed(4)}cqw`;
+  return `calc(${((px / PANEL_W) * 100).toFixed(4)}cqw * var(--pqm, 1))`;
 }
 
-/** Tipe guru — selaras dengan TEACHERS di bimble-section. */
-export type Teacher = {
-  id: string;
-  name: string;
-  shortName: string;
-  subject: string;
-  siswa: string;
-  bg: string;
-  avatar: string;
-  stars: number[];
-  /** field khusus panel */
-  role: string;
-  rating: string;
-  mengajar: string;
-  pengalaman: string;
-  tentang: string;
-  reviews: { bg: string; avatar: string; user: string; text: string }[];
-  headerImg?: string; // foto header utuh (Pudjo); undefined → komposisi HTML
-};
-
-export const TEACHER_PANEL_DATA: Record<string, Teacher> = {
-  pudjo: {
-    id: "pudjo",
-    name: "Mr. Pudjo",
-    shortName: "Mr Pudjo",
-    subject: "Matematika - SNBT - TKA",
-    siswa: "(130 Siswa)",
-    bg: "#e3aec2",
-    avatar: "/visual/bimble/guru-pudjo.png",
-    stars: [1, 1, 1, 1, 0.5],
-    role: "Guru Matematika",
-    rating: "4.9",
-    mengajar: "Mengajar : Matematika - SNBT - TKA",
-    pengalaman: "Pengalaman : 5 Tahun",
-    tentang:
-      "Saya pengajar matematika dengan pendalaman konsep dan latihan soal terdahulu. Soal SNBT & TKA",
-    reviews: [
-      {
-        bg: "#e3aec2",
-        avatar: "/visual/bimble/review-amel.png",
-        user: "@amelcantik",
-        text: "“Mr. Pudjo mengajarnya sangat asik...”",
-      },
-      {
-        bg: "#c9cef4",
-        avatar: "/visual/bimble/review-bagas.png",
-        user: "@bagasgtg",
-        text: "“Mr. Pudjo biasa mengajar dgn metode...”",
-      },
-    ],
-    headerImg: "/visual/bimble/guru-pudjo-header.png",
-  },
-  nisa: {
-    id: "nisa",
-    name: "Miss. Nisa",
-    shortName: "Miss Nisa",
-    subject: "Kimia - TKA SMA",
-    siswa: "(100 Siswa)",
-    bg: "#c9cef4",
-    avatar: "/visual/bimble/guru-nisa.png",
-    stars: [1, 1, 1, 1, 0],
-    role: "Guru Kimia",
-    rating: "4.0",
-    mengajar: "Mengajar : Kimia - TKA SMA",
-    pengalaman: "Pengalaman : 3 Tahun",
-    tentang:
-      "Saya mengajar kimia dengan pendekatan konsep yang mudah dipahami, dilengkapi latihan soal bertingkat. Soal TKA SMA",
-    reviews: [
-      {
-        bg: "#e3aec2",
-        avatar: "/visual/bimble/guru-nisa.png",
-        user: "@citraa",
-        text: "“Miss Nisa sabar banget jelasin...”",
-      },
-      {
-        bg: "#c9cef4",
-        avatar: "/visual/bimble/guru-nisa.png",
-        user: "@rizkyy",
-        text: "“Penjelasannya detail & mudah...”",
-      },
-    ],
-  },
-  nur: {
-    id: "nur",
-    name: "Miss. Nur",
-    shortName: "Miss Nur",
-    subject: "Fisika - SNBT - TKA",
-    siswa: "(70 Siswa)",
-    bg: "#cfedc0",
-    avatar: "/visual/bimble/guru-nur.png",
-    stars: [1, 1, 1, 0, 0],
-    role: "Guru Fisika",
-    rating: "3.0",
-    mengajar: "Mengajar : Fisika - SNBT - TKA",
-    pengalaman: "Pengalaman : 2 Tahun",
-    tentang:
-      "Saya mengajar fisika dengan banyak visualisasi dan contoh soal aplikasi sehari-hari. Soal SNBT & TKA",
-    reviews: [
-      {
-        bg: "#e3aec2",
-        avatar: "/visual/bimble/guru-nur.png",
-        user: "@dinda",
-        text: "“Belajar fisika jadi nggak...”",
-      },
-      {
-        bg: "#c9cef4",
-        avatar: "/visual/bimble/guru-nur.png",
-        user: "@farhan",
-        text: "“Miss Nur asik & jelas banget...”",
-      },
-    ],
-  },
-};
+/**
+ * Data panel LENGKAP untuk 13 guru kartu /bimble (bukan cuma 3).
+ * Sumber: lib/data/teacher-panels.ts — dibangun dari TEACHERS + detail per guru.
+ */
+export const TEACHER_PANEL_DATA = TEACHER_PANELS;
+export type { Teacher };
 
 /** Header panel — Mr. Pudjo pakai foto utuh (1:1 Figma); guru lain komposisi HTML. */
 function PanelHeader({ t }: { t: Teacher }) {

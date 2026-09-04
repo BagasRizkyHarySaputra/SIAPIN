@@ -12,6 +12,8 @@ type Row = {
   shadow: boolean;
 };
 
+export type { Row as LeaderboardRow };
+
 const ROWS: Row[] = [
   { rank: "4", name: "gapyearsedih", accuracy: "81.35%", points: "20.0k poin", avatar: "/visual/leaderboard/row-1.png", shadow: true },
   { rank: "5", name: "kaina", accuracy: "81.30%", points: "19.9k poin", avatar: "/visual/leaderboard/row-2.png", shadow: false },
@@ -25,11 +27,12 @@ const ROWS: Row[] = [
 /** Jarak antar kartu (top berikutnya − top sebelumnya − 128) dari Figma. */
 const GAPS = [45, 59, 45, 59, 59, 45];
 
-export function LeaderboardRows() {
+export function LeaderboardRows({ items }: { items?: Row[] }) {
+  const list = items && items.length > 0 ? items : ROWS;
   let prevGap = 0;
   return (
     <div style={{ width: "100%" }}>
-      {ROWS.map((r, i) => {
+      {list.map((r, i) => {
         const marginTop = i === 0 ? 0 : GAPS[i - 1];
         prevGap = marginTop;
         return (

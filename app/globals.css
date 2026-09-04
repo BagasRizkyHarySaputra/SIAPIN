@@ -136,6 +136,13 @@
   }
 }
 
+/* ===== Podium HP: kunci ~1x agar 3 kolom muat (2x jebol 587px) ===== */
+@media (max-width: 767px) {
+  .podium-scope {
+    --pm: 1;
+  }
+}
+
 /* ===== Bimble popup layout: desktop row / HP column (CSS murni) =====
    Satu struktur JSX (app/bimble/page.tsx) — layout diatur di sini sehingga
    tidak ada hydration mismatch & klik/state selalu jalan di semua perangkat.
@@ -162,29 +169,59 @@
   gap: calc(5.5556cqw * var(--pm, 1));
 }
 
-/* Desktop: kartu menyempit 51.25cqw (≈738px di 1440) + panel 36.11cqw (≈520px).
-   Sesuai Figma frame 333-1055: kartu x64..802, gap 52, panel x854..1374.
-   Band padding kiri 84cqw -> margin kiri -4.4444cqw agar mulai di x64.
-   Semua dikali var(--pm, 1) → ikut skala desktop 0.75x (.bimble-scope). */
+/* Desktop (active): kartu max 45cqw + popup 50cqw + gap 1.5cqw.
+   Ukuran konten kartu TIDAK berubah (tetap 0.35) — hanya kolomnya menyempit.
+   Kolom kartu sticky + scroll internal; popup di-cap bawah viewport. */
 @media (min-width: 768px) {
   .bimble-area--active {
     flex-direction: row;
     align-items: flex-start;
-    /* Jarak kartu↔panel cukup dari margin-left panel (3.6111cqw = 52px Figma).
-       Gap bawaan (5.5556cqw) di-nol-kan supaya tidak dobel (total ~117px)
-       yang mendorong panel keluar viewport. */
     gap: 0;
-    margin-left: calc((4.4444cqw * var(--pm, 1)) * -1 + (4.4444cqw * var(--pm, 1))); /* 0 — kartu tetap di x84 */
+  }
+  .bimble-area > .bimble-cards {
+    transition: width 0.45s ease;
   }
   .bimble-area--active > .bimble-cards {
-    width: calc(51.25cqw * var(--pm, 1)); /* 738 */
+    width: 45cqw;
     flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    scrollbar-width: thin;
   }
   .bimble-area--active > .bimble-panel {
+    --pqm: 0.65;
     display: block;
-    width: calc(36.1111cqw * var(--pm, 1)); /* 520 */
+    width: 42cqw;
     flex-shrink: 0;
-    margin-left: calc(3.6111cqw * var(--pm, 1)); /* 52 */
+    margin-left: 7cqw;
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    animation: bimblePanelIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes bimblePanelIn {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  .bimble-area--active > .bimble-panel.bimble-panel-closing {
+    animation: bimblePanelOut 0.25s ease-in forwards;
+  }
+  @keyframes bimblePanelOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(40px);
+    }
   }
 }
 
@@ -199,29 +236,41 @@
     /* panel kanan (desktop) tidak dipakai di HP — panel ada di dalam daftar */
     display: none;
   }
+  /* HP: panel detail ikut flow tepat di bawah kartu aktif — mendorong
+     kartu di bawah + pagination ke bawah (tidak tertimpa lagi). */
   .bimble-mobile-panel {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 2.3611cqw); /* 34px Figma — rapat di bawah kartu */
-    width: 100%;
-    z-index: 3;
-    transform-origin: top center;
-    animation: bimblePanelOpen 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    border-radius: 1.3889cqw; /* ikut sudut TeacherPanel */
-    /* Shadow tegas: memberi kesan panel "terangkat" menimpa kartu bawah */
+    display: grid;
+    grid-template-rows: 1fr;
+    margin-top: calc(2.3611cqw * var(--pm, 1)); /* 34px, sejajar gap kartu */
+    border-radius: 1.3889cqw;
     box-shadow: 0 1.1111cqw 2.7778cqw rgba(28, 20, 81, 0.22);
+    animation: bimblePanelGrow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .bimble-mobile-panel > * {
-    width: 100%;
+  .bimble-mobile-panel > .bimble-mobile-body {
+    overflow: hidden;
+    min-height: 0;
   }
-  @keyframes bimblePanelOpen {
-    0% {
+  @keyframes bimblePanelGrow {
+    from {
+      grid-template-rows: 0fr;
       opacity: 0;
-      transform: translateY(-12px) scaleY(0.96);
     }
-    100% {
+    to {
+      grid-template-rows: 1fr;
       opacity: 1;
-      transform: translateY(0) scaleY(1);
+    }
+  }
+  .bimble-mobile-panel.bimble-mobile-closing {
+    animation: bimblePanelOutMobile 0.25s ease-in forwards;
+  }
+  @keyframes bimblePanelOutMobile {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(12px);
     }
   }
 }
@@ -249,7 +298,18 @@
   }
 }
 
+/* ===== Pill motivasi bimble: 2x khusus desktop (HP ikut bimble 1x) ===== */
+@media (min-width: 768px) {
+  .bimble-pill-scope {
+    --pm: 0.7;
+  }
+}
+
 /* ===== Bimble desktop scale: 1x HP, 0.35x konten + 0.56x navbar (≥768px) ===== */
+/* overflow-x clip: garansi tidak ada scroll horizontal dari kartu/panel. */
+.bimble-page {
+  overflow-x: clip;
+}
 .bimble-scope {
   --pm: 1;
 }
@@ -287,20 +347,19 @@
   }
 }
 
-/* ===== AI diagnostic: tetap 1 baris 2 panel di HP → skala lokal 1.3x ===== */
-/* 2x butuh ~430px untuk ruang 344px; 1.3x maksimal yang muat sejajar. */
+/* ===== AI diagnostic: 2 panel ditumpuk vertikal + 2x di HP ===== */
 .ai-scope {
   --pm: 0.75;
   --ds: 0.75;
 }
 @media (max-width: 767px) {
   .ai-scope {
-    --pm: 1.3;
+    --pm: 2;
     --ds: 1;
   }
 }
 
-/* ===== Halaman soal: 1.9x HP (<768px), 1x desktop ===== */
+/* ===== Halaman soal: 1.9x HP (<768px), 0.7x desktop (≥768px) ===== */
 /* 2x penuh overflow 1px untuk 2 kartu sebaris; 1.9x pas (17px sisa). */
 .soal-scope {
   --pm: 1;
@@ -308,6 +367,114 @@
 @media (max-width: 767px) {
   .soal-scope {
     --pm: 1.9;
+  }
+}
+@media (min-width: 768px) {
+  .soal-scope {
+    --pm: 0.8;
+  }
+}
+
+/* ===== Halaman pengerjaan soal: 0.75x desktop (≥768px), 1x HP ===== */
+/* Kartu soal flex-1 mengisi sisa viewport → pas 100% tinggi layar untuk
+   soal pendek; soal panjang (>2 baris) melar alami + scroll. */
+.drill-scope {
+  --pm: 1;
+}
+@media (min-width: 768px) {
+  .drill-scope {
+    --pm: 0.75;
+  }
+}
+
+/* ===== Drill row HP: 2.25x (<768px) — aksi, label daftar, ritme ===== */
+.drill-row-scope {
+  --pm: 1;
+}
+@media (max-width: 767px) {
+  .drill-row-scope {
+    --pm: 2.25;
+  }
+}
+@media (min-width: 768px) {
+  .drill-row-scope {
+    --pm: 0.75;
+  }
+}
+
+/* ===== Nomor daftar soal: font+gap 2x khusus HP (desktop ikut row) ===== */
+@media (max-width: 767px) {
+  .drill-num-scope {
+    --pm: 2;
+  }
+}
+
+/* ===== Drill header HP 2x (back, SIAPIN, progress, countdown) ===== */
+@media (max-width: 767px) {
+  .drill-head-scope {
+    --pm: 2;
+  }
+}
+@media (min-width: 768px) {
+  .drill-head-scope {
+    --pm: 0.75;
+  }
+}
+
+/* ===== Drill card: +50% di HP (2.25x); desktop isi 0.6x, teks 0.75x ===== */
+/* (tanpa base --pm agar mobile mewarisi scope induk; desktop di-override) */
+@media (max-width: 767px) {
+  .drill-card-scope {
+    --pm: 2.25;
+  }
+}
+@media (min-width: 768px) {
+  .drill-card-scope {
+    --pm: 0.6;
+  }
+  .drill-text-scope {
+    --pm: 0.75;
+  }
+}
+
+/* ===== Drill: animasi tekan & muncul ===== */
+@keyframes drillExpIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.drill-exp-enter {
+  animation: drillExpIn 0.35s ease-out;
+}
+@keyframes drillQIn {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.drill-q-enter {
+  animation: drillQIn 0.3s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .drill-exp-enter,
+  .drill-q-enter {
+    animation: none;
+  }
+}
+
+/* ===== Panel pembahasan HP +30% (1.95x); desktop tetap 0.75x ===== */
+@media (max-width: 767px) {
+  .drill-exp-scope {
+    --pm: 1.95;
+  }
+}
+@media (min-width: 768px) {
+  .drill-exp-scope {
+    --pm: 0.75;
+  }
+}
+
+/* ===== Toolbar corat-coret HP 2.5x (desktop ikut drill-scope) ===== */
+@media (max-width: 767px) {
+  .doodle-scope {
+    --pm: 2.5;
   }
 }
 
@@ -318,6 +485,30 @@
 @media (max-width: 767px) {
   .popup-scope {
     --pm: 1.3;
+  }
+}
+
+/* ===== Popup PTN: isi 2.4x HP (<768px), 0.75x desktop (≥768px) ===== */
+@media (max-width: 767px) {
+  .ptn-popup-scope {
+    --pm: 2.4;
+  }
+}
+@media (min-width: 768px) {
+  .ptn-popup-scope {
+    --pm: 0.75;
+  }
+}
+
+/* ===== Popup edit-profile: desktop 0.9x (HP tetap 2x) ===== */
+@media (max-width: 767px) {
+  .edit-profile-scope {
+    --pm: 2;
+  }
+}
+@media (min-width: 768px) {
+  .edit-profile-scope {
+    --pm: 0.9;
   }
 }
 
@@ -377,5 +568,40 @@
 @media (prefers-reduced-motion: reduce) {
   .auth-flip-inner {
     transition: none;
+  }
+}
+
+/* ===== Transisi antar page navbar (slide searah, masuk saja) ===== */
+@keyframes page-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--tx-x, 48px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.page-t-slide {
+  animation: page-slide-in var(--tx-dur, 320ms) cubic-bezier(0.22, 1, 0.36, 1);
+  /* potong konten yang bergeser keluar viewport (biar layar tidak melebar) */
+  overflow-x: clip;
+}
+.page-t-fade {
+  animation: page-fade-in 250ms ease-out;
+  overflow-x: clip;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-t-slide,
+  .page-t-fade {
+    animation: none;
   }
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { cq } from "@/lib/cq";
+import { cqm } from "@/lib/cq";
 
 /** 1:1 data podium (top 3) — dari Figma LEADERBOARD frame 337-1256. */
-type PodiumPerson = {
+export type PodiumPerson = {
   rank: 1 | 2 | 3;
   name: string;
   points: string;
@@ -87,32 +87,34 @@ function Cap({ color, height }: { color: string; height: number }) {
   );
 }
 
-export function Podium() {
+export function Podium({ items }: { items?: PodiumPerson[] }) {
+  const list = items && items.length > 0 ? items : PODIUM;
   return (
     <div
+      className="podium-scope"
       style={{
         display: "flex",
         alignItems: "flex-end",
-        width: cq(1083),
-        height: cq(549),
+        width: cqm(1083),
+        height: cqm(549),
         marginInline: "auto",
         position: "relative",
       }}
     >
-      {PODIUM.map((p) => {
+      {list.map((p) => {
         const colH = p.bodyTop + p.bodyH; // tinggi total kolom (cap+body)
         return (
           <div
             key={p.rank}
             style={{
-              width: cq(361),
-              height: cq(colH),
+              width: cqm(361),
+              height: cqm(colH),
               position: "relative",
               flexShrink: 0,
             }}
           >
             {/* cap trapesium */}
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: cq(48) }}>
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: cqm(48) }}>
               <Cap color={p.capColor} height={48} />
             </div>
 
@@ -120,13 +122,13 @@ export function Podium() {
             <div
               style={{
                 position: "absolute",
-                top: cq(p.bodyTop),
+                top: cqm(p.bodyTop),
                 left: 0,
                 width: "100%",
-                height: cq(p.bodyH),
+                height: cqm(p.bodyH),
                 backgroundColor: p.bodyColor,
-                borderBottomLeftRadius: cq(10),
-                borderBottomRightRadius: cq(10),
+                borderBottomLeftRadius: cqm(10),
+                borderBottomRightRadius: cqm(10),
               }}
             />
 
@@ -138,9 +140,9 @@ export function Podium() {
                 position: "absolute",
                 left: "50%",
                 transform: "translateX(-50%)",
-                top: cq(p.avatarTop),
-                width: cq(141),
-                height: cq(141),
+                top: cqm(p.avatarTop),
+                width: cqm(141),
+                height: cqm(141),
                 borderRadius: "50%",
                 objectFit: "cover",
               }}
@@ -151,10 +153,10 @@ export function Podium() {
               className="font-bold text-center"
               style={{
                 position: "absolute",
-                top: cq(p.nameY),
+                top: cqm(p.nameY),
                 left: 0,
                 width: "100%",
-                fontSize: cq(24),
+                fontSize: cqm(24),
                 color: "#2a235c",
                 lineHeight: 1.2,
               }}
@@ -166,14 +168,14 @@ export function Podium() {
             <div
               style={{
                 position: "absolute",
-                top: cq(p.pillY),
+                top: cqm(p.pillY),
                 left: "50%",
                 transform: "translateX(-50%)",
-                width: cq(188),
-                height: cq(53),
-                borderRadius: cq(50),
+                width: cqm(188),
+                height: cqm(53),
+                borderRadius: cqm(50),
                 backgroundColor: "rgba(255,255,255,0.1)",
-                boxShadow: `0 ${cq(4)} ${cq(30)} rgba(0,0,0,0.1)`,
+                boxShadow: `0 ${cqm(4)} ${cqm(30)} rgba(0,0,0,0.1)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -181,7 +183,7 @@ export function Podium() {
             >
               <span
                 className="font-bold"
-                style={{ fontSize: cq(24), color: "#2a235c", lineHeight: 1.2 }}
+                style={{ fontSize: cqm(24), color: "#2a235c", lineHeight: 1.2 }}
               >
                 {p.points}
               </span>

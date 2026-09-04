@@ -1,12 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { cqm } from "@/lib/cq";
-import { PtnPopup } from "./ptn-popup";
 
-export function PilihPtn() {
-  const [popupOpen, setPopupOpen] = useState(false);
-
+export function PilihPtn({ onOpen }: { onOpen: () => void }) {
   return (
     <section className="w-full">
       <div
@@ -85,7 +81,7 @@ export function PilihPtn() {
           </span>
           <button
             type="button"
-            onClick={() => setPopupOpen(true)}
+            onClick={onOpen}
             className="mt-[calc(0.9cqw*var(--ds,1))] flex cursor-pointer items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90"
             style={{
               height: cqm(67),
@@ -101,10 +97,23 @@ export function PilihPtn() {
             Mulai Iput Nilai →
           </button>
         </div>
-      </div>
 
-      {/* popup input nilai */}
-      {popupOpen && <PtnPopup onClose={() => setPopupOpen(false)} />}
+        {/* Maskot illustration (right-ish, from design at x~126 y~1813 w161 h164) */}
+        <img
+          src="/visual/maskot.png"
+          alt=""
+          aria-hidden
+          className="pointer-events-none select-none"
+          style={{
+            position: "absolute",
+            right: cqm(20),
+            bottom: 0,
+            width: cqm(161),
+            height: "auto",
+            opacity: 0,
+          }}
+        />
+      </div>
     </section>
   );
 }

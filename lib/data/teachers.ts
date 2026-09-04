@@ -1,0 +1,145 @@
+/** Data 13 guru tampilan /bimble — 1:1 dengan TEACHERS di bimble-section.tsx.
+ *  Dipakai seed db (agar UI & db punya data identik). */
+export type BimbleGuru = {
+  id: string;
+  name: string;
+  subject: string;
+  siswa: string;
+  bg: string;
+  shadow: string;
+  avatar: string;
+  stars: number[];
+};
+
+export const TEACHERS: BimbleGuru[] = [
+  {
+    id: "pudjo",
+    name: "Mr. Pudjo",
+    subject: "Matematika  - SNBT - TKA",
+    siswa: "(130 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 1, 0.5],
+  },
+  {
+    id: "nisa",
+    name: "Miss. Nisa",
+    subject: "Kimia - TKA SMA",
+    siswa: "(100 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0],
+  },
+  {
+    id: "nur",
+    name: "Miss. Nur",
+    subject: "Fisika - SNBT - TKA",
+    siswa: "(70 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-nur.png",
+    stars: [1, 1, 1, 0, 0],
+  },
+  {
+    id: "budi",
+    name: "Mr. Budi",
+    subject: "Matematika - TKA SMA",
+    siswa: "(85 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 1, 0],
+  },
+  {
+    id: "sari",
+    name: "Miss. Sari",
+    subject: "Biologi - SNBT",
+    siswa: "(95 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0.5],
+  },
+  {
+    id: "agus",
+    name: "Mr. Agus",
+    subject: "Fisika - TKA SMA",
+    siswa: "(60 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 0, 0],
+  },
+  {
+    id: "dewi",
+    name: "Miss. Dewi",
+    subject: "B. Inggris - SNBT",
+    siswa: "(110 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 1],
+  },
+  {
+    id: "rian",
+    name: "Mr. Rian",
+    subject: "Ekonomi - TKA SMA",
+    siswa: "(75 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 0.5, 0],
+  },
+  {
+    id: "putri",
+    name: "Miss. Putri",
+    subject: "Kimia - SNBT",
+    siswa: "(120 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0.5],
+  },
+  {
+    id: "dimas",
+    name: "Mr. Dimas",
+    subject: "B. Indonesia - TKA SMP",
+    siswa: "(65 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 1, 0, 0],
+  },
+  {
+    id: "ayu",
+    name: "Miss. Ayu",
+    subject: "Matematika - SNBT",
+    siswa: "(90 Siswa)",
+    bg: "#c9cef4",
+    shadow: "#939ded",
+    avatar: "/visual/bimble/guru-nur.png",
+    stars: [1, 1, 1, 1, 0],
+  },
+  {
+    id: "fajar",
+    name: "Mr. Fajar",
+    subject: "Sejarah - TKA SMA",
+    siswa: "(55 Siswa)",
+    bg: "#cfedc0",
+    shadow: "#aae38d",
+    avatar: "/visual/bimble/guru-pudjo.png",
+    stars: [1, 1, 0.5, 0, 0],
+  },
+  {
+    id: "intan",
+    name: "Miss. Intan",
+    subject: "PKN - SNBT",
+    siswa: "(80 Siswa)",
+    bg: "#e3aec2",
+    shadow: "#d77d9f",
+    avatar: "/visual/bimble/guru-nisa.png",
+    stars: [1, 1, 1, 1, 0],
+  },
+];

@@ -26,7 +26,7 @@ export default function SoalPage({
 
       {/* white sheet — full sampai bawah layar */}
       <div
-        className="soal-scope relative mx-auto flex w-full max-w-[1440px] flex-1 flex-col bg-white"
+        className="soal-scope relative mx-auto flex w-full flex-1 flex-col bg-white"
         style={{
           borderTopLeftRadius: cqm(70),
           borderTopRightRadius: cqm(70),

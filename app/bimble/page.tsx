@@ -1,93 +1,45 @@
-"use client";
+import { prisma } from "@/lib/db";
+import BimbleClient from "./bimble-client";
+import { TEACHERS } from "@/lib/data/teachers";
+import type { BimbleTeacher } from "@/components/features/bimble/bimble-section";
 
-import { useState } from "react";
-import { Navbar } from "@/components/layout/navbar";
-import {
-  BimbleSection,
-  GuruCards,
-} from "@/components/features/bimble/bimble-section";
-import {
-  TEACHER_PANEL_DATA,
-  TeacherPanel,
-} from "@/components/features/bimble/teacher-panel";
-import { cq } from "@/lib/cq";
-
-export default function BimblePage() {
-  // null = state normal (frame 333-496); terisi = state "click" (frame 333-1055)
-  const [selected, setSelected] = useState<string | null>(null);
-  const active = selected ? TEACHER_PANEL_DATA[selected] : undefined;
-
-  const handleSelect = (id: string) => setSelected(id === selected ? null : id);
-  const close = () => setSelected(null);
-
-  return (
-    <main
-      className="flex min-h-screen w-full flex-col bg-[#dbe9ea]"
-      style={{ minHeight: "100dvh", containerType: "inline-size" }}
-    >
-      <Navbar />
-
-      {/* white rounded container (Rectangle 159) */}
-      <div
-        className="relative mx-auto flex w-full max-w-[1440px] flex-1 flex-col bg-white"
-        style={{
-          borderTopLeftRadius: cq(70),
-          borderTopRightRadius: cq(70),
-          paddingInline: cq(84),
-        }}
-      >
-        {/* Rectangle 159 top (y=196) → heading (y=246) = 50px */}
-        <div style={{ paddingTop: cq(50) }}>
-          <BimbleSection />
-        </div>
-
-        {/* lavender band (Rectangle 160) — full-bleed, dengan hairline atas #b5b0b0 */}
-        <div
-          className="relative flex-1"
-          style={{
-            backgroundColor: "#f5eafb",
-            borderTop: `${cq(1)} solid #b5b0b0`,
-            marginTop: cq(34),
-            marginInline: `calc(${cq(84)} * -1)`,
-            paddingTop: cq(61),
-            paddingBottom: cq(73),
-            paddingInline: cq(84),
-          }}
-        >
-          {/*
-            SATU struktur untuk desktop & HP — layout diatur CSS murni
-            (.bimble-area di globals.css). Tidak ada branching JSX berbasis
-            media-query → tidak ada hydration mismatch → klik/state selalu jalan.
-
-            - Desktop (≥768px): .bimble-area--active = row → kartu menyempit
-              (51.25cqw ≈ 738) di kiri + panel (36.11cqw ≈ 520) di kanan (1:1 Figma).
-            - HP (<768px): panel detail disisipkan tepat di bawah kartu aktif
-              (panelNode → .bimble-mobile-panel), menimpa kartu di bawahnya;
-              .bimble-panel kanan disembunyikan.
-          */}
-          <div
-            className={active ? "bimble-area bimble-area--active" : "bimble-area"}
-          >
-            <div className="bimble-cards">
-              <GuruCards
-                activeId={selected}
-                onSelect={handleSelect}
-                onPageChange={close}
-                panelNode={
-                  active ? (
-                    <TeacherPanel t={active} onClose={close} />
-                  ) : undefined
-                }
-              />
-            </div>
-            {active && (
-              <div className="bimble-panel">
-                <TeacherPanel t={active} onClose={close} />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </main>
-  );
+/**
+ * Server component — guru kartu diambil dari DATABASE (tabel Guru, id "bimble-*").
+ * Urutan mengikuti TEACHERS (desain). Layout sepenuhnya di BimbleClient (1:1 Figma).
+ */
+export default async function BimblePage() {
+  let teachers: BimbleTeacher[] = [];
+  try {
+    const rows = await prisma.guru.findMany({
+      where: { id: { startsWith: "bimble-" } },
+    });
+    // urut sesuai urutan TEACHERS (desain), bukan alfabet
+    const order = new Map(TEACHERS.map((t, i) => [t.id, i]));
+    rows.sort((a, b) => {
+      const ia = order.get(a.id.replace(/^bimble-/, "")) ?? 999;
+      const ib = order.get(b.id.replace(/^bimble-/, "")) ?? 999;
+      return ia - ib;
+    });
+    teachers = rows.map((g) => {
+      let stars: number[] = [];
+      try {
+        stars = JSON.parse(g.stars ?? "[]");
+      } catch {
+        stars = [];
+      }
+      return {
+        id: g.id.replace(/^bimble-/, ""),
+        name: g.nama,
+        subject: g.bidang,
+        siswa: g.siswaLabel ?? "",
+        bg: g.bg ?? "#e3aec2",
+        shadow: g.shadow ?? "#d77d9f",
+        avatar: g.avatarPath ?? "/visual/bimble/guru-pudjo.png",
+        stars,
+      };
+    });
+  } catch {
+    teachers = [];
+  }
+  return <BimbleClient teachers={teachers} />;
 }

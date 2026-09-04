@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database (SQLite — regenerable via npm run db:seed)
+prisma/*.db
+prisma/*.db-journal
+
+# backup database
+/backups/
+
+# python
+__pycache__/
+*.pyc
