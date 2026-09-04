@@ -93,6 +93,42 @@ export async function GET(req: Request) {
       profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });
     }
 
+    // ---- Achievement (dihitung dari data asli, sesuai syarat teks kartu) ----
+    // 1) Top Performer — "Masuk Top 3 Leaderboard": user punya baris leaderboard
+    //    dan peringkatnya ≤ 3 di mode leaderboard-nya.
+    let topPerformer = false;
+    if (user) {
+      const lbRow = await prisma.leaderboard.findFirst({
+        where: { userId: user.id },
+      });
+      if (lbRow) {
+        const diAtas = await prisma.leaderboard.count({
+          where: { mode: lbRow.mode, totalPoin: { gt: lbRow.totalPoin } },
+        });
+        topPerformer = diAtas < 3; // peringkat = diAtas + 1 ≤ 3
+      }
+    }
+
+    // 2) Never Give Up — "Mengulang soal yang salah sampai benar": ada sesi
+    //    subtes/paket yang pernah ada jawaban salah, lalu diulang & tuntas tanpa
+    //    salah (salah = 0) pada percobaan berikutnya.
+    const pernahSalah = new Set<string>();
+    let neverGiveUp = false;
+    const riwayatAsc = [...riwayat].sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+    );
+    for (const r of riwayatAsc) {
+      const key = `${r.mode ?? ""}|${r.subtes ?? ""}|${r.paketKe ?? ""}`;
+      if (pernahSalah.has(key) && r.salah === 0) {
+        neverGiveUp = true;
+        break;
+      }
+      if (r.salah > 0) pernahSalah.add(key);
+    }
+
+    // 3) Streak Master — "Belajar 7 hari berturut-turut": streak dari login harian.
+    const streakMaster = (profile?.streakDays ?? 0) >= 7;
+
     return NextResponse.json({
       data: {
         email: lower,
@@ -127,6 +163,11 @@ export async function GET(req: Request) {
               akurasi: profile.akurasi,
             }
           : null,
+        achievements: {
+          topPerformer,
+          neverGiveUp,
+          streakMaster,
+        },
         inputNilai: inputNilai
           ? {
               nilaiTkaSmp: inputNilai.nilaiTkaSmp,

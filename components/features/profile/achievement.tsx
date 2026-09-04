@@ -1,6 +1,7 @@
 "use client";
 
 import { cqm } from "@/lib/cq";
+import { useAuth } from "@/lib/store/auth";
 
 const ACHIEVEMENTS = [
   {
@@ -36,9 +37,46 @@ const ACHIEVEMENTS = [
     iconH: 127,
     iconTop: 24, // 764 - 740
   },
-];
+] as const;
+
+/** Status tercapai utk tiap achievement (dihitung dari data asli di server). */
+type AchievementKey = "Top Performer" | "Never Give Up" | "Streak Master";
+function useAchievementStatus(): Record<AchievementKey, boolean> {
+  const { user } = useAuth();
+  const a = user?.stats?.achievements;
+  return {
+    "Top Performer": a?.topPerformer ?? false,
+    "Never Give Up": a?.neverGiveUp ?? false,
+    "Streak Master": a?.streakMaster ?? false,
+  };
+}
+
+/** Chip kecil "Tercapai"/"Terkunci" di pojok kartu — tidak mengubah dimensi kartu. */
+function StatusBadge({ achieved, color }: { achieved: boolean; color: string }) {
+  return (
+    <span
+      className="pointer-events-none absolute inline-flex items-center rounded-full font-bold"
+      style={{
+        top: cqm(8),
+        right: cqm(8),
+        padding: `${cqm(3)} ${cqm(10)}`,
+        fontSize: cqm(10),
+        lineHeight: 1.4,
+        letterSpacing: "0.02em",
+        color: achieved ? "#ffffff" : color,
+        backgroundColor: achieved ? "#3bb273" : "rgba(255,255,255,0.55)",
+        border: achieved ? "none" : `${cqm(1)} solid ${color}33`,
+        boxShadow: achieved ? `0 ${cqm(2)} ${cqm(6)} rgba(59,178,115,0.35)` : "none",
+      }}
+    >
+      {achieved ? "✓ Tercapai" : "Terkunci"}
+    </span>
+  );
+}
 
 export function Achievement() {
+  const status = useAchievementStatus();
+
   return (
     <section>
       <h2
@@ -64,7 +102,7 @@ export function Achievement() {
         {ACHIEVEMENTS.map((a) => (
           <div
             key={a.title}
-            className="flex w-full items-center"
+            className="relative flex w-full items-center"
             style={{
               gap: cqm(32),
               borderRadius: cqm(16),
@@ -72,6 +110,7 @@ export function Achievement() {
               padding: `${cqm(20)} ${cqm(32)}`,
             }}
           >
+            <StatusBadge achieved={status[a.title]} color={a.color} />
             {/* ikon */}
             <img
               src={a.icon}
@@ -124,6 +163,7 @@ export function Achievement() {
               boxShadow: `0 ${cqm(4)} ${cqm(16)} rgba(28,20,81,0.08), 0 ${cqm(5)} 0 ${a.edge}`,
             }}
           >
+            <StatusBadge achieved={status[a.title]} color={a.color} />
             {/* ikon achievement */}
             <img
               src={a.icon}

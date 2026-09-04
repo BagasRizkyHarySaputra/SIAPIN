@@ -27,6 +27,8 @@ export interface ProfileStats {
   totalSoal: string; // "370 soal"
   akurasi: string; // "78%"
   progress: { label: string; value: string }[]; // AI Diagnostic: "58%" dst
+  /** Achievement yang tercapai — dihitung dari data asli (riwayat/leaderboard/streak). */
+  achievements: { topPerformer: boolean; neverGiveUp: boolean; streakMaster: boolean };
 }
 
 export interface User {
@@ -111,6 +113,11 @@ interface DiagnostikData {
   ringkasan?: { totalSoal?: number; akurasi?: number };
   progress?: { tkaSmp?: number; tkaSma?: number; snbt?: number };
   profile?: { streakDays?: number | null };
+  achievements?: {
+    topPerformer?: boolean;
+    neverGiveUp?: boolean;
+    streakMaster?: boolean;
+  };
 }
 
 /** Susun ProfileStats dari data diagnostik real (riwayat DB). */
@@ -128,6 +135,11 @@ function buildStats(d: DiagnostikData): ProfileStats {
       { label: "TKA SMA", value: `${prog.tkaSma ?? 0}%` },
       { label: "SNBT", value: `${prog.snbt ?? 0}%` },
     ],
+    achievements: {
+      topPerformer: d.achievements?.topPerformer ?? false,
+      neverGiveUp: d.achievements?.neverGiveUp ?? false,
+      streakMaster: d.achievements?.streakMaster ?? false,
+    },
   };
 }
 
