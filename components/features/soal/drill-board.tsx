@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { cqm } from "@/lib/cq";
 import { BANK_SOAL, type BankSoal } from "@/lib/data/soal";
 import { getPaketSoal } from "@/lib/data/bank";
+import { useAuth } from "@/lib/store/auth";
 
 const NAVY = "#1c1451";
 const TEAL = "#849ea0";
@@ -430,6 +431,7 @@ export function DrillBoard({
   tipe: "drilling" | "ujian";
 }) {
   const router = useRouter();
+  const { user } = useAuth();
   // Bank soal dinamis per mode+subtes+paket; fallback ke BANK_SOAL lama.
   const SOAL = getPaketSoal(modeSlug, subtesSlug, paket).length
     ? getPaketSoal(modeSlug, subtesSlug, paket)
@@ -441,9 +443,42 @@ export function DrillBoard({
   const [left, setLeft] = useState(30 * 60);
   const [doodleOpen, setDoodleOpen] = useState(false);
   const [doodles, setDoodles] = useState<Record<number, Stroke[]>>({});
+  // nomor soal yang sudah dikirim ke DB (hindari duplikat saat ganti jawaban)
+  const sentRef = useRef<Set<number>>(new Set());
 
   const q = SOAL[qi];
   const answered = SOAL.filter((s) => picks[s.no]).length;
+
+  /** Simpan hasil satu jawaban ke DB via API — fire & forget, non-blokir. */
+  function simpanJawaban(no: number, key: string) {
+    const so = SOAL.find((s) => s.no === no);
+    if (!so || sentRef.current.has(no)) return;
+    const benar = so.answer === key ? 1 : 0;
+    sentRef.current.add(no);
+    const email = user?.email;
+    if (!email) return;
+    try {
+      fetch("/api/riwayat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          mode: modeSlug,
+          subtes: subtesSlug,
+          paketKe: paket,
+          tipe,
+          benar,
+          salah: benar ? 0 : 1,
+          total: 1,
+          skor: benar ? 100 : 0,
+        }),
+      }).catch(() => {
+        /* non-blokir */
+      });
+    } catch {
+      /* non-blokir */
+    }
+  }
 
   // Timer khusus mode ujian.
   useEffect(() => {
@@ -461,7 +496,10 @@ export function DrillBoard({
   }
 
   function pick(key: string) {
+    // Jawaban pertama per soal yang dikirim ke DB; ganti jawaban tidak mengubah
+    // riwayat (hindari duplikat & spam). State picks tetap update untuk UI.
     setPicks((p) => ({ ...p, [q.no]: key }));
+    if (!sentRef.current.has(q.no)) simpanJawaban(q.no, key);
   }
 
   return (

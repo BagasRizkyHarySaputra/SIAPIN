@@ -172,7 +172,14 @@ function formatJoinedAt(d: Date): string {
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-export function AuthPopup({ onClose }: { onClose: () => void }) {
+export function AuthPopup({
+  onClose,
+  required = false,
+}: {
+  onClose: () => void;
+  /** Mode "gate": popup tidak bisa ditutup (dipakai halaman yang wajib login). */
+  required?: boolean;
+}) {
   const { login, register, accounts } = useAuth();
   const [view, setView] = useState<"login" | "register">("login");
   const [error, setError] = useState<string | null>(null);
@@ -190,14 +197,14 @@ export function AuthPopup({ onClose }: { onClose: () => void }) {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !required) onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose]);
+  }, [onClose, required]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,6 +226,12 @@ export function AuthPopup({ onClose }: { onClose: () => void }) {
       avatar: found.avatar,
       mode: "snbt",
       joinedAt: found.joinedAt ?? formatJoinedAt(new Date()),
+    });
+    syncToDb({
+      name: found.name,
+      email: found.email,
+      phone: found.phone,
+      avatar: found.avatar,
     });
     onClose();
   };
@@ -245,6 +258,7 @@ export function AuthPopup({ onClose }: { onClose: () => void }) {
     };
     register(acc);
     login({ name: acc.name, email: acc.email, mode: "snbt", joinedAt: acc.joinedAt });
+    syncToDb({ name: acc.name, email: acc.email });
     onClose();
   };
 
@@ -253,10 +267,35 @@ export function AuthPopup({ onClose }: { onClose: () => void }) {
     setView(v);
   };
 
+  /** Sinkronkan user mock (localStorage) ke DB Prisma via API — fire & forget. */
+  function syncToDb(u: {
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+  }) {
+    try {
+      fetch("/api/user/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: u.email,
+          name: u.name,
+          phone: u.phone,
+          avatar: u.avatar,
+        }),
+      }).catch(() => {
+        /* non-blokir */
+      });
+    } catch {
+      /* non-blokir */
+    }
+  }
+
   return (
     <div
       className="soal-popup-backdrop auth-scope"
-      onClick={onClose}
+      onClick={required ? undefined : onClose}
       style={{
         position: "fixed",
         inset: 0,
@@ -307,7 +346,7 @@ export function AuthPopup({ onClose }: { onClose: () => void }) {
                 paddingInline: cqm(70),
               }}
             >
-              <CloseButton bg="#dfe3ff" onClose={onClose} />
+              {!required && <CloseButton bg="#dfe3ff" onClose={onClose} />}
               <h2
                 className="font-bold"
                 style={{
@@ -392,7 +431,7 @@ export function AuthPopup({ onClose }: { onClose: () => void }) {
                 paddingInline: cqm(70),
               }}
             >
-              <CloseButton bg="#f6d5d5" onClose={onClose} />
+              {!required && <CloseButton bg="#f6d5d5" onClose={onClose} />}
               <h2
                 className="font-bold"
                 style={{

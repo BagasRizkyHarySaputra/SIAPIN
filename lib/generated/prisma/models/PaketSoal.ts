@@ -408,6 +408,11 @@ export type PaketSoalScalarRelationFilter = {
   isNot?: Prisma.PaketSoalWhereInput
 }
 
+export type PaketSoalNullableScalarRelationFilter = {
+  is?: Prisma.PaketSoalWhereInput | null
+  isNot?: Prisma.PaketSoalWhereInput | null
+}
+
 export type PaketSoalCreateNestedManyWithoutMapelInput = {
   create?: Prisma.XOR<Prisma.PaketSoalCreateWithoutMapelInput, Prisma.PaketSoalUncheckedCreateWithoutMapelInput> | Prisma.PaketSoalCreateWithoutMapelInput[] | Prisma.PaketSoalUncheckedCreateWithoutMapelInput[]
   connectOrCreate?: Prisma.PaketSoalCreateOrConnectWithoutMapelInput | Prisma.PaketSoalCreateOrConnectWithoutMapelInput[]
@@ -470,10 +475,12 @@ export type PaketSoalCreateNestedOneWithoutRiwayatInput = {
   connect?: Prisma.PaketSoalWhereUniqueInput
 }
 
-export type PaketSoalUpdateOneRequiredWithoutRiwayatNestedInput = {
+export type PaketSoalUpdateOneWithoutRiwayatNestedInput = {
   create?: Prisma.XOR<Prisma.PaketSoalCreateWithoutRiwayatInput, Prisma.PaketSoalUncheckedCreateWithoutRiwayatInput>
   connectOrCreate?: Prisma.PaketSoalCreateOrConnectWithoutRiwayatInput
   upsert?: Prisma.PaketSoalUpsertWithoutRiwayatInput
+  disconnect?: Prisma.PaketSoalWhereInput | boolean
+  delete?: Prisma.PaketSoalWhereInput | boolean
   connect?: Prisma.PaketSoalWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaketSoalUpdateToOneWithWhereWithoutRiwayatInput, Prisma.PaketSoalUpdateWithoutRiwayatInput>, Prisma.PaketSoalUncheckedUpdateWithoutRiwayatInput>
 }

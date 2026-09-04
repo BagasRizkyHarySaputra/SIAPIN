@@ -165,8 +165,15 @@ model RiwayatPengerjaan {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paketId   String
-  paket     PaketSoal @relation(fields: [paketId], references: [id], onDelete: Cascade)
+  // relasi opsional ke PaketSoal — bank soal utama hidup sebagai file TS statis,
+  // jadi riwayat boleh disimpan tanpa paket DB (cukup mode/subtes/paket skema).
+  paketId   String?
+  paket     PaketSoal? @relation(fields: [paketId], references: [id], onDelete: SetNull)
+  // identitas sesi dari bank statis
+  mode      String? // tka-smp | tka-sma | snbt
+  subtes    String? // mis. matematika, pm, ppu, pbm, ...
+  paketKe   Int?    // nomor paket (1..8)
+  tipe      String? // drilling | ujian
   skor      Int
   benar     Int
   salah     Int

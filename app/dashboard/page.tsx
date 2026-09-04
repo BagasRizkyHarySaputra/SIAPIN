@@ -9,6 +9,7 @@ import { PilihPtn } from "@/components/features/dashboard/pilih-ptn";
 import { PtnPopup, type PtnData } from "@/components/features/dashboard/ptn-popup";
 import { PtnResult } from "@/components/features/dashboard/ptn-result";
 import { ReviewWeb } from "@/components/features/dashboard/review-web";
+import { LoginGate } from "@/components/features/dashboard/login-gate";
 import { cqm } from "@/lib/cq";
 
 export default function DashboardPage() {
@@ -16,7 +17,8 @@ export default function DashboardPage() {
   const [ptn, setPtn] = useState<PtnData | null>(null);
 
   return (
-    <main className="min-h-screen w-full bg-[#dbe9ea]">
+    <LoginGate>
+      <main className="min-h-screen w-full bg-[#dbe9ea]">
       <Navbar />
 
       {/* white rounded container (Rectangle 159) */}
@@ -80,6 +82,7 @@ export default function DashboardPage() {
           }}
         />
       )}
-    </main>
+      </main>
+    </LoginGate>
   );
 }

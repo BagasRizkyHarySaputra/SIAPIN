@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cqm } from "@/lib/cq";
+import { PTN_LIST, findPtn, prodiByPtn } from "@/lib/data/ptn";
 
 export interface PtnData {
   jenis: string;
@@ -17,6 +18,8 @@ const JENIS_NILAI = [
   "Nilai Ujian Sekolah",
 ];
 
+// Daftar universitas dari data riil (75 PTN SNBT 2026). Popup menampilkan
+// PTN unggulan terlebih dahulu (yang sering dipilih), sisanya menyusul.
 const UNIVERSITAS = [
   "Universitas Gadjah Mada",
   "Universitas Indonesia",
@@ -26,17 +29,6 @@ const UNIVERSITAS = [
   "Institut Teknologi Sepuluh Nopember",
   "Universitas Padjadjaran",
   "Universitas Brawijaya",
-];
-
-const JURUSAN = [
-  "Kedokteran",
-  "Teknik Informatika",
-  "Teknik Elektro",
-  "Manajemen",
-  "Akuntansi",
-  "Hukum",
-  "Psikologi",
-  "Farmasi",
 ];
 
 function Chevron() {
@@ -169,6 +161,30 @@ export function PtnPopup({
   initial?: PtnData | null;
   onSave: (d: PtnData) => void;
 }) {
+  const [univ, setUniv] = useState(initial?.univ ?? "");
+  // Semua universitas riil dari dataset SNBT 2026 (75 PTN): yang populer
+  // (8 besar) ditampilkan lebih dulu, lalu sisanya mengikuti abjad.
+  const univList = useMemo(() => {
+    const namaSet = new Set<string>();
+    for (const u of UNIVERSITAS) namaSet.add(u);
+    const list = [...UNIVERSITAS];
+    for (const p of PTN_LIST) {
+      if (!namaSet.has(p.nama)) {
+        namaSet.add(p.nama);
+        list.push(p.nama);
+      }
+    }
+    return list;
+  }, []);
+
+  // Prodi riil milik universitas terpilih (dari dataset PTN).
+  const jurusanList = useMemo(() => {
+    if (!univ) return [];
+    const ptn = findPtn(univ);
+    if (!ptn) return [];
+    return prodiByPtn(ptn.id).map((p) => p.nama);
+  }, [univ]);
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -185,12 +201,14 @@ export function PtnPopup({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const univVal = String(fd.get("univ") ?? "");
+    const jurusanVal = String(fd.get("jurusan") ?? "");
     onSave({
       jenis: String(fd.get("jenis") ?? ""),
       snbt: String(fd.get("snbt") ?? ""),
       rapot: String(fd.get("rapot") ?? ""),
-      univ: String(fd.get("univ") ?? ""),
-      jurusan: String(fd.get("jurusan") ?? ""),
+      univ: univVal,
+      jurusan: jurusanVal,
     });
   }
 
@@ -323,25 +341,96 @@ export function PtnPopup({
               <div className="flex w-full flex-col" style={{ marginTop: cqm(64) }}>
                 <FieldLabel>Pilih Universitas</FieldLabel>
                 <div style={{ marginTop: cqm(19) }}>
-                  <Select
-                    ariaLabel="Pilih universitas"
-                    name="univ"
-                    options={UNIVERSITAS}
-                    placeholder="Pilih universitas"
-                    initial={initial?.univ}
-                  />
+                  <div style={{ position: "relative", width: "100%" }}>
+                    <select
+                      aria-label="Pilih universitas"
+                      name="univ"
+                      value={univ}
+                      onChange={(e) => {
+                        setUniv(e.target.value);
+                        // reset jurusan bila ganti univ
+                        const j = document.querySelector<HTMLSelectElement>(
+                          'select[name="jurusan"]'
+                        );
+                        if (j) j.value = "";
+                      }}
+                      required
+                      style={{
+                        ...inputBox,
+                        appearance: "none",
+                        WebkitAppearance: "none",
+                        paddingRight: cqm(52),
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="" disabled>
+                        Pilih universitas
+                      </option>
+                      {univList.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </select>
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        right: cqm(21),
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        display: "flex",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <Chevron />
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="flex w-full flex-col" style={{ marginTop: cqm(58) }}>
                 <FieldLabel>Pilih Jurusan Universitas</FieldLabel>
                 <div style={{ marginTop: cqm(15) }}>
-                  <Select
-                    ariaLabel="Pilih jurusan universitas"
-                    name="jurusan"
-                    options={JURUSAN}
-                    placeholder="Pilih jurusan"
-                    initial={initial?.jurusan}
-                  />
+                  <div style={{ position: "relative", width: "100%" }}>
+                    <select
+                      aria-label="Pilih jurusan universitas"
+                      name="jurusan"
+                      defaultValue={initial?.jurusan ?? ""}
+                      disabled={!univ}
+                      required
+                      style={{
+                        ...inputBox,
+                        appearance: "none",
+                        WebkitAppearance: "none",
+                        paddingRight: cqm(52),
+                        cursor: univ ? "pointer" : "not-allowed",
+                        opacity: univ ? 1 : 0.55,
+                        background: univ ? "#ffffff" : "#f0f0f5",
+                      }}
+                    >
+                      <option value="" disabled>
+                        {univ ? "Pilih jurusan/prodi" : "Pilih universitas dulu"}
+                      </option>
+                      {jurusanList.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </select>
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        right: cqm(21),
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        display: "flex",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <Chevron />
+                    </span>
+                  </div>
                 </div>
               </div>
               <button

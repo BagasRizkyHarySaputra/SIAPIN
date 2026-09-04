@@ -27,6 +27,7 @@ export type AggregateRiwayatPengerjaan = {
 }
 
 export type RiwayatPengerjaanAvgAggregateOutputType = {
+  paketKe: number | null
   skor: number | null
   benar: number | null
   salah: number | null
@@ -35,6 +36,7 @@ export type RiwayatPengerjaanAvgAggregateOutputType = {
 }
 
 export type RiwayatPengerjaanSumAggregateOutputType = {
+  paketKe: number | null
   skor: number | null
   benar: number | null
   salah: number | null
@@ -46,6 +48,10 @@ export type RiwayatPengerjaanMinAggregateOutputType = {
   id: string | null
   userId: string | null
   paketId: string | null
+  mode: string | null
+  subtes: string | null
+  paketKe: number | null
+  tipe: string | null
   skor: number | null
   benar: number | null
   salah: number | null
@@ -58,6 +64,10 @@ export type RiwayatPengerjaanMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   paketId: string | null
+  mode: string | null
+  subtes: string | null
+  paketKe: number | null
+  tipe: string | null
   skor: number | null
   benar: number | null
   salah: number | null
@@ -70,6 +80,10 @@ export type RiwayatPengerjaanCountAggregateOutputType = {
   id: number
   userId: number
   paketId: number
+  mode: number
+  subtes: number
+  paketKe: number
+  tipe: number
   skor: number
   benar: number
   salah: number
@@ -81,6 +95,7 @@ export type RiwayatPengerjaanCountAggregateOutputType = {
 
 
 export type RiwayatPengerjaanAvgAggregateInputType = {
+  paketKe?: true
   skor?: true
   benar?: true
   salah?: true
@@ -89,6 +104,7 @@ export type RiwayatPengerjaanAvgAggregateInputType = {
 }
 
 export type RiwayatPengerjaanSumAggregateInputType = {
+  paketKe?: true
   skor?: true
   benar?: true
   salah?: true
@@ -100,6 +116,10 @@ export type RiwayatPengerjaanMinAggregateInputType = {
   id?: true
   userId?: true
   paketId?: true
+  mode?: true
+  subtes?: true
+  paketKe?: true
+  tipe?: true
   skor?: true
   benar?: true
   salah?: true
@@ -112,6 +132,10 @@ export type RiwayatPengerjaanMaxAggregateInputType = {
   id?: true
   userId?: true
   paketId?: true
+  mode?: true
+  subtes?: true
+  paketKe?: true
+  tipe?: true
   skor?: true
   benar?: true
   salah?: true
@@ -124,6 +148,10 @@ export type RiwayatPengerjaanCountAggregateInputType = {
   id?: true
   userId?: true
   paketId?: true
+  mode?: true
+  subtes?: true
+  paketKe?: true
+  tipe?: true
   skor?: true
   benar?: true
   salah?: true
@@ -222,7 +250,11 @@ export type RiwayatPengerjaanGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type RiwayatPengerjaanGroupByOutputType = {
   id: string
   userId: string
-  paketId: string
+  paketId: string | null
+  mode: string | null
+  subtes: string | null
+  paketKe: number | null
+  tipe: string | null
   skor: number
   benar: number
   salah: number
@@ -257,7 +289,11 @@ export type RiwayatPengerjaanWhereInput = {
   NOT?: Prisma.RiwayatPengerjaanWhereInput | Prisma.RiwayatPengerjaanWhereInput[]
   id?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
   userId?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
-  paketId?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
+  paketId?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  mode?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  subtes?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  paketKe?: Prisma.IntNullableFilter<"RiwayatPengerjaan"> | number | null
+  tipe?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
   skor?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
   benar?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
   salah?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
@@ -265,14 +301,18 @@ export type RiwayatPengerjaanWhereInput = {
   waktu?: Prisma.IntNullableFilter<"RiwayatPengerjaan"> | number | null
   createdAt?: Prisma.DateTimeFilter<"RiwayatPengerjaan"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  paket?: Prisma.XOR<Prisma.PaketSoalScalarRelationFilter, Prisma.PaketSoalWhereInput>
+  paket?: Prisma.XOR<Prisma.PaketSoalNullableScalarRelationFilter, Prisma.PaketSoalWhereInput> | null
   jawaban?: Prisma.JawabanUserListRelationFilter
 }
 
 export type RiwayatPengerjaanOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  paketId?: Prisma.SortOrder
+  paketId?: Prisma.SortOrderInput | Prisma.SortOrder
+  mode?: Prisma.SortOrderInput | Prisma.SortOrder
+  subtes?: Prisma.SortOrderInput | Prisma.SortOrder
+  paketKe?: Prisma.SortOrderInput | Prisma.SortOrder
+  tipe?: Prisma.SortOrderInput | Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -290,7 +330,11 @@ export type RiwayatPengerjaanWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RiwayatPengerjaanWhereInput[]
   NOT?: Prisma.RiwayatPengerjaanWhereInput | Prisma.RiwayatPengerjaanWhereInput[]
   userId?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
-  paketId?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
+  paketId?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  mode?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  subtes?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  paketKe?: Prisma.IntNullableFilter<"RiwayatPengerjaan"> | number | null
+  tipe?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
   skor?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
   benar?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
   salah?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
@@ -298,14 +342,18 @@ export type RiwayatPengerjaanWhereUniqueInput = Prisma.AtLeast<{
   waktu?: Prisma.IntNullableFilter<"RiwayatPengerjaan"> | number | null
   createdAt?: Prisma.DateTimeFilter<"RiwayatPengerjaan"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  paket?: Prisma.XOR<Prisma.PaketSoalScalarRelationFilter, Prisma.PaketSoalWhereInput>
+  paket?: Prisma.XOR<Prisma.PaketSoalNullableScalarRelationFilter, Prisma.PaketSoalWhereInput> | null
   jawaban?: Prisma.JawabanUserListRelationFilter
 }, "id">
 
 export type RiwayatPengerjaanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  paketId?: Prisma.SortOrder
+  paketId?: Prisma.SortOrderInput | Prisma.SortOrder
+  mode?: Prisma.SortOrderInput | Prisma.SortOrder
+  subtes?: Prisma.SortOrderInput | Prisma.SortOrder
+  paketKe?: Prisma.SortOrderInput | Prisma.SortOrder
+  tipe?: Prisma.SortOrderInput | Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -325,7 +373,11 @@ export type RiwayatPengerjaanScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RiwayatPengerjaanScalarWhereWithAggregatesInput | Prisma.RiwayatPengerjaanScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"RiwayatPengerjaan"> | string
   userId?: Prisma.StringWithAggregatesFilter<"RiwayatPengerjaan"> | string
-  paketId?: Prisma.StringWithAggregatesFilter<"RiwayatPengerjaan"> | string
+  paketId?: Prisma.StringNullableWithAggregatesFilter<"RiwayatPengerjaan"> | string | null
+  mode?: Prisma.StringNullableWithAggregatesFilter<"RiwayatPengerjaan"> | string | null
+  subtes?: Prisma.StringNullableWithAggregatesFilter<"RiwayatPengerjaan"> | string | null
+  paketKe?: Prisma.IntNullableWithAggregatesFilter<"RiwayatPengerjaan"> | number | null
+  tipe?: Prisma.StringNullableWithAggregatesFilter<"RiwayatPengerjaan"> | string | null
   skor?: Prisma.IntWithAggregatesFilter<"RiwayatPengerjaan"> | number
   benar?: Prisma.IntWithAggregatesFilter<"RiwayatPengerjaan"> | number
   salah?: Prisma.IntWithAggregatesFilter<"RiwayatPengerjaan"> | number
@@ -336,6 +388,10 @@ export type RiwayatPengerjaanScalarWhereWithAggregatesInput = {
 
 export type RiwayatPengerjaanCreateInput = {
   id?: string
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -343,14 +399,18 @@ export type RiwayatPengerjaanCreateInput = {
   waktu?: number | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutRiwayatInput
-  paket: Prisma.PaketSoalCreateNestedOneWithoutRiwayatInput
+  paket?: Prisma.PaketSoalCreateNestedOneWithoutRiwayatInput
   jawaban?: Prisma.JawabanUserCreateNestedManyWithoutRiwayatInput
 }
 
 export type RiwayatPengerjaanUncheckedCreateInput = {
   id?: string
   userId: string
-  paketId: string
+  paketId?: string | null
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -362,6 +422,10 @@ export type RiwayatPengerjaanUncheckedCreateInput = {
 
 export type RiwayatPengerjaanUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -369,14 +433,18 @@ export type RiwayatPengerjaanUpdateInput = {
   waktu?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutRiwayatNestedInput
-  paket?: Prisma.PaketSoalUpdateOneRequiredWithoutRiwayatNestedInput
+  paket?: Prisma.PaketSoalUpdateOneWithoutRiwayatNestedInput
   jawaban?: Prisma.JawabanUserUpdateManyWithoutRiwayatNestedInput
 }
 
 export type RiwayatPengerjaanUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  paketId?: Prisma.StringFieldUpdateOperationsInput | string
+  paketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -389,7 +457,11 @@ export type RiwayatPengerjaanUncheckedUpdateInput = {
 export type RiwayatPengerjaanCreateManyInput = {
   id?: string
   userId: string
-  paketId: string
+  paketId?: string | null
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -400,6 +472,10 @@ export type RiwayatPengerjaanCreateManyInput = {
 
 export type RiwayatPengerjaanUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -411,7 +487,11 @@ export type RiwayatPengerjaanUpdateManyMutationInput = {
 export type RiwayatPengerjaanUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  paketId?: Prisma.StringFieldUpdateOperationsInput | string
+  paketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -434,6 +514,10 @@ export type RiwayatPengerjaanCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   paketId?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  subtes?: Prisma.SortOrder
+  paketKe?: Prisma.SortOrder
+  tipe?: Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -443,6 +527,7 @@ export type RiwayatPengerjaanCountOrderByAggregateInput = {
 }
 
 export type RiwayatPengerjaanAvgOrderByAggregateInput = {
+  paketKe?: Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -454,6 +539,10 @@ export type RiwayatPengerjaanMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   paketId?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  subtes?: Prisma.SortOrder
+  paketKe?: Prisma.SortOrder
+  tipe?: Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -466,6 +555,10 @@ export type RiwayatPengerjaanMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   paketId?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  subtes?: Prisma.SortOrder
+  paketKe?: Prisma.SortOrder
+  tipe?: Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -475,6 +568,7 @@ export type RiwayatPengerjaanMinOrderByAggregateInput = {
 }
 
 export type RiwayatPengerjaanSumOrderByAggregateInput = {
+  paketKe?: Prisma.SortOrder
   skor?: Prisma.SortOrder
   benar?: Prisma.SortOrder
   salah?: Prisma.SortOrder
@@ -595,6 +689,10 @@ export type RiwayatPengerjaanUpdateOneRequiredWithoutJawabanNestedInput = {
 
 export type RiwayatPengerjaanCreateWithoutPaketInput = {
   id?: string
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -608,6 +706,10 @@ export type RiwayatPengerjaanCreateWithoutPaketInput = {
 export type RiwayatPengerjaanUncheckedCreateWithoutPaketInput = {
   id?: string
   userId: string
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -648,7 +750,11 @@ export type RiwayatPengerjaanScalarWhereInput = {
   NOT?: Prisma.RiwayatPengerjaanScalarWhereInput | Prisma.RiwayatPengerjaanScalarWhereInput[]
   id?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
   userId?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
-  paketId?: Prisma.StringFilter<"RiwayatPengerjaan"> | string
+  paketId?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  mode?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  subtes?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
+  paketKe?: Prisma.IntNullableFilter<"RiwayatPengerjaan"> | number | null
+  tipe?: Prisma.StringNullableFilter<"RiwayatPengerjaan"> | string | null
   skor?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
   benar?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
   salah?: Prisma.IntFilter<"RiwayatPengerjaan"> | number
@@ -659,19 +765,27 @@ export type RiwayatPengerjaanScalarWhereInput = {
 
 export type RiwayatPengerjaanCreateWithoutUserInput = {
   id?: string
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
   total: number
   waktu?: number | null
   createdAt?: Date | string
-  paket: Prisma.PaketSoalCreateNestedOneWithoutRiwayatInput
+  paket?: Prisma.PaketSoalCreateNestedOneWithoutRiwayatInput
   jawaban?: Prisma.JawabanUserCreateNestedManyWithoutRiwayatInput
 }
 
 export type RiwayatPengerjaanUncheckedCreateWithoutUserInput = {
   id?: string
-  paketId: string
+  paketId?: string | null
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -708,6 +822,10 @@ export type RiwayatPengerjaanUpdateManyWithWhereWithoutUserInput = {
 
 export type RiwayatPengerjaanCreateWithoutJawabanInput = {
   id?: string
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -715,13 +833,17 @@ export type RiwayatPengerjaanCreateWithoutJawabanInput = {
   waktu?: number | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutRiwayatInput
-  paket: Prisma.PaketSoalCreateNestedOneWithoutRiwayatInput
+  paket?: Prisma.PaketSoalCreateNestedOneWithoutRiwayatInput
 }
 
 export type RiwayatPengerjaanUncheckedCreateWithoutJawabanInput = {
   id?: string
   userId: string
-  paketId: string
+  paketId?: string | null
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -748,6 +870,10 @@ export type RiwayatPengerjaanUpdateToOneWithWhereWithoutJawabanInput = {
 
 export type RiwayatPengerjaanUpdateWithoutJawabanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -755,13 +881,17 @@ export type RiwayatPengerjaanUpdateWithoutJawabanInput = {
   waktu?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutRiwayatNestedInput
-  paket?: Prisma.PaketSoalUpdateOneRequiredWithoutRiwayatNestedInput
+  paket?: Prisma.PaketSoalUpdateOneWithoutRiwayatNestedInput
 }
 
 export type RiwayatPengerjaanUncheckedUpdateWithoutJawabanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  paketId?: Prisma.StringFieldUpdateOperationsInput | string
+  paketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -773,6 +903,10 @@ export type RiwayatPengerjaanUncheckedUpdateWithoutJawabanInput = {
 export type RiwayatPengerjaanCreateManyPaketInput = {
   id?: string
   userId: string
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -783,6 +917,10 @@ export type RiwayatPengerjaanCreateManyPaketInput = {
 
 export type RiwayatPengerjaanUpdateWithoutPaketInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -796,6 +934,10 @@ export type RiwayatPengerjaanUpdateWithoutPaketInput = {
 export type RiwayatPengerjaanUncheckedUpdateWithoutPaketInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -808,6 +950,10 @@ export type RiwayatPengerjaanUncheckedUpdateWithoutPaketInput = {
 export type RiwayatPengerjaanUncheckedUpdateManyWithoutPaketInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -818,7 +964,11 @@ export type RiwayatPengerjaanUncheckedUpdateManyWithoutPaketInput = {
 
 export type RiwayatPengerjaanCreateManyUserInput = {
   id?: string
-  paketId: string
+  paketId?: string | null
+  mode?: string | null
+  subtes?: string | null
+  paketKe?: number | null
+  tipe?: string | null
   skor: number
   benar: number
   salah: number
@@ -829,19 +979,27 @@ export type RiwayatPengerjaanCreateManyUserInput = {
 
 export type RiwayatPengerjaanUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   waktu?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  paket?: Prisma.PaketSoalUpdateOneRequiredWithoutRiwayatNestedInput
+  paket?: Prisma.PaketSoalUpdateOneWithoutRiwayatNestedInput
   jawaban?: Prisma.JawabanUserUpdateManyWithoutRiwayatNestedInput
 }
 
 export type RiwayatPengerjaanUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paketId?: Prisma.StringFieldUpdateOperationsInput | string
+  paketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -853,7 +1011,11 @@ export type RiwayatPengerjaanUncheckedUpdateWithoutUserInput = {
 
 export type RiwayatPengerjaanUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paketId?: Prisma.StringFieldUpdateOperationsInput | string
+  paketId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subtes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paketKe?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tipe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   skor?: Prisma.IntFieldUpdateOperationsInput | number
   benar?: Prisma.IntFieldUpdateOperationsInput | number
   salah?: Prisma.IntFieldUpdateOperationsInput | number
@@ -897,6 +1059,10 @@ export type RiwayatPengerjaanSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   userId?: boolean
   paketId?: boolean
+  mode?: boolean
+  subtes?: boolean
+  paketKe?: boolean
+  tipe?: boolean
   skor?: boolean
   benar?: boolean
   salah?: boolean
@@ -904,7 +1070,7 @@ export type RiwayatPengerjaanSelect<ExtArgs extends runtime.Types.Extensions.Int
   waktu?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  paket?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
+  paket?: boolean | Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>
   jawaban?: boolean | Prisma.RiwayatPengerjaan$jawabanArgs<ExtArgs>
   _count?: boolean | Prisma.RiwayatPengerjaanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["riwayatPengerjaan"]>
@@ -913,6 +1079,10 @@ export type RiwayatPengerjaanSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   userId?: boolean
   paketId?: boolean
+  mode?: boolean
+  subtes?: boolean
+  paketKe?: boolean
+  tipe?: boolean
   skor?: boolean
   benar?: boolean
   salah?: boolean
@@ -920,13 +1090,17 @@ export type RiwayatPengerjaanSelectCreateManyAndReturn<ExtArgs extends runtime.T
   waktu?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  paket?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
+  paket?: boolean | Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>
 }, ExtArgs["result"]["riwayatPengerjaan"]>
 
 export type RiwayatPengerjaanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
   paketId?: boolean
+  mode?: boolean
+  subtes?: boolean
+  paketKe?: boolean
+  tipe?: boolean
   skor?: boolean
   benar?: boolean
   salah?: boolean
@@ -934,13 +1108,17 @@ export type RiwayatPengerjaanSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   waktu?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  paket?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
+  paket?: boolean | Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>
 }, ExtArgs["result"]["riwayatPengerjaan"]>
 
 export type RiwayatPengerjaanSelectScalar = {
   id?: boolean
   userId?: boolean
   paketId?: boolean
+  mode?: boolean
+  subtes?: boolean
+  paketKe?: boolean
+  tipe?: boolean
   skor?: boolean
   benar?: boolean
   salah?: boolean
@@ -949,33 +1127,37 @@ export type RiwayatPengerjaanSelectScalar = {
   createdAt?: boolean
 }
 
-export type RiwayatPengerjaanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "paketId" | "skor" | "benar" | "salah" | "total" | "waktu" | "createdAt", ExtArgs["result"]["riwayatPengerjaan"]>
+export type RiwayatPengerjaanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "paketId" | "mode" | "subtes" | "paketKe" | "tipe" | "skor" | "benar" | "salah" | "total" | "waktu" | "createdAt", ExtArgs["result"]["riwayatPengerjaan"]>
 export type RiwayatPengerjaanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  paket?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
+  paket?: boolean | Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>
   jawaban?: boolean | Prisma.RiwayatPengerjaan$jawabanArgs<ExtArgs>
   _count?: boolean | Prisma.RiwayatPengerjaanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RiwayatPengerjaanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  paket?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
+  paket?: boolean | Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>
 }
 export type RiwayatPengerjaanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  paket?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
+  paket?: boolean | Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>
 }
 
 export type $RiwayatPengerjaanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "RiwayatPengerjaan"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
-    paket: Prisma.$PaketSoalPayload<ExtArgs>
+    paket: Prisma.$PaketSoalPayload<ExtArgs> | null
     jawaban: Prisma.$JawabanUserPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    paketId: string
+    paketId: string | null
+    mode: string | null
+    subtes: string | null
+    paketKe: number | null
+    tipe: string | null
     skor: number
     benar: number
     salah: number
@@ -1377,7 +1559,7 @@ readonly fields: RiwayatPengerjaanFieldRefs;
 export interface Prisma__RiwayatPengerjaanClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  paket<T extends Prisma.PaketSoalDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaketSoalDefaultArgs<ExtArgs>>): Prisma.Prisma__PaketSoalClient<runtime.Types.Result.GetResult<Prisma.$PaketSoalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  paket<T extends Prisma.RiwayatPengerjaan$paketArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RiwayatPengerjaan$paketArgs<ExtArgs>>): Prisma.Prisma__PaketSoalClient<runtime.Types.Result.GetResult<Prisma.$PaketSoalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   jawaban<T extends Prisma.RiwayatPengerjaan$jawabanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RiwayatPengerjaan$jawabanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JawabanUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1411,6 +1593,10 @@ export interface RiwayatPengerjaanFieldRefs {
   readonly id: Prisma.FieldRef<"RiwayatPengerjaan", 'String'>
   readonly userId: Prisma.FieldRef<"RiwayatPengerjaan", 'String'>
   readonly paketId: Prisma.FieldRef<"RiwayatPengerjaan", 'String'>
+  readonly mode: Prisma.FieldRef<"RiwayatPengerjaan", 'String'>
+  readonly subtes: Prisma.FieldRef<"RiwayatPengerjaan", 'String'>
+  readonly paketKe: Prisma.FieldRef<"RiwayatPengerjaan", 'Int'>
+  readonly tipe: Prisma.FieldRef<"RiwayatPengerjaan", 'String'>
   readonly skor: Prisma.FieldRef<"RiwayatPengerjaan", 'Int'>
   readonly benar: Prisma.FieldRef<"RiwayatPengerjaan", 'Int'>
   readonly salah: Prisma.FieldRef<"RiwayatPengerjaan", 'Int'>
@@ -1813,6 +1999,25 @@ export type RiwayatPengerjaanDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many RiwayatPengerjaans to delete.
    */
   limit?: number
+}
+
+/**
+ * RiwayatPengerjaan.paket
+ */
+export type RiwayatPengerjaan$paketArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaketSoal
+   */
+  select?: Prisma.PaketSoalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaketSoal
+   */
+  omit?: Prisma.PaketSoalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaketSoalInclude<ExtArgs> | null
+  where?: Prisma.PaketSoalWhereInput
 }
 
 /**

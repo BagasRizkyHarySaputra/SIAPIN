@@ -4,7 +4,8 @@
  * pentagon/hexagon grid in #e5e7eb, magenta #c207af data polygon + dots.
  * Pure SVG so it scales with the container (cqw sizing handled by parent). */
 
-const LABELS = [
+// Default fallback — dipakai bila parent tidak mengirim data riil.
+const DEFAULT_LABELS = [
   "Matematika",
   "B. Indonesia",
   "B. Inggris",
@@ -16,19 +17,24 @@ const LABELS = [
 ];
 
 // values 0..1 per label (roughly matching the magenta polygon in the design)
-const VALUES = [0.72, 0.55, 0.6, 0.68, 0.5, 0.42, 0.58, 0.5];
+const DEFAULT_VALUES = [0.72, 0.55, 0.6, 0.68, 0.5, 0.42, 0.58, 0.5];
 
 export function RadarChart({
   size = 340,
   labelSide = "left",
+  labels = DEFAULT_LABELS,
+  values = DEFAULT_VALUES,
 }: {
   size?: number;
   labelSide?: "left" | "right";
+  labels?: string[];
+  /** 0..1 per label */
+  values?: number[];
 }) {
   const cx = size / 2;
   const cy = size / 2;
   const R = size * 0.36;
-  const n = LABELS.length;
+  const n = labels.length;
 
   const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
   const point = (i: number, r: number) => {
@@ -38,8 +44,9 @@ export function RadarChart({
   const poly = (r: number) =>
     Array.from({ length: n }, (_, i) => point(i, r).join(",")).join(" ");
 
-  // data polygon points
-  const dataPts = LABELS.map((_, i) => point(i, R * VALUES[i])).join(" ");
+  // data polygon points (clamp 0..1)
+  const safe = values.map((v) => Math.max(0, Math.min(1, v || 0)));
+  const dataPts = labels.map((_, i) => point(i, R * (safe[i] ?? 0))).join(" ");
 
   return (
     <div
@@ -62,7 +69,7 @@ export function RadarChart({
           />
         ))}
         {/* spokes */}
-        {LABELS.map((_, i) => {
+        {labels.map((_, i) => {
           const [x, y] = point(i, R);
           return (
             <line
@@ -85,8 +92,8 @@ export function RadarChart({
           strokeLinejoin="round"
         />
         {/* data dots */}
-        {LABELS.map((_, i) => {
-          const [x, y] = point(i, R * VALUES[i]);
+        {labels.map((_, i) => {
+          const [x, y] = point(i, R * (safe[i] ?? 0));
           return <circle key={i} cx={x} cy={y} r={4} fill="#c207af" />;
         })}
       </svg>
