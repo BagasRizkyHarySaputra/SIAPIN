@@ -1566,6 +1566,7 @@ export const UserProfileScalarFieldEnum = {
   userId: 'userId',
   namaLengkap: 'namaLengkap',
   streakDays: 'streakDays',
+  lastLoginAt: 'lastLoginAt',
   totalSoal: 'totalSoal',
   akurasi: 'akurasi',
   aiDiagnosticProgress: 'aiDiagnosticProgress',

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { AccountCard } from "@/components/features/profile/account-card";
 import { StatCards } from "@/components/features/profile/stat-cards";
@@ -8,11 +8,20 @@ import { Achievement } from "@/components/features/profile/achievement";
 import { AiAndSettings } from "@/components/features/profile/ai-settings";
 import { AuthPopup } from "@/components/features/profile/auth-popup";
 import { EditProfilePopup } from "@/components/features/profile/edit-profile-popup";
+import { useAuth } from "@/lib/store/auth";
 import { cqm } from "@/lib/cq";
 
 export default function ProfilePage() {
   const [authOpen, setAuthOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const { user, refreshStats } = useAuth();
+
+  // Setiap /profile dibuka, pastikan statistik (streak/total soal/akurasi/
+  // progress AI Diagnostic) selalu dari DB — termasuk setelah mengerjakan soal.
+  useEffect(() => {
+    if (user?.email) refreshStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main className="min-h-screen w-full bg-[#dbe9ea]" style={{ overflowX: "clip" }}>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cqm } from "@/lib/cq";
 import { usePageNav } from "./page-transition";
+import { useAuth } from "@/lib/store/auth";
 
 const links = [
   { href: "/dashboard", label: "Beranda" },
@@ -15,6 +16,8 @@ const links = [
 export function Navbar() {
   const pathname = usePathname();
   const { navigate } = usePageNav();
+  const { user } = useAuth();
+  const streak = user?.stats?.streak ?? "1 day";
 
   return (
     <header
@@ -32,9 +35,11 @@ export function Navbar() {
         }}
         className="col-start-1 row-start-1 flex items-center justify-self-start gap-[1.2cqw]"
       >
-        <span
-          className="block rounded-[2cqw] bg-[#d9d9d9]"
-          style={{ width: cqm(55), height: cqm(55) }}
+        <img
+          src="/visual/logo-siapin.png"
+          alt="Logo SIAPIN"
+          className="block rounded-[2cqw]"
+          style={{ width: cqm(55), height: cqm(55), objectFit: "cover" }}
         />
         <span
           className="font-display font-semibold text-[#454545]"
@@ -90,7 +95,7 @@ export function Navbar() {
             </span>
           </span>
           <span className="font-bold text-[#b6744f]" style={{ fontSize: cqm(24) }}>
-            5 days
+            {streak}
           </span>
         </div>
 

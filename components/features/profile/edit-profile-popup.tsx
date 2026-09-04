@@ -6,9 +6,16 @@ import { useAuth } from "@/lib/store/auth";
 
 const DEFAULT_AVATAR = "/visual/profile/avatar-default.png";
 
+/** Target ukuran data URL avatar — dibulatkan ≤ ~1 KB (1.024 char). */
+const TARGET_CHARS = 1024;
+/** Kualitas JPEG awal saat kompresi (0–1). Diturunkan bertahap bila masih besar. */
+const START_QUALITY = 0.85;
+const MIN_QUALITY = 0.4;
+
 /**
- * Kompres & ubah file gambar jadi data URL (persegi, ≤ ukuran tertentu) supaya
- * muat di localStorage. Mirip perilaku crop-avatar IG: hasil dipusatkan.
+ * Kompres & ubah file gambar jadi data URL JPEG persegi sekecil mungkin
+ * (≤ ~1 KB) supaya hemat penyimpanan localStorage & chat. Gambar dipusatkan
+ * ala crop-avatar, dimensi diturunkan bertahap sampai muat target.
  */
 function readImageFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -16,18 +23,42 @@ function readImageFile(file: File): Promise<string> {
     const img = new Image();
     img.onload = () => {
       try {
-        const SIZE = 256;
-        const canvas = document.createElement("canvas");
-        canvas.width = SIZE;
-        canvas.height = SIZE;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) throw new Error("no canvas");
         const side = Math.min(img.width, img.height);
         const sx = (img.width - side) / 2;
         const sy = (img.height - side) / 2;
-        ctx.drawImage(img, sx, sy, side, side, 0, 0, SIZE, SIZE);
+
+        const make = (size: number, quality: number): string => {
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("no canvas");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, size, size);
+          ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+          return canvas.toDataURL("image/jpeg", quality);
+        };
+
+        // Iterasi: mulai dari 96px, kecilkan ukuran & turunkan kualitas sampai
+        // data URL ≤ target. Data URL jpeg 96px biasanya sudah < 1 KB.
+        let best: string | null = null;
+        const sizes = [96, 80, 64, 48, 40, 32];
+        for (const size of sizes) {
+          for (const q of [START_QUALITY, 0.7, 0.55, MIN_QUALITY]) {
+            const dataUrl = make(size, q);
+            if (dataUrl.length <= TARGET_CHARS) {
+              best = dataUrl;
+              break;
+            }
+            // simpan kandidat terkecil (bila tak ada yang muat)
+            if (!best || dataUrl.length < best.length) best = dataUrl;
+          }
+          if (best && best.length <= TARGET_CHARS) break;
+        }
+        // fallback paling kecil yang pernah dibuat (selalu ada)
+        const result = best ?? make(32, MIN_QUALITY);
         URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL("image/jpeg", 0.85));
+        resolve(result);
       } catch (e) {
         URL.revokeObjectURL(url);
         reject(e);
@@ -44,16 +75,18 @@ function readImageFile(file: File): Promise<string> {
 /**
  * Popup "Edit Profile" — mengikuti desain Figma 369-1127.
  * Avatar & tombol kamera bisa diklik → pilih gambar dari perangkat (ala IG),
- * lalu pratinjau; Simpan menyimpan nama/telepon/email + foto profil.
+ * lalu pratinjau; Simpan menyimpan nama/telepon + foto profil.
+ * Email sengaja dibuat read-only: email adalah identitas login (jembatan ke DB),
+ * mengubahnya tanpa verifikasi bikin profil "nge-bug"/terpisah dari riwayat.
  */
 export function EditProfilePopup({ onClose }: { onClose: () => void }) {
   const { user, updateProfile } = useAuth();
 
   const [name, setName] = useState(user?.name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
   const [avatar, setAvatar] = useState<string | undefined>(user?.avatar);
   const [busy, setBusy] = useState(false);
+  const [warn, setWarn] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -74,14 +107,20 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
   const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ""; // biar file sama bisa dipilih ulang
+    setWarn(null);
     if (!file) return;
-    if (!file.type.startsWith("image/")) return;
+    // hanya menerima gambar — selain gambar ditolak dengan pesan jelas
+    if (!file.type.startsWith("image/")) {
+      setWarn("File harus berupa gambar (jpg, png, webp, dll).");
+      return;
+    }
     setBusy(true);
     try {
       const dataUrl = await readImageFile(file);
       setAvatar(dataUrl);
+      setWarn(null);
     } catch {
-      /* file tidak valid — abaikan */
+      setWarn("Gambar tidak bisa dibaca. Coba file lain.");
     } finally {
       setBusy(false);
     }
@@ -89,7 +128,7 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    updateProfile({ name, phone, email, avatar });
+    updateProfile({ name, phone, avatar });
     onClose();
   };
 
@@ -232,11 +271,15 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
               margin: 0,
               marginTop: -cqm(16),
               fontSize: cqm(12),
-              color: "#f6b4b2",
+              color: warn ? "#ef5b7e" : "#f6b4b2",
               cursor: "default",
+              textAlign: "center",
+              maxWidth: cqm(400),
             }}
           >
-            {busy ? "Memproses…" : "Tekan foto untuk ganti profil"}
+            {busy
+              ? "Memproses…"
+              : warn ?? "Tekan foto untuk ganti profil (khusus gambar, otomatis diperkecil)"}
           </p>
 
           {/* Nama Lengkap */}
@@ -259,13 +302,14 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
             />
           </Field>
 
-          {/* Email */}
+          {/* Email — read-only: identitas login, tidak bisa diubah di sini */}
           <Field label="Email">
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={inputStyle}
+              value={user?.email ?? ""}
+              readOnly
+              disabled
+              style={{ ...inputStyle, opacity: 0.75, cursor: "not-allowed" }}
               placeholder="email dia saat login"
             />
           </Field>

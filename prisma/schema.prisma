@@ -120,6 +120,9 @@ model UserProfile {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   namaLengkap String? // bisa beda dari login name
   streakDays  Int      @default(0)
+  // Waktu login/aktivasi terakhir — dipakai menghitung streak harian:
+  // login tiap hari → streakDays+1; ada hari terlewat → reset ke 1.
+  lastLoginAt DateTime?
   totalSoal   Int      @default(0)
   akurasi     Float?   // 0-100
   aiDiagnosticProgress Json? // simpan progress AI Diagnostic (opsional denormalisasi)

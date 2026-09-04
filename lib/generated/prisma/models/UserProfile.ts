@@ -43,6 +43,7 @@ export type UserProfileMinAggregateOutputType = {
   userId: string | null
   namaLengkap: string | null
   streakDays: number | null
+  lastLoginAt: Date | null
   totalSoal: number | null
   akurasi: number | null
   createdAt: Date | null
@@ -54,6 +55,7 @@ export type UserProfileMaxAggregateOutputType = {
   userId: string | null
   namaLengkap: string | null
   streakDays: number | null
+  lastLoginAt: Date | null
   totalSoal: number | null
   akurasi: number | null
   createdAt: Date | null
@@ -65,6 +67,7 @@ export type UserProfileCountAggregateOutputType = {
   userId: number
   namaLengkap: number
   streakDays: number
+  lastLoginAt: number
   totalSoal: number
   akurasi: number
   aiDiagnosticProgress: number
@@ -91,6 +94,7 @@ export type UserProfileMinAggregateInputType = {
   userId?: true
   namaLengkap?: true
   streakDays?: true
+  lastLoginAt?: true
   totalSoal?: true
   akurasi?: true
   createdAt?: true
@@ -102,6 +106,7 @@ export type UserProfileMaxAggregateInputType = {
   userId?: true
   namaLengkap?: true
   streakDays?: true
+  lastLoginAt?: true
   totalSoal?: true
   akurasi?: true
   createdAt?: true
@@ -113,6 +118,7 @@ export type UserProfileCountAggregateInputType = {
   userId?: true
   namaLengkap?: true
   streakDays?: true
+  lastLoginAt?: true
   totalSoal?: true
   akurasi?: true
   aiDiagnosticProgress?: true
@@ -212,6 +218,7 @@ export type UserProfileGroupByOutputType = {
   userId: string
   namaLengkap: string | null
   streakDays: number
+  lastLoginAt: Date | null
   totalSoal: number
   akurasi: number | null
   aiDiagnosticProgress: runtime.JsonValue | null
@@ -247,6 +254,7 @@ export type UserProfileWhereInput = {
   userId?: Prisma.StringFilter<"UserProfile"> | string
   namaLengkap?: Prisma.StringNullableFilter<"UserProfile"> | string | null
   streakDays?: Prisma.IntFilter<"UserProfile"> | number
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null
   totalSoal?: Prisma.IntFilter<"UserProfile"> | number
   akurasi?: Prisma.FloatNullableFilter<"UserProfile"> | number | null
   aiDiagnosticProgress?: Prisma.JsonNullableFilter<"UserProfile">
@@ -260,6 +268,7 @@ export type UserProfileOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   namaLengkap?: Prisma.SortOrderInput | Prisma.SortOrder
   streakDays?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalSoal?: Prisma.SortOrder
   akurasi?: Prisma.SortOrderInput | Prisma.SortOrder
   aiDiagnosticProgress?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -276,6 +285,7 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserProfileWhereInput | Prisma.UserProfileWhereInput[]
   namaLengkap?: Prisma.StringNullableFilter<"UserProfile"> | string | null
   streakDays?: Prisma.IntFilter<"UserProfile"> | number
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null
   totalSoal?: Prisma.IntFilter<"UserProfile"> | number
   akurasi?: Prisma.FloatNullableFilter<"UserProfile"> | number | null
   aiDiagnosticProgress?: Prisma.JsonNullableFilter<"UserProfile">
@@ -289,6 +299,7 @@ export type UserProfileOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   namaLengkap?: Prisma.SortOrderInput | Prisma.SortOrder
   streakDays?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalSoal?: Prisma.SortOrder
   akurasi?: Prisma.SortOrderInput | Prisma.SortOrder
   aiDiagnosticProgress?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -309,6 +320,7 @@ export type UserProfileScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string
   namaLengkap?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null
   streakDays?: Prisma.IntWithAggregatesFilter<"UserProfile"> | number
+  lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserProfile"> | Date | string | null
   totalSoal?: Prisma.IntWithAggregatesFilter<"UserProfile"> | number
   akurasi?: Prisma.FloatNullableWithAggregatesFilter<"UserProfile"> | number | null
   aiDiagnosticProgress?: Prisma.JsonNullableWithAggregatesFilter<"UserProfile">
@@ -320,6 +332,7 @@ export type UserProfileCreateInput = {
   id?: string
   namaLengkap?: string | null
   streakDays?: number
+  lastLoginAt?: Date | string | null
   totalSoal?: number
   akurasi?: number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -333,6 +346,7 @@ export type UserProfileUncheckedCreateInput = {
   userId: string
   namaLengkap?: string | null
   streakDays?: number
+  lastLoginAt?: Date | string | null
   totalSoal?: number
   akurasi?: number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -344,6 +358,7 @@ export type UserProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaLengkap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   streakDays?: Prisma.IntFieldUpdateOperationsInput | number
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalSoal?: Prisma.IntFieldUpdateOperationsInput | number
   akurasi?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -357,6 +372,7 @@ export type UserProfileUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   namaLengkap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   streakDays?: Prisma.IntFieldUpdateOperationsInput | number
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalSoal?: Prisma.IntFieldUpdateOperationsInput | number
   akurasi?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -369,6 +385,7 @@ export type UserProfileCreateManyInput = {
   userId: string
   namaLengkap?: string | null
   streakDays?: number
+  lastLoginAt?: Date | string | null
   totalSoal?: number
   akurasi?: number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -380,6 +397,7 @@ export type UserProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaLengkap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   streakDays?: Prisma.IntFieldUpdateOperationsInput | number
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalSoal?: Prisma.IntFieldUpdateOperationsInput | number
   akurasi?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -392,6 +410,7 @@ export type UserProfileUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   namaLengkap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   streakDays?: Prisma.IntFieldUpdateOperationsInput | number
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalSoal?: Prisma.IntFieldUpdateOperationsInput | number
   akurasi?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -409,6 +428,7 @@ export type UserProfileCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   namaLengkap?: Prisma.SortOrder
   streakDays?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
   totalSoal?: Prisma.SortOrder
   akurasi?: Prisma.SortOrder
   aiDiagnosticProgress?: Prisma.SortOrder
@@ -427,6 +447,7 @@ export type UserProfileMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   namaLengkap?: Prisma.SortOrder
   streakDays?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
   totalSoal?: Prisma.SortOrder
   akurasi?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -438,6 +459,7 @@ export type UserProfileMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   namaLengkap?: Prisma.SortOrder
   streakDays?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
   totalSoal?: Prisma.SortOrder
   akurasi?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -482,6 +504,10 @@ export type UserProfileUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutUserInput, Prisma.UserProfileUpdateWithoutUserInput>, Prisma.UserProfileUncheckedUpdateWithoutUserInput>
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type NullableFloatFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -494,6 +520,7 @@ export type UserProfileCreateWithoutUserInput = {
   id?: string
   namaLengkap?: string | null
   streakDays?: number
+  lastLoginAt?: Date | string | null
   totalSoal?: number
   akurasi?: number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -505,6 +532,7 @@ export type UserProfileUncheckedCreateWithoutUserInput = {
   id?: string
   namaLengkap?: string | null
   streakDays?: number
+  lastLoginAt?: Date | string | null
   totalSoal?: number
   akurasi?: number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -532,6 +560,7 @@ export type UserProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaLengkap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   streakDays?: Prisma.IntFieldUpdateOperationsInput | number
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalSoal?: Prisma.IntFieldUpdateOperationsInput | number
   akurasi?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -543,6 +572,7 @@ export type UserProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaLengkap?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   streakDays?: Prisma.IntFieldUpdateOperationsInput | number
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalSoal?: Prisma.IntFieldUpdateOperationsInput | number
   akurasi?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   aiDiagnosticProgress?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -557,6 +587,7 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   userId?: boolean
   namaLengkap?: boolean
   streakDays?: boolean
+  lastLoginAt?: boolean
   totalSoal?: boolean
   akurasi?: boolean
   aiDiagnosticProgress?: boolean
@@ -570,6 +601,7 @@ export type UserProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   namaLengkap?: boolean
   streakDays?: boolean
+  lastLoginAt?: boolean
   totalSoal?: boolean
   akurasi?: boolean
   aiDiagnosticProgress?: boolean
@@ -583,6 +615,7 @@ export type UserProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   namaLengkap?: boolean
   streakDays?: boolean
+  lastLoginAt?: boolean
   totalSoal?: boolean
   akurasi?: boolean
   aiDiagnosticProgress?: boolean
@@ -596,6 +629,7 @@ export type UserProfileSelectScalar = {
   userId?: boolean
   namaLengkap?: boolean
   streakDays?: boolean
+  lastLoginAt?: boolean
   totalSoal?: boolean
   akurasi?: boolean
   aiDiagnosticProgress?: boolean
@@ -603,7 +637,7 @@ export type UserProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "namaLengkap" | "streakDays" | "totalSoal" | "akurasi" | "aiDiagnosticProgress" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
+export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "namaLengkap" | "streakDays" | "lastLoginAt" | "totalSoal" | "akurasi" | "aiDiagnosticProgress" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
 export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -624,6 +658,7 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     userId: string
     namaLengkap: string | null
     streakDays: number
+    lastLoginAt: Date | null
     totalSoal: number
     akurasi: number | null
     aiDiagnosticProgress: runtime.JsonValue | null
@@ -1057,6 +1092,7 @@ export interface UserProfileFieldRefs {
   readonly userId: Prisma.FieldRef<"UserProfile", 'String'>
   readonly namaLengkap: Prisma.FieldRef<"UserProfile", 'String'>
   readonly streakDays: Prisma.FieldRef<"UserProfile", 'Int'>
+  readonly lastLoginAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
   readonly totalSoal: Prisma.FieldRef<"UserProfile", 'Int'>
   readonly akurasi: Prisma.FieldRef<"UserProfile", 'Float'>
   readonly aiDiagnosticProgress: Prisma.FieldRef<"UserProfile", 'Json'>
