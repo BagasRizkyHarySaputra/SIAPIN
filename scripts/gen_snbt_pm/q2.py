@@ -4,8 +4,8 @@
 def load():
     Q = []
     def add(prompt, fmt, calc, dist, expl, otype="int"):
-        # calc: function(fmt)->correct value used for verification
-        correct = calc(fmt)
+        # calc: function(fmt)->correct value OR constant
+        correct = calc(fmt) if callable(calc) else calc
         Q.append(dict(prompt=prompt, fmt=fmt, correct=correct, dist=dist,
                       expl=expl, otype=otype, calc=calc))
     def fmt(tpl, f): return tpl.format(**f)
@@ -130,10 +130,10 @@ def load():
         [(1, "Waktu berbanding terbalik dengan banyak pekerja: t = 5×8/4 = 10 jam")], otype="int")
 
     add("Kakak dapat menyelesaikan pekerjaan rumah dalam {a} jam dan adik dalam {b} jam. Jika kakak mengerjakan {c} jam lebih dulu lalu dibantu adik, total waktu penyelesaian sejak kakak mulai adalah … jam.",
-        dict(a=6, b=12, c=1), 13/3, [3, 4, 5],
-        [(1, "Sisa setelah 1 jam = 1 − 1/6 = 5/6")], otype="dec")
-    Q[-1]["expl"].append((1, "Bersama: 1/6 + 1/12 = 1/4 per jam ⟹ 5/6 ÷ 1/4 = 20/6 = 10/3 jam"))
-    Q[-1]["expl"].append((1, "Total = 1 + 10/3 = 13/3 jam = 4⅓ jam"))
+        dict(a=6, b=12, c=3), lambda f: 5, [4, 4.5, 6],
+        [(1, "Dalam 3 jam kakak menyelesaikan 3/6 = 1/2 bagian; sisa 1/2")], otype="int")
+    Q[-1]["expl"].append((1, "Bersama: 1/6 + 1/12 = 1/4 per jam ⟹ (1/2) ÷ (1/4) = 2 jam"))
+    Q[-1]["expl"].append((1, "Total = 3 + 2 = 5 jam"))
 
     add("Sebuah perusahaan memproduksi {n} unit barang dengan {m} mesin dalam waktu {h} jam. Banyak unit yang diproduksi oleh {m2} mesin dalam waktu {h2} jam adalah … unit.",
         dict(n=600, m=4, h=6, m2=6, h2=8), 1200, [900, 1000, 1400],
@@ -149,7 +149,7 @@ def load():
         [(1, "12/3 = 4 m²/hari"), (0, "; "), (1, "7 × 4 = 28 m²")], otype="int")
 
     add("Dua pompa air memiliki debit berbeda. Pompa pertama dapat mengosongkan kolam dalam {a} jam, pompa kedua dalam {b} jam. Jika pompa pertama bekerja {c} jam kemudian disusul pompa kedua, total waktu pengosongan sejak pompa pertama dinyalakan adalah … jam.",
-        dict(a=6, b=12, c=2), 16/3, [4, 5, 6],
+        dict(a=6, b=12, c=2), lambda f: 14/3, [4, 5, 6],
         [(1, "Dalam 2 jam, pompa 1 mengosongkan 2/6 = 1/3; sisa 2/3")], otype="dec")
     Q[-1]["expl"].append((1, "Bersama: 1/6 + 1/12 = 1/4 per jam ⟹ (2/3) ÷ (1/4) = 8/3 jam"))
     Q[-1]["expl"].append((1, "Total = 2 + 8/3 = 14/3 jam = 4⅔ jam"))
