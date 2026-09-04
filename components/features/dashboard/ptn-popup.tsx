@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cqm } from "@/lib/cq";
 import { PTN_LIST, findPtn, prodiByPtn } from "@/lib/data/ptn";
 
@@ -126,6 +126,210 @@ function Select({
   );
 }
 
+/** Combobox — user bisa mengetik untuk mempersempit daftar pilihan.
+ * Dipakai untuk pilih universitas & jurusan/prodi. Menggantikan <select>
+ * biasa agar daftar panjang (75 PTN / 90+ prodi) tetap mudah dicari. */
+function SearchSelect({
+  ariaLabel,
+  name,
+  options,
+  placeholder,
+  value,
+  onSelect,
+  disabled,
+  emptyText,
+}: {
+  ariaLabel: string;
+  name: string;
+  options: string[];
+  placeholder: string;
+  value: string;
+  onSelect: (v: string) => void;
+  disabled?: boolean;
+  /** Teks saat dropdown terbuka tapi tidak ada opsi yang cocok. */
+  emptyText?: string;
+}) {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState(-1);
+
+  // Sinkronkan query saat value berubah dari luar (mis. reset saat ganti univ)
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((o) => o.toLowerCase().includes(q));
+  }, [query, options]);
+
+  const listRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Tutup dropdown saat klik di luar
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  function choose(v: string) {
+    onSelect(v);
+    setQuery(v);
+    setOpen(false);
+    setHighlight(-1);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open && (e.key === "ArrowDown" || e.key === "Enter")) {
+      if (e.key === "ArrowDown") {
+        setOpen(true);
+        e.preventDefault();
+      }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlight((h) => (h + 1) % filtered.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlight((h) => (h - 1 + filtered.length) % filtered.length);
+    } else if (e.key === "Enter") {
+      if (open && highlight >= 0 && filtered[highlight]) {
+        e.preventDefault();
+        choose(filtered[highlight]);
+      } else if (open && filtered.length === 1) {
+        e.preventDefault();
+        choose(filtered[0]);
+      }
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }
+
+  return (
+    <div ref={rootRef} style={{ position: "relative", width: "100%" }}>
+      <input
+        aria-label={ariaLabel}
+        name={name}
+        role="combobox"
+        aria-expanded={open}
+        aria-autocomplete="list"
+        autoComplete="off"
+        value={query}
+        disabled={disabled}
+        placeholder={placeholder}
+        onFocus={() => setOpen(true)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+          setHighlight(-1);
+          // update nilai tersimpan — hanya set bila cocok persis, biar tombol Simpan
+          // tetap memakai pilihan valid; jika user mengetik bebas, form tetap butuh pilihan.
+          const v = e.target.value;
+          const exact = options.find(
+            (o) => o.toLowerCase() === v.trim().toLowerCase()
+          );
+          onSelect(exact ? exact : v);
+        }}
+        onKeyDown={onKeyDown}
+        required
+        style={{
+          ...inputBox,
+          opacity: disabled ? 0.55 : 1,
+          background: disabled ? "#f0f0f5" : "#ffffff",
+          cursor: disabled ? "not-allowed" : "text",
+        }}
+      />
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          right: cqm(21),
+          top: "50%",
+          transform: "translateY(-50%)",
+          display: "flex",
+          pointerEvents: "none",
+        }}
+      >
+        <Chevron />
+      </span>
+
+      {open && !disabled && (
+        <div
+          ref={listRef}
+          role="listbox"
+          className="searchselect-dropdown"
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            left: 0,
+            right: 0,
+            zIndex: 60,
+            maxHeight: cqm(240),
+            overflowY: "auto",
+            backgroundColor: "#ffffff",
+            borderRadius: cqm(14),
+            border: `${cqm(2)} solid rgba(28, 20, 81, 0.25)`,
+            boxShadow: "0 12px 40px rgba(28, 20, 81, 0.18)",
+          }}
+        >
+          {filtered.length === 0 ? (
+            <div
+              style={{
+                padding: cqm(14),
+                fontSize: cqm(15),
+                color: "#8a8a9a",
+              }}
+            >
+              {emptyText ?? "Tidak ada pilihan yang cocok"}
+            </div>
+          ) : (
+            filtered.slice(0, 80).map((o, idx) => {
+              const active = idx === highlight;
+              return (
+                <button
+                  key={o}
+                  type="button"
+                  role="option"
+                  aria-selected={o === value}
+                  onMouseEnter={() => setHighlight(idx)}
+                  onClick={() => choose(o)}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    textAlign: "left",
+                    background: active ? "#f5eafb" : "transparent",
+                    border: "none",
+                    paddingBlock: cqm(10),
+                    paddingInline: cqm(16),
+                    fontSize: cqm(16),
+                    color: "#1c1451",
+                    fontFamily: "inherit",
+                    cursor: "pointer",
+                    borderRadius: 0,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {o}
+                </button>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StepHeader({ no, title }: { no: string; title: string }) {
   return (
     <div className="flex items-center" style={{ gap: cqm(29) }}>
@@ -162,6 +366,14 @@ export function PtnPopup({
   onSave: (d: PtnData) => void;
 }) {
   const [univ, setUniv] = useState(initial?.univ ?? "");
+  const [jurusan, setJurusan] = useState(initial?.jurusan ?? "");
+  const [snbt, setSnbt] = useState(initial?.snbt ?? "");
+  const [rapot, setRapot] = useState(initial?.rapot ?? "");
+  const [snbtWarn, setSnbtWarn] = useState(false);
+  const [rapotWarn, setRapotWarn] = useState(false);
+  const [snbtMsg, setSnbtMsg] = useState("");
+  const [rapotMsg, setRapotMsg] = useState("");
+  const [formErr, setFormErr] = useState("");
   // Semua universitas riil dari dataset SNBT 2026 (75 PTN): yang populer
   // (8 besar) ditampilkan lebih dulu, lalu sisanya mengikuti abjad.
   const univList = useMemo(() => {
@@ -201,14 +413,60 @@ export function PtnPopup({
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const univVal = String(fd.get("univ") ?? "");
-    const jurusanVal = String(fd.get("jurusan") ?? "");
+    const jenisVal = String(fd.get("jenis") ?? "");
+    const univVal = String(fd.get("univ") ?? "").trim();
+    const jurusanVal = String(fd.get("jurusan") ?? "").trim();
+    const snbtVal = String(fd.get("snbt") ?? "").trim();
+    const rapotVal = String(fd.get("rapot") ?? "").trim();
+
+    // --- validasi input numerik (SNBT & rapot): hanya angka/desimal ---
+    const numRe = /^\d{1,3}([.,]\d{1,2})?$/;
+    if (snbtVal && !numRe.test(snbtVal)) {
+      setSnbtWarn(true);
+      setFormErr("Nilai SNBT harus berupa angka (contoh: 650 atau 620.5).");
+      return;
+    }
+    if (rapotVal && !numRe.test(rapotVal)) {
+      setRapotWarn(true);
+      setFormErr("Rata-rata rapot harus berupa angka (contoh: 87 atau 90.5).");
+      return;
+    }
+
+    // --- validasi pilihan universitas & jurusan harus cocok dgn daftar ---
+    const univCocok = univList.some(
+      (u) => u.toLowerCase() === univVal.toLowerCase()
+    );
+    if (!univVal || !univCocok) {
+      setFormErr(
+        univVal
+          ? "Universitas tidak ada di daftar. Pilih dari daftar yang muncul saat mengetik."
+          : "Silakan pilih universitas dulu."
+      );
+      return;
+    }
+    const jurCocok = jurusanList.some(
+      (j) => j.toLowerCase() === jurusanVal.toLowerCase()
+    );
+    if (!jurusanVal || !jurCocok) {
+      setFormErr(
+        jurusanVal
+          ? "Jurusan/prodi tidak ada di daftar universitas tsb. Pilih dari daftar yang muncul."
+          : "Silakan pilih jurusan/prodi dulu."
+      );
+      return;
+    }
+
+    setFormErr("");
     onSave({
-      jenis: String(fd.get("jenis") ?? ""),
-      snbt: String(fd.get("snbt") ?? ""),
-      rapot: String(fd.get("rapot") ?? ""),
-      univ: univVal,
-      jurusan: jurusanVal,
+      jenis: jenisVal,
+      snbt: snbtVal,
+      rapot: rapotVal,
+      univ: univCocok
+        ? univList.find((u) => u.toLowerCase() === univVal.toLowerCase())!
+        : univVal,
+      jurusan: jurCocok
+        ? jurusanList.find((j) => j.toLowerCase() === jurusanVal.toLowerCase())!
+        : jurusanVal,
     });
   }
 
@@ -318,9 +576,49 @@ export function PtnPopup({
                   inputMode="decimal"
                   aria-label="Nilai SNBT"
                   name="snbt"
-                  defaultValue={initial?.snbt ?? ""}
-                  style={{ ...inputBox, marginTop: cqm(15) }}
+                  value={snbt}
+                  onChange={(e) => {
+                    // hanya izinkan digit & satu titik/koma desimal
+                    const v = e.target.value;
+                    const clean = v.replace(/[^\d.,]/g, "").replace(/([.,].*)[.,]/g, "$1");
+                    setSnbt(clean);
+                    if (v !== clean) {
+                      // ada karakter non-angka yang dibuang (mis. paste huruf)
+                      setSnbtWarn(true);
+                      setSnbtMsg("Nilai SNBT hanya boleh angka (huruf tidak bisa diketik).");
+                    } else {
+                      setSnbtWarn(false);
+                      setSnbtMsg("");
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (/^[a-zA-Z]$/.test(e.key)) {
+                      e.preventDefault();
+                      setSnbtWarn(true);
+                      setSnbtMsg("Nilai SNBT hanya boleh angka (huruf tidak bisa diketik).");
+                    }
+                  }}
+                  style={{
+                    ...inputBox,
+                    marginTop: cqm(15),
+                    ...(snbtWarn
+                      ? { borderColor: "#e11d48", boxShadow: "0 0 0 3px rgba(225,29,72,0.15)" }
+                      : {}),
+                  }}
                 />
+                {snbtWarn && (
+                  <span
+                    role="alert"
+                    style={{
+                      marginTop: cqm(10),
+                      fontSize: cqm(14),
+                      color: "#e11d48",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {snbtMsg || "Nilai SNBT harus berupa angka."}
+                  </span>
+                )}
               </div>
               <div className="flex w-full flex-col" style={{ marginTop: cqm(60) }}>
                 <FieldLabel>Rata - Rata Rapot</FieldLabel>
@@ -329,9 +627,47 @@ export function PtnPopup({
                   inputMode="decimal"
                   aria-label="Rata-rata rapot"
                   name="rapot"
-                  defaultValue={initial?.rapot ?? ""}
-                  style={{ ...inputBox, marginTop: cqm(13) }}
+                  value={rapot}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    const clean = v.replace(/[^\d.,]/g, "").replace(/([.,].*)[.,]/g, "$1");
+                    setRapot(clean);
+                    if (v !== clean) {
+                      setRapotWarn(true);
+                      setRapotMsg("Rata-rata rapot hanya boleh angka (huruf tidak bisa diketik).");
+                    } else {
+                      setRapotWarn(false);
+                      setRapotMsg("");
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (/^[a-zA-Z]$/.test(e.key)) {
+                      e.preventDefault();
+                      setRapotWarn(true);
+                      setRapotMsg("Rata-rata rapot hanya boleh angka (huruf tidak bisa diketik).");
+                    }
+                  }}
+                  style={{
+                    ...inputBox,
+                    marginTop: cqm(13),
+                    ...(rapotWarn
+                      ? { borderColor: "#e11d48", boxShadow: "0 0 0 3px rgba(225,29,72,0.15)" }
+                      : {}),
+                  }}
                 />
+                {rapotWarn && (
+                  <span
+                    role="alert"
+                    style={{
+                      marginTop: cqm(10),
+                      fontSize: cqm(14),
+                      color: "#e11d48",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {rapotMsg || "Rata-rata rapot harus berupa angka."}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -341,98 +677,53 @@ export function PtnPopup({
               <div className="flex w-full flex-col" style={{ marginTop: cqm(64) }}>
                 <FieldLabel>Pilih Universitas</FieldLabel>
                 <div style={{ marginTop: cqm(19) }}>
-                  <div style={{ position: "relative", width: "100%" }}>
-                    <select
-                      aria-label="Pilih universitas"
-                      name="univ"
-                      value={univ}
-                      onChange={(e) => {
-                        setUniv(e.target.value);
-                        // reset jurusan bila ganti univ
-                        const j = document.querySelector<HTMLSelectElement>(
-                          'select[name="jurusan"]'
-                        );
-                        if (j) j.value = "";
-                      }}
-                      required
-                      style={{
-                        ...inputBox,
-                        appearance: "none",
-                        WebkitAppearance: "none",
-                        paddingRight: cqm(52),
-                        cursor: "pointer",
-                      }}
-                    >
-                      <option value="" disabled>
-                        Pilih universitas
-                      </option>
-                      {univList.map((o) => (
-                        <option key={o} value={o}>
-                          {o}
-                        </option>
-                      ))}
-                    </select>
-                    <span
-                      aria-hidden
-                      style={{
-                        position: "absolute",
-                        right: cqm(21),
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        display: "flex",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      <Chevron />
-                    </span>
-                  </div>
+                  <SearchSelect
+                    ariaLabel="Pilih universitas"
+                    name="univ"
+                    options={univList}
+                    placeholder="Ketik & pilih universitas"
+                    value={univ}
+                    onSelect={(v) => {
+                      setUniv(v);
+                      // reset jurusan bila ganti univ
+                      setJurusan("");
+                    }}
+                    emptyText="Universitas tidak ditemukan. Ketik nama lain."
+                  />
                 </div>
               </div>
               <div className="flex w-full flex-col" style={{ marginTop: cqm(58) }}>
                 <FieldLabel>Pilih Jurusan Universitas</FieldLabel>
                 <div style={{ marginTop: cqm(15) }}>
-                  <div style={{ position: "relative", width: "100%" }}>
-                    <select
-                      aria-label="Pilih jurusan universitas"
-                      name="jurusan"
-                      defaultValue={initial?.jurusan ?? ""}
-                      disabled={!univ}
-                      required
-                      style={{
-                        ...inputBox,
-                        appearance: "none",
-                        WebkitAppearance: "none",
-                        paddingRight: cqm(52),
-                        cursor: univ ? "pointer" : "not-allowed",
-                        opacity: univ ? 1 : 0.55,
-                        background: univ ? "#ffffff" : "#f0f0f5",
-                      }}
-                    >
-                      <option value="" disabled>
-                        {univ ? "Pilih jurusan/prodi" : "Pilih universitas dulu"}
-                      </option>
-                      {jurusanList.map((o) => (
-                        <option key={o} value={o}>
-                          {o}
-                        </option>
-                      ))}
-                    </select>
-                    <span
-                      aria-hidden
-                      style={{
-                        position: "absolute",
-                        right: cqm(21),
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        display: "flex",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      <Chevron />
-                    </span>
-                  </div>
+                  <SearchSelect
+                    ariaLabel="Pilih jurusan universitas"
+                    name="jurusan"
+                    options={jurusanList}
+                    placeholder={
+                      univ ? "Ketik & pilih jurusan/prodi" : "Pilih universitas dulu"
+                    }
+                    value={jurusan}
+                    onSelect={setJurusan}
+                    disabled={!univ}
+                    emptyText="Prodi tidak ditemukan di universitas ini."
+                  />
                 </div>
               </div>
+              {formErr && (
+                <p
+                  role="alert"
+                  style={{
+                    marginTop: cqm(20),
+                    fontSize: cqm(15),
+                    color: "#e11d48",
+                    lineHeight: 1.5,
+                    textAlign: "center",
+                    fontWeight: 600,
+                  }}
+                >
+                  {formErr}
+                </p>
+              )}
               <button
                 type="submit"
                 className="cursor-pointer font-bold transition hover:brightness-[0.97]"
