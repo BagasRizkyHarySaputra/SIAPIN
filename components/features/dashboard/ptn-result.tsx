@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { cqm } from "@/lib/cq";
 import { useAuth } from "@/lib/store/auth";
 import { findPtn, prodiByPtn, type ProdiInfo } from "@/lib/data/ptn";
+import { logoPtnByNama, initials as initialsLogo } from "@/lib/data/ptn/logo";
 import {
   buatRekomendasi,
   estimasiProdi,
@@ -12,10 +13,66 @@ import {
 } from "@/lib/data/ptn/estimasi";
 import type { PtnData } from "./ptn-popup";
 
+/** Inisial nama — dipakai fallback logo. */
 function initials(name: string) {
-  const w = name.split(/\s+/).filter(Boolean);
-  return ((w[0]?.[0] ?? "") + (w[1]?.[0] ?? "")).toUpperCase() || "?";
+  return initialsLogo(name);
 }
+
+/** Logo universitas bulat — gambar logo bila ada, fallback inisial. */
+function LogoPtn({
+  nama,
+  size,
+  fontSize,
+}: {
+  nama: string;
+  size: number;
+  fontSize: number;
+}) {
+  const src = logoPtnByNama(nama);
+  const bg = src ? "#ffffff" : "#1c1451";
+  const color = src ? "#1c1451" : "#ffffff";
+  const pad = src ? cqm(6) : 0;
+  if (src) {
+    return (
+      <span
+        className="flex shrink-0 items-center justify-center"
+        style={{
+          width: cqm(size),
+          height: cqm(size),
+          borderRadius: "50%",
+          backgroundColor: bg,
+          border: `${cqm(1.5)} solid #e3e3ee`,
+          overflow: "hidden",
+          padding: pad,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={nama}
+          loading="lazy"
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        />
+      </span>
+    );
+  }
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center font-bold"
+      style={{
+        width: cqm(size),
+        height: cqm(size),
+        borderRadius: "50%",
+        backgroundColor: bg,
+        color,
+        fontSize: cqm(fontSize),
+      }}
+    >
+      {initials(nama)}
+    </span>
+  );
+}
+
 
 /** Warna zona peluang — mengikuti gaya existing (#45b8ac teal, #e2603c oranye). */
 function zonaWarna(zona: HasilEstimasi["zona"]) {
@@ -172,19 +229,7 @@ export function PtnResult({
         }}
       >
         <div className="flex w-full items-center" style={{ gap: cqm(20) }}>
-          <span
-            className="flex shrink-0 items-center justify-center font-bold"
-            style={{
-              width: cqm(72),
-              height: cqm(72),
-              borderRadius: "50%",
-              backgroundColor: "#1c1451",
-              color: "#ffffff",
-              fontSize: cqm(28),
-            }}
-          >
-            {initials(data.univ)}
-          </span>
+          <LogoPtn nama={data.univ} size={72} fontSize={28} />
           <p
             className="font-bold"
             style={{
