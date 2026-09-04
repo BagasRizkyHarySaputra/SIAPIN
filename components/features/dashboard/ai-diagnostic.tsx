@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cqm } from "@/lib/cq";
 import { useAuth } from "@/lib/store/auth";
 import { modes } from "@/lib/data/modes";
@@ -13,7 +13,19 @@ const MODE_STYLE: Record<string, { label: string; color: string }> = {
   snbt: { label: "SNBT", color: "#df5b97" },
 };
 
-// Peta slug subtes → label (dari modes.ts) untuk grafik radar.
+// Urutan & warna label subtes per mode (dari modes.ts) — dipakai grafik radar.
+const SUBTES_META: Record<string, { slug: string; short: string; color: string }[]> =
+  Object.fromEntries(
+    modes.map((m) => [
+      m.slug,
+      m.subtests.map((s) => ({
+        slug: s.slug,
+        short: s.short ?? s.name,
+        color: s.color,
+      })),
+    ]),
+  );
+
 function subtesLabel(slug: string): string {
   for (const m of modes) {
     const s = m.subtests.find((x) => x.slug === slug);
@@ -38,6 +50,12 @@ function subtesLabel(slug: string): string {
   return map[slug] ?? slug;
 }
 
+interface SubAgg {
+  benar: number;
+  total: number;
+  sesi: number;
+}
+
 interface DiagResp {
   data?: {
     progress?: { tkaSmp: number; tkaSma: number; snbt: number };
@@ -47,10 +65,13 @@ interface DiagResp {
       tkaSma?: { benar: number; total: number; sesi: number };
       snbt?: { benar: number; total: number; sesi: number };
     };
-    perSubtes?: Record<string, { benar: number; total: number; sesi: number }>;
+    perSubtes?: Record<string, SubAgg>;
+    perSubtesByMode?: Record<string, Record<string, SubAgg>>;
   };
   error?: string;
 }
+
+const MODE_ORDER = ["tka-smp", "tka-sma", "snbt"] as const;
 
 export function AiDiagnostic() {
   const { user } = useAuth();
@@ -63,10 +84,10 @@ export function AiDiagnostic() {
     { label: "TKA SMA", color: "#5858b8", pct: 0, sesi: 0 },
     { label: "SNBT", color: "#df5b97", pct: 0, sesi: 0 },
   ]);
-  const [radar, setRadar] = useState<{ labels: string[]; values: number[] }>({
-    labels: [],
-    values: [],
-  });
+  // perSubtesByMode mentah dari API — kunci per subtes slug
+  const [rawByMode, setRawByMode] = useState<Record<string, Record<string, SubAgg>>>({});
+  // mode yang sedang dipilih di grafik radar (default "snbt")
+  const [activeMode, setActiveMode] = useState<string>("snbt");
   const [kosong, setKosong] = useState(false);
 
   useEffect(() => {
@@ -104,24 +125,27 @@ export function AiDiagnostic() {
           },
         ]);
 
-        // radar dari per-subtes (top 8 by jumlah soal)
-        const sub = d.perSubtes ?? {};
-        const entries = Object.entries(sub)
-          .filter(([, v]) => v.total > 0)
-          .sort((a, b) => b[1].total - a[1].total)
-          .slice(0, 8);
-        if (entries.length === 0) {
+        const byMode = d.perSubtesByMode ?? {};
+        setRawByMode(byMode);
+
+        const totalSoalAll = Object.values(byMode).reduce(
+          (acc, subs) =>
+            acc +
+            Object.values(subs).reduce((a, s) => a + (s?.total ?? 0), 0),
+          0,
+        );
+        if (totalSoalAll === 0) {
           setKosong(true);
-          setRadar({ labels: [], values: [] });
           return;
         }
         setKosong(false);
-        setRadar({
-          labels: entries.map(([slug]) => subtesLabel(slug)),
-          values: entries.map(([, v]) =>
-            Math.round((v.benar / v.total) * 100) / 100,
-          ),
+
+        // default mode: yang pertama punya data (urutan tetap tka-smp→sma→snbt)
+        const first = MODE_ORDER.find((m) => {
+          const subs = byMode[m] ?? {};
+          return Object.values(subs).some((s) => (s?.total ?? 0) > 0);
         });
+        if (first) setActiveMode((prev) => prev || first);
       })
       .catch(() => {
         if (aktif) setKosong(true);
@@ -132,6 +156,26 @@ export function AiDiagnostic() {
   }, [email]);
 
   const totalSesi = progress.reduce((a, b) => a + b.sesi, 0);
+
+  // --- Data radar utk mode aktif: SEMUA subtes mode tsb jadi sumbu.
+  // Subtes yg belum dikerjakan → nilai 0 (titik tengah). Akurasi 0..1.
+  const radar = useMemo(() => {
+    const metas = SUBTES_META[activeMode] ?? [];
+    const subs = rawByMode[activeMode] ?? {};
+    const labels: string[] = [];
+    const values: number[] = [];
+    const done: boolean[] = [];
+    for (const meta of metas) {
+      const agg = subs[meta.slug];
+      const total = agg?.total ?? 0;
+      labels.push(meta.short);
+      values.push(
+        total > 0 ? Math.round(((agg?.benar ?? 0) / total) * 100) / 100 : 0,
+      );
+      done.push(total > 0);
+    }
+    return { labels, values, done, nDone: done.filter(Boolean).length };
+  }, [activeMode, rawByMode]);
 
   return (
     <div
@@ -290,53 +334,69 @@ export function AiDiagnostic() {
           >
             Grafik Diagnostic
           </h3>
-          {/* mode pills */}
+          {/* mode pills — klik untuk ganti mode grafik */}
           <div className="flex gap-[calc(0.9cqw*var(--ds,1))]">
-            {[
-              { t: "TKA SMP", c: "#cfedc0" },
-              { t: "TKA SMA", c: "#5858b8" },
-              { t: "SNBT", c: "#e3aec2" },
-            ].map((p) => (
-              <span
-                key={p.t}
-                className="flex items-center justify-center rounded-full font-bold text-white"
-                style={{
-                  height: cqm(30),
-                  paddingInline: cqm(16),
-                  backgroundColor: p.c,
-                  fontSize: cqm(16),
-                }}
-              >
-                {p.t}
-              </span>
-            ))}
+            {MODE_ORDER.map((slug) => {
+              const st = MODE_STYLE[slug];
+              const active = slug === activeMode;
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  onClick={() => setActiveMode(slug)}
+                  className="cursor-pointer font-bold transition"
+                  style={{
+                    height: cqm(30),
+                    paddingInline: cqm(16),
+                    borderRadius: cqm(999),
+                    border: "none",
+                    fontSize: cqm(15),
+                    color: active ? "#ffffff" : st.color,
+                    backgroundColor: active ? st.color : "transparent",
+                    boxShadow: active
+                      ? "none"
+                      : `inset 0 0 0 ${cqm(2)} ${st.color}`,
+                    opacity: 1,
+                  }}
+                >
+                  {st.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* radar: labels left, chart right */}
+        {/* radar: semua subtes mode aktif sebagai sumbu, label mengelilingi */}
         <div
-          className="flex items-center"
-          style={{ gap: cqm(20), marginTop: cqm(40) }}
+          className="flex items-center justify-center"
+          style={{ marginTop: cqm(40) }}
         >
-          {radar.labels.length > 0 ? (
-            <>
-              <div className="flex flex-col gap-[calc(0.8cqw*var(--ds,1))]">
-                {radar.labels.map((s) => (
-                  <span
-                    key={s}
-                    className="font-bold"
-                    style={{
-                      fontSize: cqm(16),
-                      color: "#1c1451",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-              <RadarChart size={340} labels={radar.labels} values={radar.values} />
-            </>
+          {!kosong && radar.labels.length > 0 ? (
+            <div className="relative flex items-center justify-center">
+              <RadarChart
+                size={360}
+                labels={radar.labels}
+                values={radar.values}
+                showEmpty
+              />
+              {radar.nDone === 0 && (
+                <p
+                  className="font-bold"
+                  style={{
+                    position: "absolute",
+                    maxWidth: cqm(170),
+                    textAlign: "center",
+                    fontSize: cqm(13),
+                    color: "#b0b0c0",
+                    lineHeight: 1.45,
+                    pointerEvents: "none",
+                  }}
+                >
+                  Belum ada data pengerjaan. Coba kerjakan latihan soal{" "}
+                  {MODE_STYLE[activeMode]?.label ?? ""}!
+                </p>
+              )}
+            </div>
           ) : (
             <p
               className="font-normal"

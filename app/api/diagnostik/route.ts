@@ -32,6 +32,13 @@ export async function GET(req: Request) {
       string,
       { benar: number; total: number; sesi: number }
     > = {};
+    // perSubtesByMode: key "mode" -> { subtes: { benar, total, sesi } }
+    // Dipakai radar chart agar subtes dari mode berbeda tidak tercampur
+    // (mis. "matematika" ada di TKA SMA & TKA SMP).
+    const perSubtesByMode: Record<
+      string,
+      Record<string, { benar: number; total: number; sesi: number }>
+    > = {};
     let totalBenar = 0;
     let totalSoal = 0;
     let totalSesi = riwayat.length;
@@ -49,6 +56,16 @@ export async function GET(req: Request) {
       perSubtes[s].benar += r.benar;
       perSubtes[s].total += r.total;
       perSubtes[s].sesi += 1;
+
+      perSubtesByMode[m] = perSubtesByMode[m] ?? {};
+      perSubtesByMode[m][s] = perSubtesByMode[m][s] ?? {
+        benar: 0,
+        total: 0,
+        sesi: 0,
+      };
+      perSubtesByMode[m][s].benar += r.benar;
+      perSubtesByMode[m][s].total += r.total;
+      perSubtesByMode[m][s].sesi += 1;
 
       totalBenar += r.benar;
       totalSoal += r.total;
@@ -91,6 +108,7 @@ export async function GET(req: Request) {
         },
         progress,
         perSubtes,
+        perSubtesByMode,
         aiDiagnostic: aiDb
           ? {
               tkaSmp: aiDb.tkaSmp,

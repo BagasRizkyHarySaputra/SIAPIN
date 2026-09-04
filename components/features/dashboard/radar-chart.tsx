@@ -1,56 +1,65 @@
 "use client";
 
-/** Radar chart approximation matching the "Grafik Diagnostic" design:
- * pentagon/hexagon grid in #e5e7eb, magenta #c207af data polygon + dots.
- * Pure SVG so it scales with the container (cqw sizing handled by parent). */
+import React from "react";
+
+/** Radar chart — grid konsentris #e5e7eb, poligon data magenta #c207af + titik.
+ * Label ditulis MENGELILINGI chart di ujung tiap sumbu (gaya grafik stats
+ * mobile), jadi semua sumbu selalu terlihat & mudah dibaca. Pure SVG. */
 
 // Default fallback — dipakai bila parent tidak mengirim data riil.
-const DEFAULT_LABELS = [
-  "Matematika",
-  "B. Indonesia",
-  "B. Inggris",
-  "Ekonomi",
-  "Biologi",
-  "Kimia",
-  "PKN",
-  "Sejarah",
-];
+const DEFAULT_LABELS = ["PM", "PPU", "PBM", "PK", "LBI", "LBE"];
+const DEFAULT_VALUES = [0.75, 0, 0, 0.5, 0, 0];
 
-// values 0..1 per label (roughly matching the magenta polygon in the design)
-const DEFAULT_VALUES = [0.72, 0.55, 0.6, 0.68, 0.5, 0.42, 0.58, 0.5];
+interface Pt {
+  x: number;
+  y: number;
+}
 
 export function RadarChart({
   size = 340,
-  labelSide = "left",
   labels = DEFAULT_LABELS,
   values = DEFAULT_VALUES,
+  showEmpty = true,
 }: {
+  /** Ukuran viewBox SVG (persegi). */
   size?: number;
-  labelSide?: "left" | "right";
   labels?: string[];
   /** 0..1 per label */
   values?: number[];
+  /** true: label subtes yang belum dikerjakan (nilai 0) tetap tampil. */
+  showEmpty?: boolean;
 }) {
   const cx = size / 2;
   const cy = size / 2;
-  const R = size * 0.36;
+  const R = size * 0.33; // sedikit lebih kecil agar ruang label di tepi
   const n = labels.length;
 
+  // sudut mulai dari atas (-90deg), searah jarum jam
   const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
-  const point = (i: number, r: number) => {
+  const point = (i: number, r: number): Pt => {
     const a = angle(i);
-    return [cx + r * Math.cos(a), cy + r * Math.sin(a)] as const;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
   };
   const poly = (r: number) =>
-    Array.from({ length: n }, (_, i) => point(i, r).join(",")).join(" ");
+    Array.from({ length: n }, (_, i) => {
+      const p = point(i, r);
+      return `${p.x.toFixed(2)},${p.y.toFixed(2)}`;
+    }).join(" ");
 
-  // data polygon points (clamp 0..1)
   const safe = values.map((v) => Math.max(0, Math.min(1, v || 0)));
-  const dataPts = labels.map((_, i) => point(i, R * (safe[i] ?? 0))).join(" ");
+  const dataPts = labels
+    .map((_, i) => {
+      const p = point(i, R * (safe[i] ?? 0));
+      return `${p.x.toFixed(2)},${p.y.toFixed(2)}`;
+    })
+    .join(" ");
+
+  // Posisi label: perpanjang jari-jari sedikit melewati lingkaran terluar.
+  const labelR = R + size * 0.075;
 
   return (
     <div
-      className="relative"
+      className="relative shrink-0"
       style={{
         width: "100%",
         maxWidth: `calc(${((size / 1440) * 100).toFixed(4)}cqw * var(--pm, 1))`,
@@ -70,31 +79,78 @@ export function RadarChart({
         ))}
         {/* spokes */}
         {labels.map((_, i) => {
-          const [x, y] = point(i, R);
+          const p = point(i, R);
           return (
             <line
-              key={i}
+              key={`spoke-${i}`}
               x1={cx}
               y1={cy}
-              x2={x}
-              y2={y}
+              x2={p.x}
+              y2={p.y}
               stroke="#e5e7eb"
               strokeWidth={1}
             />
           );
         })}
         {/* data polygon */}
-        <polygon
-          points={dataPts}
-          fill="rgba(194,7,175,0.18)"
-          stroke="#c207af"
-          strokeWidth={2}
-          strokeLinejoin="round"
-        />
+        {n > 2 ? (
+          <polygon
+            points={dataPts}
+            fill="rgba(194,7,175,0.18)"
+            stroke="#c207af"
+            strokeWidth={2}
+            strokeLinejoin="round"
+          />
+        ) : (
+          /* 2 sumbu → garis (bukan poligon tertutup) */
+          <polyline
+            points={dataPts}
+            fill="none"
+            stroke="#c207af"
+            strokeWidth={2}
+          />
+        )}
         {/* data dots */}
         {labels.map((_, i) => {
-          const [x, y] = point(i, R * (safe[i] ?? 0));
-          return <circle key={i} cx={x} cy={y} r={4} fill="#c207af" />;
+          const p = point(i, R * (safe[i] ?? 0));
+          const isZero = safe[i] === 0;
+          return (
+            <circle
+              key={`dot-${i}`}
+              cx={p.x}
+              cy={p.y}
+              r={isZero ? 2.5 : 4}
+              fill={isZero ? "#c9c9d6" : "#c207af"}
+            />
+          );
+        })}
+        {/* label tiap sumbu — mengelilingi chart */}
+        {labels.map((label, i) => {
+          if (!showEmpty && safe[i] === 0) return null;
+          const p = point(i, labelR);
+          const a = angle(i);
+          // text-anchor berdasar posisi sudut
+          const cos = Math.cos(a);
+          const sin = Math.sin(a);
+          let anchor: "start" | "middle" | "end" = "middle";
+          if (Math.abs(cos) < 0.25) anchor = "middle";
+          else if (cos > 0) anchor = "start";
+          else anchor = "end";
+          const dy = sin > 0.35 ? 14 : sin < -0.35 ? -6 : 4;
+          return (
+            <text
+              key={`label-${i}`}
+              x={p.x}
+              y={p.y + dy}
+              textAnchor={anchor}
+              fill={safe[i] === 0 ? "#9aa0ae" : "#1c1451"}
+              fontSize={15}
+              fontWeight={700}
+              fontFamily="inherit"
+            >
+              {label}
+            </text>
+          );
         })}
       </svg>
     </div>
