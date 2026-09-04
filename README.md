@@ -128,6 +128,45 @@ Keduanya memakai **data riil** `pg`, `pgLow`, `pgHigh`, `rasio`, `dayaTampung`, 
 | Prisma 7 (SQLite) | Apache-2.0 | ORM + DB |
 | Plus Jakarta Sans, Baloo 2 (Google Fonts) | OFL | Tipografi |
 
+## 6. Struktur Data di Project
+
+File data statis yang dipakai fitur estimasi & diagnostik:
+
+```
+lib/data/ptn/
+├── snbt-2026.json        # 75 PTN + 3.825 prodi (data utama, 808 KB)
+└── index.ts              # barrel: tipe PtnInfo/ProdiInfo + helper findPtn/prodiByPtn/PTN_LIST
+lib/data/ptn/estimasi.ts  # engine CDF normal: estimasiProdi(), buatRekomendasi(), skorGabungan()
+lib/data/bank/banks/      # 2.158 soal statis per subtes (14 file TS)
+lib/repo/riwayat.ts       # repository simpan/list riwayat pengerjaan (Prisma)
+app/api/riwayat/          # POST /api/riwayat — simpan hasil jawaban
+app/api/diagnostik/       # GET /api/diagnostik?email= — agregasi progress per user
+app/api/user/sync/        # POST /api/user/sync — upsert user mock → DB
+```
+
+## 7. Cara Update Data
+
+- **Bank soal**: edit file TS di `lib/data/bank/banks/` lalu jalankan `npx tsc --noEmit` & `grep -c "no:"` untuk verifikasi.
+- **Data PTN/prodi**: saat SNPMB merilis daya tampung tahun baru —
+  1. Dapatkan parquet terbaru dari [TeguhEP/LolosKampus](https://github.com/TeguhEP/LolosKampus) (`data/app/passing_grade_ref.parquet`, `ptn_index.parquet`)
+  2. Jalankan skrip ekstraksi (lihat riwayat commit: pandas → `snbt-2026.json`)
+  3. Pastikan `index.ts` tipe tetap cocok, lalu `npx tsc --noEmit`
+
+## 8. Lisensi & Atribusi Data
+
+| Data | Lisensi | Catatan |
+|---|---|---|
+| Bank soal SIAPIN (2.158) | © SIAPIN — orisinal | Ditulis tim SIAPIN + bantuan AI, diverifikasi |
+| Dataset LolosKampus | Repo publik, **tanpa lisensi eksplisit** | Data faktual daya tampung/peminat berasal dari SNPMB (data publik pemerintah); PG = estimasi komunitas |
+| Dataset divarvian/daya-tampung | Repo publik, **tanpa lisensi eksplisit** | Data agregasi daya tampung SNPMB |
+| Data resmi SNPMB | Publik (pemerintah) | https://snpmb.bppp.kemdikbud.go.id |
+
+> Jika SIAPIN dipublikasikan/dikomersialkan, sebaiknya: (1) kredit `TeguhEP/LolosKampus` & `divarvian/daya-tampung` di footer/tentang, (2) verifikasi ulang angka lewat portal SNPMB resmi.
+
+## 9. Deskripsi Singkat (siap pakai)
+
+> **SIAPIN — Siap Taklukkan PTN Impianmu.** Platform bimbingan belajar online untuk persiapan SNBT, TKA SMA, & TKA SMP. 2.158 soal latihan orisinal + pembahasan, diagnostik AI otomatis dari hasil pengerjaan (grafik radar per subtes), dan estimasi peluang lolos ke 75 PTN / 3.825 prodi berbasis passing grade & daya tampung riil — lengkap dengan rekomendasi untuk meningkatkan peluang.
+
 ---
 
 ## ⚠️ Disclaimer
