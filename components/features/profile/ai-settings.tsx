@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 import { cqm } from "@/lib/cq";
 import { useAuth } from "@/lib/store/auth";
 import { ConfirmPopup } from "@/components/features/profile/confirm-popup";
@@ -252,9 +253,15 @@ function Settings() {
           title="Log Out"
           message="Anda yakin ingin keluar dari akun anda?"
           confirmLabel="Konfirmasi"
-          onConfirm={() => {
-            logout();
+          onConfirm={async () => {
             setConfirm(null);
+            // 1. Hapus sesi Auth.js (cookie) — kalau login via Google/credentials.
+            // 2. AuthBridge akan melihat sesi hilang → store mock ikut logout.
+            await signOut({ redirect: false }).catch(() => {});
+            // 3. Bersihkan store mock (localStorage) langsung.
+            logout();
+            // 4. Balik ke beranda.
+            window.location.href = "/";
           }}
           onClose={() => setConfirm(null)}
         />
@@ -262,11 +269,16 @@ function Settings() {
       {confirm === "delete" && (
         <ConfirmPopup
           title="Hapus Akun"
-          message="Anda yakin ingin menghapus akun anda?"
+          message="Anda yakin ingin menghapus akun anda? Seluruh data (riwayat, diagnostik, leaderboard) akan dihapus permanen."
           confirmLabel="Konfirmasi"
-          onConfirm={() => {
-            deleteAccount();
+          onConfirm={async () => {
             setConfirm(null);
+            // 1. Hapus user dari DATABASE (semua data terkait ikut cascade).
+            await deleteAccount();
+            // 2. Hapus sesi Auth.js (cookie) kalau ada.
+            await signOut({ redirect: false }).catch(() => {});
+            // 3. Balik ke beranda.
+            window.location.href = "/";
           }}
           onClose={() => setConfirm(null)}
         />

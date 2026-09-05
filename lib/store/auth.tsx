@@ -64,8 +64,8 @@ interface AuthState {
     patch: Partial<Pick<User, "name" | "phone" | "email" | "avatar">>
   ) => void;
   register: (account: Account) => void;
-  /** Hapus akun permanen (dari daftar akun + logout). */
-  deleteAccount: () => void;
+  /** Hapus akun permanen (dari DB, daftar akun lokal + logout). */
+  deleteAccount: () => Promise<void>;
   /** Sinkron ke DB + muat ulang statistik real (streak/total/akurasi/progress). */
   refreshStats: () => Promise<void>;
 }
@@ -291,23 +291,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const deleteAccount = () => {
-    // hapus akun aktif dari daftar akun terdaftar
+  const deleteAccount = async () => {
+    // 1. Hapus dari DATABASE (semua data user: riwayat, diagnostik,
+    //    leaderboard, achievement, profil) — via API.
+    const email = readLS<User>(USER_KEY)?.email;
+    if (email) {
+      try {
+        await fetch("/api/user", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+      } catch {
+        /* jaringan error — tetap lanjut bersihkan lokal */
+      }
+    }
+
+    // 2. Hapus akun aktif dari daftar akun terdaftar (localStorage)
     setUser((current) => {
       if (current?.email) {
-        const email = current.email;
+        const em = current.email;
         const isSeed = SEED_ACCOUNTS.some(
-          (s) => s.email.toLowerCase() === email.toLowerCase()
+          (s) => s.email.toLowerCase() === em.toLowerCase()
         );
         const list = readLS<Account[]>(ACCOUNTS_KEY) ?? [];
-        const next = list.filter((a) => a.email !== email);
+        const next = list.filter((a) => a.email !== em);
         setAccounts(next);
         writeLS(ACCOUNTS_KEY, next);
         // kalau yang dihapus akun seed, tandai agar tidak muncul lagi
         if (isSeed) {
           const removed = readLS<string[]>(SEED_REMOVED_KEY) ?? [];
-          if (!removed.includes(email)) {
-            writeLS(SEED_REMOVED_KEY, [...removed, email]);
+          if (!removed.includes(em)) {
+            writeLS(SEED_REMOVED_KEY, [...removed, em]);
           }
         }
       }
