@@ -96,13 +96,24 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
-  password  String // hashed (saat ini mock, pakai bcrypt/plain utk demo)
+  password  String? // hashed (bcrypt). null utk user OAuth Google (login via Google)
   phone     String?
   avatar    String? // data URL / path
   role      Role     @default(SISWA)
   joinedAt  DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // ---- Auth.js / OAuth / verifikasi ----
+  emailVerified DateTime? // kapan email diverifikasi (null = belum)
+  googleId      String?   @unique // sub Google utk login OAuth
+  image         String? // foto dari Google (jika login OAuth)
+  // token verifikasi email (1x pakai, ada expiry)
+  verifyToken    String?
+  verifyTokenExp DateTime?
+  // token reset password (1x pakai, ada expiry)
+  resetToken    String?
+  resetTokenExp DateTime?
 
   profile        UserProfile?
   diagnostic     AiDiagnostic?

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/store/auth";
+import SessionProvider from "@/components/features/profile/session-provider";
+import AuthBridge from "@/components/features/profile/auth-bridge";
 import { PageTransitionProvider } from "@/components/layout/page-transition";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -34,7 +36,10 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <AuthProvider>
-          <PageTransitionProvider>{children}</PageTransitionProvider>
+          <SessionProvider>
+            <AuthBridge />
+            <PageTransitionProvider>{children}</PageTransitionProvider>
+          </SessionProvider>
         </AuthProvider>
       </body>
     </html>

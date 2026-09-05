@@ -12,6 +12,7 @@
  * Jalankan: npx prisma db seed   (atau: npx tsx prisma/seed.ts)
  */
 import { PrismaClient } from "../lib/generated/prisma/client";
+import bcrypt from "bcryptjs";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { modes } from "../lib/data/modes";
 import { BANK_SOAL } from "../lib/data/soal";
@@ -165,11 +166,17 @@ async function seedUserDemo() {
 
   const user = await prisma.user.upsert({
     where: { email: "contoh@gmail.com" },
-    update: {},
+    update: {
+      // Jangan timpa password/state kalau user sudah pernah di-update manual.
+      ...(process.env.NODE_ENV === "production"
+        ? {}
+        : { password: bcrypt.hashSync("contoh123", 10) }),
+    },
     create: {
       email: "contoh@gmail.com",
       name: "Contoh User",
-      password: "contoh123", // mock — TODO: hash saat produksi
+      password: bcrypt.hashSync("contoh123", 10), // hashed (bcrypt)
+      emailVerified: new Date(), // demo sudah verified
       phone: "081234567890",
       role: "SISWA",
       joinedAt: new Date("2025-08-17"),

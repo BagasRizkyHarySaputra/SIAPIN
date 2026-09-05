@@ -35,6 +35,13 @@ export type UserMinAggregateOutputType = {
   joinedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  emailVerified: Date | null
+  googleId: string | null
+  image: string | null
+  verifyToken: string | null
+  verifyTokenExp: Date | null
+  resetToken: string | null
+  resetTokenExp: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -48,6 +55,13 @@ export type UserMaxAggregateOutputType = {
   joinedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  emailVerified: Date | null
+  googleId: string | null
+  image: string | null
+  verifyToken: string | null
+  verifyTokenExp: Date | null
+  resetToken: string | null
+  resetTokenExp: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -61,6 +75,13 @@ export type UserCountAggregateOutputType = {
   joinedAt: number
   createdAt: number
   updatedAt: number
+  emailVerified: number
+  googleId: number
+  image: number
+  verifyToken: number
+  verifyTokenExp: number
+  resetToken: number
+  resetTokenExp: number
   _all: number
 }
 
@@ -76,6 +97,13 @@ export type UserMinAggregateInputType = {
   joinedAt?: true
   createdAt?: true
   updatedAt?: true
+  emailVerified?: true
+  googleId?: true
+  image?: true
+  verifyToken?: true
+  verifyTokenExp?: true
+  resetToken?: true
+  resetTokenExp?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -89,6 +117,13 @@ export type UserMaxAggregateInputType = {
   joinedAt?: true
   createdAt?: true
   updatedAt?: true
+  emailVerified?: true
+  googleId?: true
+  image?: true
+  verifyToken?: true
+  verifyTokenExp?: true
+  resetToken?: true
+  resetTokenExp?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -102,6 +137,13 @@ export type UserCountAggregateInputType = {
   joinedAt?: true
   createdAt?: true
   updatedAt?: true
+  emailVerified?: true
+  googleId?: true
+  image?: true
+  verifyToken?: true
+  verifyTokenExp?: true
+  resetToken?: true
+  resetTokenExp?: true
   _all?: true
 }
 
@@ -181,13 +223,20 @@ export type UserGroupByOutputType = {
   id: string
   email: string
   name: string
-  password: string
+  password: string | null
   phone: string | null
   avatar: string | null
   role: $Enums.Role
   joinedAt: Date
   createdAt: Date
   updatedAt: Date
+  emailVerified: Date | null
+  googleId: string | null
+  image: string | null
+  verifyToken: string | null
+  verifyTokenExp: Date | null
+  resetToken: string | null
+  resetTokenExp: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -215,13 +264,20 @@ export type UserWhereInput = {
   id?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringFilter<"User"> | string
+  password?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  googleId?: Prisma.StringNullableFilter<"User"> | string | null
+  image?: Prisma.StringNullableFilter<"User"> | string | null
+  verifyToken?: Prisma.StringNullableFilter<"User"> | string | null
+  verifyTokenExp?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  resetToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetTokenExp?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   profile?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   diagnostic?: Prisma.XOR<Prisma.AiDiagnosticNullableScalarRelationFilter, Prisma.AiDiagnosticWhereInput> | null
   inputNilai?: Prisma.InputNilaiListRelationFilter
@@ -235,13 +291,20 @@ export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  password?: Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleId?: Prisma.SortOrderInput | Prisma.SortOrder
+  image?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifyToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifyTokenExp?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetTokenExp?: Prisma.SortOrderInput | Prisma.SortOrder
   profile?: Prisma.UserProfileOrderByWithRelationInput
   diagnostic?: Prisma.AiDiagnosticOrderByWithRelationInput
   inputNilai?: Prisma.InputNilaiOrderByRelationAggregateInput
@@ -254,17 +317,24 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  googleId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringFilter<"User"> | string
+  password?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   joinedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  image?: Prisma.StringNullableFilter<"User"> | string | null
+  verifyToken?: Prisma.StringNullableFilter<"User"> | string | null
+  verifyTokenExp?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  resetToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetTokenExp?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   profile?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   diagnostic?: Prisma.XOR<Prisma.AiDiagnosticNullableScalarRelationFilter, Prisma.AiDiagnosticWhereInput> | null
   inputNilai?: Prisma.InputNilaiListRelationFilter
@@ -272,19 +342,26 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   leaderboard?: Prisma.XOR<Prisma.LeaderboardNullableScalarRelationFilter, Prisma.LeaderboardWhereInput> | null
   achievements?: Prisma.UserAchievementListRelationFilter
   backups?: Prisma.BackupLogListRelationFilter
-}, "id" | "email">
+}, "id" | "email" | "googleId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  password?: Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleId?: Prisma.SortOrderInput | Prisma.SortOrder
+  image?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifyToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifyTokenExp?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetTokenExp?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -297,26 +374,40 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
-  password?: Prisma.StringWithAggregatesFilter<"User"> | string
+  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   avatar?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   joinedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  googleId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  verifyToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  verifyTokenExp?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  resetToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetTokenExp?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
@@ -330,13 +421,20 @@ export type UserUncheckedCreateInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
@@ -350,13 +448,20 @@ export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
@@ -370,13 +475,20 @@ export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
@@ -390,39 +502,60 @@ export type UserCreateManyInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -436,6 +569,13 @@ export type UserCountOrderByAggregateInput = {
   joinedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  googleId?: Prisma.SortOrder
+  image?: Prisma.SortOrder
+  verifyToken?: Prisma.SortOrder
+  verifyTokenExp?: Prisma.SortOrder
+  resetToken?: Prisma.SortOrder
+  resetTokenExp?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -449,6 +589,13 @@ export type UserMaxOrderByAggregateInput = {
   joinedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  googleId?: Prisma.SortOrder
+  image?: Prisma.SortOrder
+  verifyToken?: Prisma.SortOrder
+  verifyTokenExp?: Prisma.SortOrder
+  resetToken?: Prisma.SortOrder
+  resetTokenExp?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -462,6 +609,13 @@ export type UserMinOrderByAggregateInput = {
   joinedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  googleId?: Prisma.SortOrder
+  image?: Prisma.SortOrder
+  verifyToken?: Prisma.SortOrder
+  verifyTokenExp?: Prisma.SortOrder
+  resetToken?: Prisma.SortOrder
+  resetTokenExp?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -476,6 +630,10 @@ export type UserNullableScalarRelationFilter = {
 
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserCreateNestedOneWithoutProfileInput = {
@@ -582,13 +740,20 @@ export type UserCreateWithoutProfileInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
   riwayat?: Prisma.RiwayatPengerjaanCreateNestedManyWithoutUserInput
@@ -601,13 +766,20 @@ export type UserUncheckedCreateWithoutProfileInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
   riwayat?: Prisma.RiwayatPengerjaanUncheckedCreateNestedManyWithoutUserInput
@@ -636,13 +808,20 @@ export type UserUpdateWithoutProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
   riwayat?: Prisma.RiwayatPengerjaanUpdateManyWithoutUserNestedInput
@@ -655,13 +834,20 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
   riwayat?: Prisma.RiwayatPengerjaanUncheckedUpdateManyWithoutUserNestedInput
@@ -674,13 +860,20 @@ export type UserCreateWithoutDiagnosticInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
   riwayat?: Prisma.RiwayatPengerjaanCreateNestedManyWithoutUserInput
@@ -693,13 +886,20 @@ export type UserUncheckedCreateWithoutDiagnosticInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
   riwayat?: Prisma.RiwayatPengerjaanUncheckedCreateNestedManyWithoutUserInput
@@ -728,13 +928,20 @@ export type UserUpdateWithoutDiagnosticInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
   riwayat?: Prisma.RiwayatPengerjaanUpdateManyWithoutUserNestedInput
@@ -747,13 +954,20 @@ export type UserUncheckedUpdateWithoutDiagnosticInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
   riwayat?: Prisma.RiwayatPengerjaanUncheckedUpdateManyWithoutUserNestedInput
@@ -766,13 +980,20 @@ export type UserCreateWithoutInputNilaiInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   riwayat?: Prisma.RiwayatPengerjaanCreateNestedManyWithoutUserInput
@@ -785,13 +1006,20 @@ export type UserUncheckedCreateWithoutInputNilaiInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   riwayat?: Prisma.RiwayatPengerjaanUncheckedCreateNestedManyWithoutUserInput
@@ -820,13 +1048,20 @@ export type UserUpdateWithoutInputNilaiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   riwayat?: Prisma.RiwayatPengerjaanUpdateManyWithoutUserNestedInput
@@ -839,13 +1074,20 @@ export type UserUncheckedUpdateWithoutInputNilaiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   riwayat?: Prisma.RiwayatPengerjaanUncheckedUpdateManyWithoutUserNestedInput
@@ -858,13 +1100,20 @@ export type UserCreateWithoutRiwayatInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
@@ -877,13 +1126,20 @@ export type UserUncheckedCreateWithoutRiwayatInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
@@ -912,13 +1168,20 @@ export type UserUpdateWithoutRiwayatInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
@@ -931,13 +1194,20 @@ export type UserUncheckedUpdateWithoutRiwayatInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
@@ -950,13 +1220,20 @@ export type UserCreateWithoutLeaderboardInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
@@ -969,13 +1246,20 @@ export type UserUncheckedCreateWithoutLeaderboardInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
@@ -1004,13 +1288,20 @@ export type UserUpdateWithoutLeaderboardInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
@@ -1023,13 +1314,20 @@ export type UserUncheckedUpdateWithoutLeaderboardInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
@@ -1042,13 +1340,20 @@ export type UserCreateWithoutAchievementsInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
@@ -1061,13 +1366,20 @@ export type UserUncheckedCreateWithoutAchievementsInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
@@ -1096,13 +1408,20 @@ export type UserUpdateWithoutAchievementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
@@ -1115,13 +1434,20 @@ export type UserUncheckedUpdateWithoutAchievementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
@@ -1134,13 +1460,20 @@ export type UserCreateWithoutBackupsInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiCreateNestedManyWithoutUserInput
@@ -1153,13 +1486,20 @@ export type UserUncheckedCreateWithoutBackupsInput = {
   id?: string
   email: string
   name: string
-  password: string
+  password?: string | null
   phone?: string | null
   avatar?: string | null
   role?: $Enums.Role
   joinedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  emailVerified?: Date | string | null
+  googleId?: string | null
+  image?: string | null
+  verifyToken?: string | null
+  verifyTokenExp?: Date | string | null
+  resetToken?: string | null
+  resetTokenExp?: Date | string | null
   profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   diagnostic?: Prisma.AiDiagnosticUncheckedCreateNestedOneWithoutUserInput
   inputNilai?: Prisma.InputNilaiUncheckedCreateNestedManyWithoutUserInput
@@ -1188,13 +1528,20 @@ export type UserUpdateWithoutBackupsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUpdateManyWithoutUserNestedInput
@@ -1207,13 +1554,20 @@ export type UserUncheckedUpdateWithoutBackupsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifyTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExp?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   diagnostic?: Prisma.AiDiagnosticUncheckedUpdateOneWithoutUserNestedInput
   inputNilai?: Prisma.InputNilaiUncheckedUpdateManyWithoutUserNestedInput
@@ -1291,6 +1645,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   joinedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailVerified?: boolean
+  googleId?: boolean
+  image?: boolean
+  verifyToken?: boolean
+  verifyTokenExp?: boolean
+  resetToken?: boolean
+  resetTokenExp?: boolean
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   diagnostic?: boolean | Prisma.User$diagnosticArgs<ExtArgs>
   inputNilai?: boolean | Prisma.User$inputNilaiArgs<ExtArgs>
@@ -1312,6 +1673,13 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   joinedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailVerified?: boolean
+  googleId?: boolean
+  image?: boolean
+  verifyToken?: boolean
+  verifyTokenExp?: boolean
+  resetToken?: boolean
+  resetTokenExp?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1325,6 +1693,13 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   joinedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailVerified?: boolean
+  googleId?: boolean
+  image?: boolean
+  verifyToken?: boolean
+  verifyTokenExp?: boolean
+  resetToken?: boolean
+  resetTokenExp?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1338,9 +1713,16 @@ export type UserSelectScalar = {
   joinedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  emailVerified?: boolean
+  googleId?: boolean
+  image?: boolean
+  verifyToken?: boolean
+  verifyTokenExp?: boolean
+  resetToken?: boolean
+  resetTokenExp?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "password" | "phone" | "avatar" | "role" | "joinedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "password" | "phone" | "avatar" | "role" | "joinedAt" | "createdAt" | "updatedAt" | "emailVerified" | "googleId" | "image" | "verifyToken" | "verifyTokenExp" | "resetToken" | "resetTokenExp", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   diagnostic?: boolean | Prisma.User$diagnosticArgs<ExtArgs>
@@ -1369,13 +1751,20 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     email: string
     name: string
-    password: string
+    password: string | null
     phone: string | null
     avatar: string | null
     role: $Enums.Role
     joinedAt: Date
     createdAt: Date
     updatedAt: Date
+    emailVerified: Date | null
+    googleId: string | null
+    image: string | null
+    verifyToken: string | null
+    verifyTokenExp: Date | null
+    resetToken: string | null
+    resetTokenExp: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1816,6 +2205,13 @@ export interface UserFieldRefs {
   readonly joinedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly emailVerified: Prisma.FieldRef<"User", 'DateTime'>
+  readonly googleId: Prisma.FieldRef<"User", 'String'>
+  readonly image: Prisma.FieldRef<"User", 'String'>
+  readonly verifyToken: Prisma.FieldRef<"User", 'String'>
+  readonly verifyTokenExp: Prisma.FieldRef<"User", 'DateTime'>
+  readonly resetToken: Prisma.FieldRef<"User", 'String'>
+  readonly resetTokenExp: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

@@ -13,14 +13,17 @@
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.10.0",
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
     "next": "16.3.4",
+    "next-auth": "^5.0.0-beta.32",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@prisma/client": "^7.10.0",
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
