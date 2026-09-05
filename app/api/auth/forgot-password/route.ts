@@ -45,7 +45,10 @@ export async function POST(req: Request) {
       data: {
         sent: true,
         mailMode: mail.mode,
-        ...(mail.mode === "simulasi" ? { simUrl: mail.url } : {}),
+        // Mode simulasi ATAU kirim gagal: tampilkan link di UI supaya alur
+        // tetap bisa dites (mis. sender Brevo belum aktif).
+        ...(mail.mode === "simulasi" || !mail.ok ? { simUrl: mail.url } : {}),
+        ...(!mail.ok ? { mailError: mail.error } : {}),
       },
     });
   } catch (e) {

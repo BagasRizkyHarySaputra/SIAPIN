@@ -7,7 +7,8 @@ import crypto from "crypto";
  *  - Jika `RESEND_API_KEY` KOSONG → mode simulasi: email TIDAK dikirim.
  *    Link verifikasi/reset dikembalikan ke pemanggil (ditampilkan di UI)
  *    sehingga alur bisa dites offline tanpa bahan apa pun.
- *  - Jika `RESEND_API_KEY` terisi → kirim email beneran via Resend API.
+ *  - Jika `RESEND_API_KEY` terisi → kirim email beneran via Brevo API
+ *    (key disimpan dgn nama RESEND_ demi backward-compat; provider = Brevo).
  */
 
 export function generateToken(bytes = 32): string {
@@ -39,6 +40,8 @@ export interface MailResult {
 
 /**
  * Kirim email verifikasi / reset password.
+ * Provider: Brevo (Sendinblue) — `POST https://api.brevo.com/v3/smtp/email`.
+ * Key disimpan di env `RESEND_API_KEY` (nama lama, backward-compat).
  * @param to       email penerima
  * @param subject  subjek
  * @param html     body HTML (sudah berisi link aksi)
@@ -58,14 +61,26 @@ export async function sendMail(opts: {
 
   try {
     const key = process.env.RESEND_API_KEY!;
-    const from = process.env.EMAIL_FROM ?? "SIAPIN <onboarding@resend.dev>";
-    const res = await fetch("https://api.resend.com/emails", {
+    // EMAIL_FROM bisa "SIAPIN <de13ugg1ng@gmail.com>" → pecah jadi name + email.
+    const fromRaw = process.env.EMAIL_FROM ?? "SIAPIN <de13ugg1ng@gmail.com>";
+    const m = fromRaw.match(/^(.*?)\s*<([^>]+)>$/);
+    const sender = m
+      ? { name: m[1].trim(), email: m[2].trim() }
+      : { name: "SIAPIN", email: fromRaw.trim() };
+
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${key}`,
+        "api-key": key,
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      body: JSON.stringify({ from, to, subject, html }),
+      body: JSON.stringify({
+        sender,
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      }),
     });
     if (!res.ok) {
       const text = await res.text();

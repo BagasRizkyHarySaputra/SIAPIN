@@ -273,11 +273,23 @@ function Settings() {
           confirmLabel="Konfirmasi"
           onConfirm={async () => {
             setConfirm(null);
-            // 1. Hapus user dari DATABASE (semua data terkait ikut cascade).
-            await deleteAccount();
-            // 2. Hapus sesi Auth.js (cookie) kalau ada.
+            // Tandai akun sedang dihapus → AuthBridge tidak akan auto-login
+            // dari sesi lama yang masih sempat terbaca sebelum cookie hilang.
+            const em = (() => {
+              try { return JSON.parse(localStorage.getItem("siapin.user") || "null")?.email || ""; } catch { return ""; }
+            })();
+            if (em) {
+              try { sessionStorage.setItem("siapin.deleting", em); } catch { /* ignore */ }
+            }
+            // 1. Hapus SESI Auth.js (cookie) DULU — supaya AuthBridge tidak
+            //    login-ulang & sync tidak menciptakan ulang user setelah dihapus.
             await signOut({ redirect: false }).catch(() => {});
-            // 3. Balik ke beranda.
+            // 2. Hapus user dari DATABASE (semua data terkait ikut cascade)
+            //    + bersihkan store mock (localStorage).
+            await deleteAccount();
+            // 3. Hapus penanda (sesi sudah bersih; tab ini boleh login lagi).
+            try { sessionStorage.removeItem("siapin.deleting"); } catch { /* ignore */ }
+            // 4. Balik ke beranda.
             window.location.href = "/";
           }}
           onClose={() => setConfirm(null)}

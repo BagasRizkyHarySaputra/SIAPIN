@@ -170,6 +170,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * session-restore dan saat profil diubah (nama/telepon/avatar).
    */
   const syncAndLoad = useCallback(async (u: User) => {
+    // Sedang proses hapus akun → jangan upsert (menciptakan ulang) user.
+    try {
+      if (sessionStorage.getItem("siapin.deleting")?.toLowerCase() === u.email.toLowerCase()) {
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
     try {
       await fetch("/api/user/sync", {
         method: "POST",

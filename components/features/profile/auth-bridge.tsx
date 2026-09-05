@@ -26,6 +26,17 @@ export default function AuthBridge() {
     const sesEmail = session.user.email.toLowerCase();
     const localEmail = user?.email?.toLowerCase();
 
+    // Sedang proses hapus akun → JANGAN auto-login dari sesi (sesi lama masih
+    // sempat terbaca sesaat sebelum cookie hilang). Ini mencegah akun yang baru
+    // dihapus "muncul lagi" lewat sync/upsert.
+    try {
+      if (sessionStorage.getItem("siapin.deleting")?.toLowerCase() === sesEmail) {
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+
     // Sudah login sebagai user yang sama → tak perlu apa-apa.
     if (localEmail === sesEmail) return;
 
