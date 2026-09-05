@@ -552,31 +552,32 @@
   }
 }
 
-/* ===== Auth popup (login/register): flip depan-belakang ===== */
+/* ===== Auth popup (login/register): render kondisional per view =====
+   Dulu pakai flip 3D (rotateY + backface-visibility). Saat container popup
+   memakai overflow-y:auto, konteks 3D jadi flat sehingga backface-visibility
+   gagal & kedua muka tampak dobel. Sekarang hanya satu muka dirender — aman. */
 .auth-flip-inner {
-  display: grid;
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.4, 0.1, 0.2, 1);
-}
-.auth-flip-inner.flipped {
-  transform: rotateY(180deg);
+  /* kartu tunggal; tinggi mengikuti konten aktif */
 }
 .auth-face {
-  grid-area: 1 / 1;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  animation: authFaceIn 0.28s ease-out;
 }
 .auth-face-back {
-  transform: rotateY(180deg);
+  /* tidak perlu transform apa pun — face dirender kondisional */
+}
+@keyframes authFaceIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .auth-input::placeholder {
   color: #b5b0b0;
   opacity: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .auth-flip-inner {
-    transition: none;
-  }
 }
 
 /* ===== Transisi antar page navbar (slide searah, masuk saja) ===== */

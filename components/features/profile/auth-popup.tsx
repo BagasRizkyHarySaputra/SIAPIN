@@ -182,7 +182,7 @@ export function AuthPopup({
   required?: boolean;
 }) {
   const { login, register, accounts } = useAuth();
-  const [view, setView] = useState<"login" | "register" | "forgot">("login");
+  const [view, setView] = useState<"login" | "register" | "forgot" | "checkEmail">("login");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -199,6 +199,7 @@ export function AuthPopup({
   // forgot state
   const [fpEmail, setFpEmail] = useState("");
   const [fpDone, setFpDone] = useState<string | null>(null);
+  const [regSimUrl, setRegSimUrl] = useState<string | null>(null);
 
   // Cek apakah Google OAuth dikonfigurasi (server) — tampilkan tombol bila ya.
   useEffect(() => {
@@ -316,16 +317,12 @@ export function AuthPopup({
         setError(j?.error ?? "Gagal mendaftar. Coba lagi.");
         return;
       }
-      // Registrasi server → TIDAK auto-login; tunggu verifikasi email.
+      // Registrasi server → TIDAK auto-login; user harus verifikasi email dulu.
+      // Tampilkan layar "Cek Email Kamu" berisi instruksi + (mode simulasi) link.
       const simUrl = j?.data?.simUrl as string | undefined;
-      setView("login");
+      setRegSimUrl(simUrl ?? null);
       setLoginEmail(email);
-      setNotice(
-        simUrl
-          ? "Akun dibuat! Buka link verifikasi (mode simulasi) lalu login:"
-          : "Akun dibuat! Cek email kamu untuk link verifikasi, lalu login."
-      );
-      if (simUrl) setFpDone(simUrl); // reuse state utk tampilkan link
+      setView("checkEmail");
     } catch {
       setError("Gagal terhubung ke server. Coba lagi.");
     } finally {
@@ -373,10 +370,11 @@ export function AuthPopup({
     }
   };
 
-  const switchTo = (v: "login" | "register" | "forgot") => {
+  const switchTo = (v: "login" | "register" | "forgot" | "checkEmail") => {
     setError(null);
     setNotice(null);
     setFpDone(null);
+    setRegSimUrl(null);
     setView(v);
   };
 
@@ -434,10 +432,11 @@ export function AuthPopup({
           overflowY: "auto",
         }}
       >
-        <div style={{ perspective: "1400px" }}>
-          {/* kartu putih — INI yang nge-flip */}
+        <div>
+          {/* kartu putih — render kondisional per view (tanpa flip 3D yang bisa
+              "dobel" saat backface-visibility gagal di sebagian browser) */}
           <div
-            className={`auth-flip-inner${view === "register" ? " flipped" : ""}`}
+            className="auth-flip-inner"
             style={{
               position: "relative",
               backgroundColor: "#ffffff",
@@ -446,7 +445,8 @@ export function AuthPopup({
               boxShadow: "0 24px 80px rgba(28, 20, 81, 0.25)",
             }}
           >
-            {/* ===== DEPAN: login ===== */}
+            {/* ===== LOGIN (depan) — tampil di view login / forgot ===== */}
+            {(view === "login" || view === "forgot") && (
             <div
               className="auth-face"
               style={{
@@ -625,8 +625,10 @@ export function AuthPopup({
                 Belum punya akun? Buat akun
               </button>
             </div>
+            )}
 
-            {/* ===== BELAKANG: register ===== */}
+            {/* ===== REGISTER (belakang) — tampil hanya di view register ===== */}
+            {view === "register" && (
             <div
               className="auth-face auth-face-back"
               style={{
@@ -716,6 +718,128 @@ export function AuthPopup({
                 Sudah punya akun?
               </button>
             </div>
+            )}
+
+            {/* ===== CEK EMAIL (setelah Buat Akun) — tampil di view checkEmail ===== */}
+            {view === "checkEmail" && (
+              <div
+                className="auth-face"
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  paddingTop: cqm(80),
+                  paddingBottom: cqm(64),
+                  paddingInline: cqm(70),
+                }}
+              >
+                {!required && <CloseButton bg="#dfe3ff" onClose={onClose} />}
+                <h2
+                  className="font-bold"
+                  style={{
+                    fontSize: cqm(30),
+                    color: "#454545",
+                    textAlign: "center",
+                    margin: 0,
+                  }}
+                >
+                  SIAPIN
+                </h2>
+                <div style={{ textAlign: "center", marginTop: cqm(24) }}>
+                  <div
+                    style={{
+                      width: cqm(96),
+                      height: cqm(96),
+                      borderRadius: "50%",
+                      backgroundColor: "#e4e7ff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto",
+                    }}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      style={{ width: cqm(48), height: cqm(48) }}
+                      fill="none"
+                      stroke="#5858b8"
+                      strokeWidth={1.8}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                    >
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                      <path d="m22 7-10 6L2 7" />
+                    </svg>
+                  </div>
+                  <h3
+                    className="font-bold"
+                    style={{
+                      fontSize: cqm(22),
+                      color: "#2a235c",
+                      margin: cqm(22),
+                    }}
+                  >
+                    Cek Email Kamu!
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: cqm(15),
+                      color: "#6b6b7b",
+                      lineHeight: 1.5,
+                      margin: 0,
+                    }}
+                  >
+                    Kami sudah mengirim link verifikasi ke email kamu. Klik link
+                    tersebut untuk mengaktifkan akun, lalu kamu akan langsung
+                    diarahkan ke dashboard.
+                  </p>
+                  {regSimUrl && (
+                    <p
+                      style={{
+                        fontSize: cqm(14),
+                        color: "#8b87e6",
+                        background: "#f0efff",
+                        borderRadius: cqm(12),
+                        padding: cqm(14),
+                        marginTop: cqm(18),
+                        marginBottom: 0,
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      <span style={{ fontWeight: 700 }}>
+                        Mode simulasi (email belum dikonfigurasi):
+                      </span>
+                      <br />
+                      <a
+                        href={regSimUrl}
+                        style={{ color: "#5858b8", textDecoration: "underline" }}
+                      >
+                        {regSimUrl}
+                      </a>
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => switchTo("login")}
+                    className="cursor-pointer font-bold transition hover:brightness-[0.97]"
+                    style={{
+                      width: "100%",
+                      marginTop: cqm(24),
+                      height: cqm(64),
+                      borderRadius: cqm(32),
+                      backgroundColor: "#e4e7ff",
+                      border: `${cqm(2)} solid #5858b8`,
+                      color: "#5858b8",
+                      fontSize: cqm(20),
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Kembali ke Masuk
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* ===== FORGOT PASSWORD (overlay di atas face login, view=forgot) ===== */}
             {view === "forgot" && (

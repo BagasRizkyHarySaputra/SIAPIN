@@ -17,16 +17,21 @@ function VerifyContent() {
       setMessage("Tautan verifikasi tidak lengkap.");
       return;
     }
-    fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`)
+    const apiUrl = `/api/auth/verify-email?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+
+    // Route API memverifikasi + membuat sesi Auth.js (cookie) lalu membalas
+    // JSON { data: { verified: true } }. Begitu sukses, arahkan ke dashboard.
+    fetch(apiUrl, { redirect: "follow" })
       .then(async (r) => {
-        const j = await r.json();
-        if (r.ok) {
+        const j = await r.json().catch(() => null);
+        if (r.ok && j?.data?.verified) {
           setState("ok");
-          setMessage("Email kamu berhasil diverifikasi! Silakan login.");
-        } else {
-          setState("error");
-          setMessage(j?.error ?? "Verifikasi gagal.");
+          setMessage("Email berhasil diverifikasi! Mengalihkan ke dashboard...");
+          window.location.href = "/dashboard";
+          return;
         }
+        setState("error");
+        setMessage(j?.error ?? "Verifikasi gagal.");
       })
       .catch(() => {
         setState("error");
@@ -44,7 +49,7 @@ function VerifyContent() {
           {state === "loading" ? "Memverifikasi..." : state === "ok" ? "Berhasil!" : "Verifikasi Gagal"}
         </h1>
         <p style={{ color: "#555", fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>{message}</p>
-        {state !== "loading" && (
+        {state === "error" && (
           <button
             onClick={() => router.push("/profile")}
             style={{ background: "#4b0a95", color: "#fff", border: "none", padding: "12px 24px", borderRadius: 10, fontWeight: 700, cursor: "pointer" }}
