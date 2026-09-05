@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   title: "SIAPIN — Siap Taklukkan PTN Impianmu",
   description:
     "SIAPIN adalah platform belajar online untuk persiapan SNBT, TKA SMA, dan TKA SMP. Drill soal, pantau progress, dan raih kampus impianmu.",
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }, { url: "/favicon.ico", type: "image/x-icon" }],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

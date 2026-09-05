@@ -141,7 +141,7 @@ function Settings() {
         style={{
           marginTop: cqm(25),
           width: "100%",
-          height: cqm(284),
+          height: cqm(306), // 3 baris: 30 + 3×92 = 306 (baris 3 tdk terpotong)
           borderRadius: cqm(30),
           backgroundColor: "#f5eafb",
           border: `${cqm(2)} solid rgba(132, 121, 138, 0.55)`, // #84798a
@@ -229,14 +229,16 @@ function Settings() {
               >
                 &lt;
               </span>
-              {/* separator */}
+              {/* separator — di DASAR container (92) = tepat di tengah antara
+                  konten baris ini & baris berikutnya, sehingga tiap baris
+                  benar-benar center (sebelumnya di 65 → konten nempel garis). */}
               {i < 2 && (
                 <div
                   style={{
                     position: "absolute",
                     left: 0,
                     right: 0,
-                    top: cqm(65), // 1163-1098 = 65 setelah baris 1
+                    top: cqm(92),
                     height: cqm(2),
                     backgroundColor: "rgba(132,121,138,0.5)",
                   }}

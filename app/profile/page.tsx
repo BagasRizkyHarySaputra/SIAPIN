@@ -24,12 +24,18 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full bg-[#dbe9ea]" style={{ overflowX: "clip" }}>
+    <main
+      className="flex min-h-screen w-full flex-col bg-[#dbe9ea]"
+      style={{ minHeight: "100dvh", overflowX: "clip" }}
+    >
       <Navbar />
 
-      {/* white sheet (Rectangle 159) — mulai y196; padding kiri 74 (konten desain x73/74) */}
+      {/* white sheet (Rectangle 159) — mulai y196; padding kiri 74 (konten desain x73/74)
+          flex-col: blok2 atas rapat alami; AiAndSettings memakai mt-auto (lihat di
+          dalam) sehingga saat viewport tinggi ia menempel ke dasar — konten tidak
+          numpuk di atas & tidak tersebar janggal antar kartu. */}
       <div
-        className="profile-scope relative mx-auto w-full bg-white"
+        className="profile-scope relative mx-auto flex w-full flex-1 flex-col bg-white"
         style={{
           borderTopLeftRadius: cqm(70),
           borderTopRightRadius: cqm(70),
@@ -54,8 +60,10 @@ export default function ProfilePage() {
           <Achievement />
         </div>
 
-        {/* AI Diagnostic + Lainnya: title y1003 - (740+231) = 32 */}
-        <div style={{ marginTop: cqm(32) }}>
+        {/* AI Diagnostic + Lainnya: title y1003 - (740+231) = 32
+            mt-auto: saat viewport tinggi, blok ini menempel ke dasar sheet
+            (konten tidak numpuk di atas); paddingTop 32 menjaga jarak min. */}
+        <div style={{ marginTop: "auto", paddingTop: cqm(32) }}>
           <AiAndSettings />
         </div>
       </div>
