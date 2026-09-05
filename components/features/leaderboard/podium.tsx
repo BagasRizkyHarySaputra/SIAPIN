@@ -1,6 +1,7 @@
 "use client";
 
 import { cqm } from "@/lib/cq";
+import { PodiumConfetti } from "./confetti";
 
 /** 1:1 data podium (top 3) — dari Figma LEADERBOARD frame 337-1256. */
 export type PodiumPerson = {
@@ -90,6 +91,7 @@ function Cap({ color, height }: { color: string; height: number }) {
 export function Podium({ items }: { items?: PodiumPerson[] }) {
   const list = items && items.length > 0 ? items : PODIUM;
   return (
+    <>
     <div
       className="podium-scope"
       style={{
@@ -113,8 +115,8 @@ export function Podium({ items }: { items?: PodiumPerson[] }) {
               flexShrink: 0,
             }}
           >
-            {/* cap trapesium */}
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: cqm(48) }}>
+            {/* cap trapesium — titik sembur confetti */}
+            <div data-podium-cap style={{ position: "absolute", top: 0, left: 0, width: "100%", height: cqm(48) }}>
               <Cap color={p.capColor} height={48} />
             </div>
 
@@ -192,5 +194,7 @@ export function Podium({ items }: { items?: PodiumPerson[] }) {
         );
       })}
     </div>
+      <PodiumConfetti />
+    </>
   );
 }
