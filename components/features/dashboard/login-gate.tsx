@@ -6,11 +6,24 @@ import { AuthPopup } from "@/components/features/profile/auth-popup";
 
 /**
  * LoginGate — membungkus halaman yang WAJIB login (/dashboard, /soal/*).
- * Selama user belum login, children TIDAK dirender (hindari fetch API tanpa
- * auth & render konten mahal) dan popup login mode "required" ditampilkan —
- * tidak bisa ditutup sampai berhasil login. Layout halaman tidak diubah.
+ *
+ * Saat user belum login, popup login mode "required" tampil (tidak bisa
+ * ditutup sampai berhasil login).
+ *
+ * Prop `showContentWhileLocked`:
+ *  - true  (dipakai /dashboard): konten halaman TETAP dirender di belakang
+ *    popup, sehingga setelah login TIDAK perlu render ulang dari nol — hemat
+ *    biaya render/fetch & transisi terasa instan.
+ *  - false (default, /soal/*): konten disembunyikan selama belum login —
+ *    konten latihan (paket/soal) tetap terkunci dari pengunjung anonim.
  */
-export function LoginGate({ children }: { children: React.ReactNode }) {
+export function LoginGate({
+  children,
+  showContentWhileLocked = false,
+}: {
+  children: React.ReactNode;
+  showContentWhileLocked?: boolean;
+}) {
   const { user } = useAuth();
   const [hydrated, setHydrated] = useState(false);
 
@@ -18,17 +31,17 @@ export function LoginGate({ children }: { children: React.ReactNode }) {
     setHydrated(true);
   }, []);
 
-  // Hindari flash sebelum hydration selesai.
+  // Hindari flash sebelum hydration selesai — konten & popup sama-sama
+  // ditentukan setelah hydrated agar state user final sudah diketahui.
   if (!hydrated) return null;
 
-  if (!user) {
-    return (
-      <>
-        {/* Navbar tetap tampil agar ada jalan keluar ke halaman publik */}
-        <AuthPopup required onClose={() => {}} />
-      </>
-    );
-  }
+  if (user) return <>{children}</>;
 
-  return <>{children}</>;
+  // Belum login.
+  return (
+    <>
+      {showContentWhileLocked ? children : null}
+      <AuthPopup required onClose={() => {}} />
+    </>
+  );
 }

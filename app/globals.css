@@ -534,9 +534,17 @@
   }
 }
 
-/* ===== Auth popup: skala lokal 3x di HP (sebelumnya 2x, +50%) ===== */
+/* ===== Auth popup: skala lokal 3x di HP (sebelumnya 2x, +50%) =====
+   Desktop: 0.78x — card login/register lebih ramping di layar lebar.
+   HP <768px: 3x (konsisten dgn desain mobile popup). */
 .auth-scope {
-  --pm: 1;
+  --pm: 0.78;
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  /* Layar sedang (tablet/laptop kecil): sedikit lebih besar dari desktop penuh */
+  .auth-scope {
+    --pm: 0.85;
+  }
 }
 @media (max-width: 767px) {
   .auth-scope {

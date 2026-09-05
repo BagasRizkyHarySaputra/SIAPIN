@@ -17,7 +17,7 @@ export default function DashboardPage() {
   const [ptn, setPtn] = useState<PtnData | null>(null);
 
   return (
-    <LoginGate>
+    <LoginGate showContentWhileLocked>
       <main className="min-h-screen w-full bg-[#dbe9ea]">
       <Navbar />
 
