@@ -52,7 +52,7 @@ function pillStyle(modeSlug: string, accent: string) {
   return { text: accent, bg: pastel(accent) };
 }
 
-/** 8 paket drill dummy — skor 0 (belum dikerjakan). */
+/** Ikon ulangi untuk paket yang sudah pernah dikerjakan. */
 function RetryIcon({ color }: { color: string }) {
   return (
     <svg

@@ -809,10 +809,16 @@ export function DrillBoard({
   useEffect(() => {
     if (tipe !== "ujian") return;
     const id = setInterval(() => {
-      setLeft((v) => (v > 0 ? v - 1 : 0));
+      setLeft((v) => (v > 1 ? v - 1 : 0));
     }, 1000);
     return () => clearInterval(id);
   }, [tipe]);
+
+  // Saat waktu habis (ujian), submit otomatis.
+  useEffect(() => {
+    if (tipe !== "ujian" || left > 0) return;
+    if (!submittedRef.current) handleSubmit();
+  }, [left, tipe]);
 
   function goto(n: number) {
     setQi(Math.min(Math.max(n, 0), total - 1));

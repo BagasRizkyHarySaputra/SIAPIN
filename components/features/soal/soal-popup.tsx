@@ -7,7 +7,7 @@ const OPTIONS = [
   {
     key: "drilling",
     title: "Drilling",
-    desc: "Tanpa Timer - Pembahasan",
+    desc: "Tanpa Timer, Langsung Pembahasan",
     bg: "#d9e8e6",
     border: "#7d9b98",
     circle: "#8ba3a0",
@@ -15,7 +15,7 @@ const OPTIONS = [
   {
     key: "ujian",
     title: "Ujian",
-    desc: "30 Menit - Skor Akhir",
+    desc: "30 Menit, Skor Akhir Langsung",
     bg: "#ece7f3",
     border: "#9a8fa8",
     circle: "#8f86a3",
