@@ -294,10 +294,10 @@ cd siapin
 <summary><b>2️⃣ Install dependensi</b></summary>
 
 ```bash
-npm install --legacy-peer-deps
+npm install
 ```
 
-> ⚠️ **Wajib** memakai `--legacy-peer-deps` (menghindari bug resolusi peer dependency `edgesOut`).
+> Jika menemui masalah resolusi peer dependency di environment tertentu, gunakan `npm install --legacy-peer-deps`.
 
 </details>
 
