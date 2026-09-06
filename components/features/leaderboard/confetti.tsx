@@ -67,6 +67,24 @@ export function PodiumConfetti() {
     };
     fit();
 
+    // Kapan posisi cap dijamin final. Wrapper page (.page-t-slide/.page-t-fade)
+    // beranimasi saat halaman baru masuk — podium ikut bergeser selama itu.
+    // Baca durasi animasi SEKALI di sini (bukan via getAnimations di IO yang
+    // sering kosong karena animasi sudah selesai/dibersihkan). Partikel baru
+    // boleh spawn setelah settleAt → pita tidak pernah melenceng dari cap.
+    let settleAt = 0;
+    {
+      const w = document.querySelector(".page-t-slide, .page-t-fade");
+      const raw = w ? getComputedStyle(w).animationDuration || "" : "";
+      // animationDuration bisa "0.37s" (detik) atau "370ms" — normalisasi.
+      let dur = 0;
+      if (raw.endsWith("ms")) dur = parseFloat(raw) || 0;
+      else if (raw.endsWith("s")) dur = (parseFloat(raw) || 0) * 1000;
+      if (dur > 0) {
+        settleAt = performance.now() + dur + 60;
+      }
+    }
+
     const emitters = () =>
       [...document.querySelectorAll("[data-podium-cap]")].map((el) => {
         const r = el.getBoundingClientRect();
@@ -100,8 +118,11 @@ export function PodiumConfetti() {
       last = t;
 
       // Semburan berurutan per podium selama ~1.6 dtk masing-masing.
+      // Tapi jangan spawn sebelum settleAt: selama halaman masih slide,
+      // posisi cap belum final → pita akan melenceng (arah kiri-kanan).
       const els = emitters();
       els.forEach((e, i) => {
+        if (t < settleAt) return;
         const local = (t - startedAt - i * 280) / 1000;
         if (local > 0 && local < 1.6 && Math.random() < 0.9) {
           spawn(e.x, e.y, 3);
@@ -154,46 +175,6 @@ export function PodiumConfetti() {
       raf = requestAnimationFrame(tick);
     };
 
-    /**
-     * Tunggu sampai posisi cap benar-benar final sebelum menyembur.
-     * Saat navigasi SPA, halaman baru masuk dengan animasi slide
-     * (.page-t-slide/.page-t-fade) — podium ikut bergeser. Kalau confetti
-     * mulai selama slide, pitanya menyembur dari posisi yang melenceng
-     * (belum di tempat akhir) lalu "mengejar" — terlihat gak pas.
-     */
-    const whenSettled = (el: Element, cb: () => void) => {
-      const anim = el.closest(".page-t-slide, .page-t-fade");
-      if (!anim) return cb();
-      // Animasi CSS yang masih berjalan pada wrapper page (WAAPI).
-      // playState bisa "idle" | "running" | "pending" | "paused" | "finished"
-      // (TS lib tak menyertakan "pending", jadi hitung yang bukan idle/finished).
-      const running = (anim.getAnimations?.() || []).filter(
-        (a) => a.playState !== "idle" && a.playState !== "finished",
-      );
-      if (running.length === 0) return cb();
-      let done = false;
-      const cleanup = () => {
-        running.forEach((a) => a.removeEventListener("finish", finish));
-      };
-      const finish = () => {
-        if (done) return;
-        done = true;
-        cleanup();
-        cb();
-      };
-      // Jaring pengaman: apa pun yang terjadi, jangan tunda lebih dari 700ms.
-      // (Kalau animasi tak pernah "finish" — mis. di-cancel React saat navigasi
-      // berikutnya — confetti tetap jalan, telat sedikit lebih baik dari macet.)
-      const bail = window.setTimeout(finish, 700);
-      running.forEach((a) => a.addEventListener("finish", finish));
-      // Fallback kalau event finish terlewat: mulai paling lambat dur+150ms.
-      const maxDur = running.reduce((m, a) => {
-        const d = (a.effect as KeyframeEffect | null)?.getTiming?.().duration || 0;
-        return Math.max(m, typeof d === "number" ? d : 0);
-      }, 0);
-      window.setTimeout(finish, maxDur + 150);
-    };
-
     const first = document.querySelector("[data-podium-cap]");
     let io: IntersectionObserver | null = null;
     if (first) {
@@ -201,7 +182,7 @@ export function PodiumConfetti() {
         (entries) => {
           if (entries.some((e) => e.isIntersecting)) {
             io?.disconnect();
-            whenSettled(entries.find((e) => e.isIntersecting)!.target, begin);
+            begin();
           }
         },
         { threshold: 0.15 },
