@@ -304,7 +304,13 @@ npm install
 <details open>
 <summary><b>3️⃣ Siapkan environment variable</b></summary>
 
-Buat file `.env` di root proyek. Contoh isi minimal:
+Buat file `.env` di root proyek. Cara tercepat: salin dari contoh yang sudah disediakan, lalu isi nilainya.
+
+```bash
+cp .env.example .env
+```
+
+Isi minimal yang perlu diperhatikan (semua sudah ada di `.env.example`):
 
 ```env
 # URL aplikasi
