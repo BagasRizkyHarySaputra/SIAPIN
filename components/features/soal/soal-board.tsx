@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cqm } from "@/lib/cq";
 import type { Mode } from "@/lib/types";
+import { useAuth } from "@/lib/store/auth";
+import { getJumlahPaket } from "@/lib/data/bank";
 import { SoalPopup } from "./soal-popup";
 
 /** Palet pill SNBT 1:1 dari Figma (frame 299-1225). */
@@ -51,11 +53,6 @@ function pillStyle(modeSlug: string, accent: string) {
 }
 
 /** 8 paket drill dummy — skor 0 (belum dikerjakan). */
-const PACKETS = Array.from({ length: 8 }, (_, i) => ({
-  no: i + 1,
-  skor: 0,
-}));
-
 function RetryIcon({ color }: { color: string }) {
   return (
     <svg
@@ -76,9 +73,12 @@ function RetryIcon({ color }: { color: string }) {
 
 export function SoalBoard({ mode }: { mode: Mode }) {
   const router = useRouter();
+  const { user } = useAuth();
   const [selected, setSelected] = useState(0);
   const [popupOpen, setPopupOpen] = useState(false);
   const [packet, setPacket] = useState(1);
+  // skor terakhir per paket (key: nomor paket) — diisi dari riwayat DB.
+  const [skorMap, setSkorMap] = useState<Record<number, number>>({});
 
   // Tema kartu paket mengikuti pill mapel yang aktif (semua mode).
   const activeSub = mode.subtests[selected] ?? mode.subtests[0];
@@ -87,6 +87,55 @@ export function SoalBoard({ mode }: { mode: Mode }) {
     mode.slug === "snbt" ? activeSub.slug : activeSub.color,
   );
   const accent = theme.text;
+
+  // Jumlah paket valid mengikuti isi bank (50 soal/paket, maks 8).
+  const jumlahPaket = Math.max(1, getJumlahPaket(mode.slug, activeSub.slug));
+
+  // Muat skor terakhir tiap paket dari riwayat (per mode + subtes aktif).
+  useEffect(() => {
+    if (!user?.email) return;
+    let cancel = false;
+    const muat = () => {
+      const qs = new URLSearchParams({
+        email: user.email,
+        mode: mode.slug,
+        subtes: activeSub.slug,
+      });
+      fetch(`/api/riwayat?${qs.toString()}`)
+        .then((r) => (r.ok ? r.json() : { data: [] }))
+        .then((json) => {
+          if (cancel) return;
+          const rows: {
+            paketKe: number | null;
+            skor: number;
+            total: number;
+            createdAt: string;
+          }[] = Array.isArray(json?.data) ? json.data : [];
+          // Untuk tiap paket, ambil skor dari sesi utuh terbaru (total >= 10).
+          // Riwayat lawas menyimpan 1 baris per jawaban (total=1) — dilewati agar
+          // tidak menampilkan skor 100/0 per jawaban sebagai "skor paket".
+          const best: Record<number, number> = {};
+          for (const row of rows) {
+            if (row.paketKe == null) continue;
+            if ((row.total ?? 0) < 10) continue;
+            const prev = best[row.paketKe];
+            // rows sudah terurut terbaru dulu (createdAt desc) → cukup isi sekali.
+            if (prev === undefined) best[row.paketKe] = row.skor;
+          }
+          setSkorMap(best);
+        })
+        .catch(() => {
+          /* non-blokir */
+        });
+    };
+    muat();
+    // Saat kembali dari halaman pengerjaan (history back), muat ulang skor.
+    window.addEventListener("focus", muat);
+    return () => {
+      cancel = true;
+      window.removeEventListener("focus", muat);
+    };
+  }, [user?.email, mode.slug, activeSub.slug]);
 
   function openPacket(no: number) {
     setPacket(no);
@@ -145,7 +194,10 @@ export function SoalBoard({ mode }: { mode: Mode }) {
         className="grid grid-cols-2 justify-items-center md:grid-cols-4"
         style={{ marginTop: cqm(49), columnGap: cqm(28), rowGap: cqm(58) }}
       >
-        {PACKETS.map((c) => (
+        {Array.from({ length: jumlahPaket }, (_, i) => {
+          const pernah = skorMap[i + 1] !== undefined;
+          const c = { no: i + 1, skor: pernah ? skorMap[i + 1]! : 0 };
+          return (
           <div
             key={c.no}
             onClick={() => openPacket(c.no)}
@@ -187,7 +239,7 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 color: accent,
               }}
             >
-              {c.skor}
+              {pernah ? c.skor : "-"}
             </span>
             <span
               className="font-bold"
@@ -200,7 +252,7 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 color: withAlpha(accent, 0.65),
               }}
             >
-              Skor
+              {pernah ? "Skor" : "Belum"}
             </span>
 
             {/* tombol Mulai */}
@@ -226,10 +278,11 @@ export function SoalBoard({ mode }: { mode: Mode }) {
                 justifyContent: "center",
               }}
             >
-              Mulai
+              {pernah ? "Ulangi" : "Mulai"}
             </button>
 
-            {/* ikon ulangi */}
+            {/* ikon ulangi — hanya muncul untuk paket yang sudah pernah dikerjakan */}
+            {pernah && (
             <button
               type="button"
               aria-label="Ulangi"
@@ -246,8 +299,10 @@ export function SoalBoard({ mode }: { mode: Mode }) {
             >
               <RetryIcon color={accent} />
             </button>
+            )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Popup kesiapan — judul mengikuti pill subtes yang aktif */}

@@ -57,8 +57,11 @@ export function getBank(modeSlug: string, subtesSlug: string): BankSoal[] {
   return REGISTRY[key] ?? [];
 }
 
-/** Jumlah soal per paket (default 10 sesuai konfigurasi mode). */
-export const SOAL_PER_PAKET = 10;
+/**
+ * Jumlah soal per paket.
+ * Standar ujian: satu paket berisi 50 soal (slice berurutan dari bank 150+).
+ */
+export const SOAL_PER_PAKET = 50;
 
 /** Ambil slice soal untuk paket tertentu (1-indexed). */
 export function getPaketSoal(
@@ -70,7 +73,7 @@ export function getPaketSoal(
   if (bank.length === 0) return [];
   const start = (paket - 1) * SOAL_PER_PAKET;
   const slice = bank.slice(start, start + SOAL_PER_PAKET);
-  // Renumber 1..10 untuk paket ini
+  // Renumber 1..SOAL_PER_PAKET untuk paket ini
   return slice.map((s, i) => ({ ...s, no: i + 1 }));
 }
 

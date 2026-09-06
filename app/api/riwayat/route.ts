@@ -46,3 +46,35 @@ export async function POST(req: Request) {
     );
   }
 }
+
+/**
+ * GET /api/riwayat?email=...&mode=...&subtes=...
+ * Ambil riwayat milik user (opsional filter mode/subtes), terbaru dulu.
+ * Dipakai grid paket soal untuk menampilkan skor terakhir tiap paket.
+ */
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const email = url.searchParams.get("email") ?? "";
+    const mode = url.searchParams.get("mode") ?? undefined;
+    const subtes = url.searchParams.get("subtes") ?? undefined;
+
+    if (!email) {
+      return NextResponse.json({ error: "email wajib diisi" }, { status: 400 });
+    }
+
+    const rows = await riwayatRepo.listByEmail(email);
+    const filtered = rows.filter(
+      (r) =>
+        (!mode || r.mode === mode) &&
+        (!subtes || r.subtes === subtes),
+    );
+
+    return NextResponse.json({ data: filtered });
+  } catch (e) {
+    return NextResponse.json(
+      { error: (e as Error).message },
+      { status: 500 }
+    );
+  }
+}

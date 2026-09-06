@@ -467,6 +467,10 @@
     animation: none;
   }
 }
+@keyframes drillSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 /* ===== Panel pembahasan HP +30% (1.95x); desktop tetap 0.75x ===== */
 @media (max-width: 767px) {

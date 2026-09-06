@@ -419,6 +419,284 @@ function ExpPanel({ q }: { q: BankSoal }) {
   );
 }
 
+/** Hasil hitung sesi: skor + rekap benar/salah + analisa per blok 10 soal. */
+type HasilSesi = {
+  benar: number;
+  salah: number;
+  total: number;
+  skor: number;
+  blok: { label: string; benar: number; total: number }[];
+};
+
+/** Overlay hasil submit — muncul setelah tombol Submit di soal terakhir. */
+function ResultOverlay({
+  hasil,
+  onBack,
+  onRetry,
+}: {
+  hasil: HasilSesi;
+  onBack: () => void;
+  onRetry: () => void;
+}) {
+  const msg =
+    hasil.skor >= 85
+      ? "Luar biasa! Pertahankan dan asah lagi bagian yang belum sempurna."
+      : hasil.skor >= 70
+        ? "Bagus! Sedikit lagi menuju skor terbaik."
+        : hasil.skor >= 50
+          ? "Terus berlatih, kamu pasti bisa naikkan skor ini."
+          : "Jangan menyerah. Pelajari pembahasan lalu coba lagi.";
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 60,
+        backgroundColor: "rgba(28, 20, 81, 0.55)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: cqm(20),
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Hasil latihan"
+        style={{
+          width: "100%",
+          maxWidth: cqm(560),
+          maxHeight: "90dvh",
+          overflowY: "auto",
+          backgroundColor: "#ffffff",
+          borderRadius: cqm(44),
+          paddingTop: cqm(40),
+          paddingBottom: cqm(38),
+          paddingInline: cqm(40),
+          textAlign: "center",
+        }}
+      >
+        <div
+          aria-hidden
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: cqm(72),
+            height: cqm(72),
+            margin: "0 auto",
+            borderRadius: "50%",
+            backgroundColor: hasil.skor >= 70 ? "#e7f4ea" : "#fdeceb",
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            style={{ width: cqm(40), height: cqm(40) }}
+            fill="none"
+            stroke={hasil.skor >= 70 ? "#2f9e62" : "#e05d5d"}
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+        </div>
+        <h2
+          className="font-bold"
+          style={{ fontSize: cqm(34), color: "#1c1451", margin: 0, marginTop: cqm(12) }}
+        >
+          Latihan Selesai
+        </h2>
+        <p
+          className="font-medium"
+          style={{ fontSize: cqm(20), color: "#6f6a85", margin: 0, marginTop: cqm(6) }}
+        >
+          {msg}
+        </p>
+
+        {/* Skor utama */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: cqm(18),
+            marginTop: cqm(26),
+          }}
+        >
+          <div
+            style={{
+              minWidth: cqm(150),
+              borderRadius: cqm(28),
+              backgroundColor: hasil.skor >= 70 ? "#e7f4ea" : "#fdeceb",
+              paddingBlock: cqm(22),
+              paddingInline: cqm(20),
+            }}
+          >
+            <p
+              className="font-bold"
+              style={{ fontSize: cqm(52), color: hasil.skor >= 70 ? "#2f9e62" : "#e05d5d", margin: 0 }}
+            >
+              {hasil.skor}
+            </p>
+            <p className="font-bold" style={{ fontSize: cqm(18), color: "#1c1451", margin: 0 }}>
+              Skor
+            </p>
+          </div>
+          <div
+            style={{
+              minWidth: cqm(130),
+              borderRadius: cqm(28),
+              backgroundColor: "#f5f3fb",
+              paddingBlock: cqm(22),
+              paddingInline: cqm(16),
+            }}
+          >
+            <p className="font-bold" style={{ fontSize: cqm(30), color: "#2f9e62", margin: 0 }}>
+              {hasil.benar}
+            </p>
+            <p className="font-bold" style={{ fontSize: cqm(18), color: "#1c1451", margin: 0 }}>
+              Benar
+            </p>
+          </div>
+          <div
+            style={{
+              minWidth: cqm(130),
+              borderRadius: cqm(28),
+              backgroundColor: "#f5f3fb",
+              paddingBlock: cqm(22),
+              paddingInline: cqm(16),
+            }}
+          >
+            <p className="font-bold" style={{ fontSize: cqm(30), color: "#e05d5d", margin: 0 }}>
+              {hasil.salah}
+            </p>
+            <p className="font-bold" style={{ fontSize: cqm(18), color: "#1c1451", margin: 0 }}>
+              Salah
+            </p>
+          </div>
+        </div>
+
+        {/* Analisa per bagian */}
+        <div style={{ textAlign: "left", marginTop: cqm(28) }}>
+          <p className="font-bold" style={{ fontSize: cqm(20), color: "#1c1451", margin: 0 }}>
+            Analisa Kekurangan
+          </p>
+          <p
+            className="font-medium"
+            style={{ fontSize: cqm(16), color: "#6f6a85", margin: 0, marginTop: cqm(4) }}
+          >
+            Bagian yang masih perlu diasah ditandai.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: cqm(10), marginTop: cqm(16) }}>
+            {hasil.blok.map((b, i) => {
+              const pct = b.total > 0 ? Math.round((b.benar / b.total) * 100) : 0;
+              const lemah = pct < 60;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: cqm(12),
+                    borderRadius: cqm(16),
+                    backgroundColor: lemah ? "#fdeceb" : "#eef7f0",
+                    border: `${cqm(2)} solid ${lemah ? "#f3c1c0" : "#bfe0c8"}`,
+                    paddingBlock: cqm(10),
+                    paddingInline: cqm(16),
+                  }}
+                >
+                  <span
+                    className="font-bold"
+                    style={{
+                      width: cqm(118),
+                      fontSize: cqm(17),
+                      color: "#1c1451",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {b.label}
+                  </span>
+                  <div
+                    style={{
+                      flex: 1,
+                      height: cqm(14),
+                      borderRadius: cqm(8),
+                      backgroundColor: "#e6e3ef",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${pct}%`,
+                        borderRadius: cqm(8),
+                        backgroundColor: lemah ? "#e05d5d" : "#2f9e62",
+                      }}
+                    />
+                  </div>
+                  <span
+                    className="font-bold"
+                    style={{ fontSize: cqm(16), color: lemah ? "#c04545" : "#2f9e62", width: cqm(64), textAlign: "right", flexShrink: 0 }}
+                  >
+                    {pct}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Aksi */}
+        <div
+          style={{
+            display: "flex",
+            gap: cqm(14),
+            marginTop: cqm(30),
+          }}
+        >
+          <button
+            type="button"
+            onClick={onRetry}
+            className="cursor-pointer font-bold transition hover:brightness-[0.97]"
+            style={{
+              flex: 1,
+              minHeight: cqm(54),
+              borderRadius: cqm(50),
+              backgroundColor: "#f0f54b",
+              border: "none",
+              color: "#1c1451",
+              fontSize: cqm(22),
+              fontFamily: "inherit",
+            }}
+          >
+            Ulangi
+          </button>
+          <button
+            type="button"
+            onClick={onBack}
+            className="cursor-pointer font-bold transition hover:brightness-[0.97]"
+            style={{
+              flex: 1,
+              minHeight: cqm(54),
+              borderRadius: cqm(50),
+              backgroundColor: "#1c1451",
+              border: "none",
+              color: "#ffffff",
+              fontSize: cqm(22),
+              fontFamily: "inherit",
+            }}
+          >
+            Kembali
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function DrillBoard({
   modeSlug,
   subtesSlug,
@@ -443,22 +721,58 @@ export function DrillBoard({
   const [left, setLeft] = useState(30 * 60);
   const [doodleOpen, setDoodleOpen] = useState(false);
   const [doodles, setDoodles] = useState<Record<number, Stroke[]>>({});
-  // nomor soal yang sudah dikirim ke DB (hindari duplikat saat ganti jawaban)
-  const sentRef = useRef<Set<number>>(new Set());
+  // State hasil submit: null = belum submit, "loading" = sedang menghitung,
+  // lalu objek { benar, salah, total, skor, blok } saat hasil siap.
+  const [result, setResult] = useState<
+    | null
+    | "loading"
+    | { benar: number; salah: number; total: number; skor: number; blok: { label: string; benar: number; total: number }[] }
+  >(null);
+  const submittedRef = useRef(false);
 
   const q = SOAL[qi];
   const answered = SOAL.filter((s) => picks[s.no]).length;
+  const email = user?.email;
 
-  /** Simpan hasil satu jawaban ke DB via API — fire & forget, non-blokir. */
-  function simpanJawaban(no: number, key: string) {
-    const so = SOAL.find((s) => s.no === no);
-    if (!so || sentRef.current.has(no)) return;
-    const benar = so.answer === key ? 1 : 0;
-    sentRef.current.add(no);
-    const email = user?.email;
-    if (!email) return;
+  /** Hitung skor lokal dari jawaban user (state picks) vs kunci. */
+  function hitungHasil() {
+    let benar = 0;
+    const blokMap = new Map<number, { benar: number; total: number }>();
+    for (const s of SOAL) {
+      const b = s.no <= 10 ? 1 : s.no <= 20 ? 2 : s.no <= 30 ? 3 : s.no <= 40 ? 4 : 5;
+      const blok = blokMap.get(b) ?? { benar: 0, total: 0 };
+      blok.total += 1;
+      if (picks[s.no] === s.answer) {
+        benar += 1;
+        blok.benar += 1;
+      }
+      blokMap.set(b, blok);
+    }
+    const total = SOAL.length;
+    const skor = total > 0 ? Math.round((benar / total) * 100) : 0;
+    const blok = [1, 2, 3, 4, 5].map((b) => ({
+      label:
+        b === 1
+          ? "Soal 1-10"
+          : b === 2
+            ? "Soal 11-20"
+            : b === 3
+              ? "Soal 21-30"
+              : b === 4
+                ? "Soal 31-40"
+                : "Soal 41-50",
+      benar: blokMap.get(b)?.benar ?? 0,
+      total: blokMap.get(b)?.total ?? 0,
+    }));
+    return { benar, salah: total - benar, total, skor, blok };
+  }
+
+  /** Kirim SATU riwayat agregat sesi ini (pengganti simpan per soal). */
+  async function simpanSesi(h: { benar: number; total: number; skor: number }) {
+    if (!email || submittedRef.current) return;
+    submittedRef.current = true;
     try {
-      fetch("/api/riwayat", {
+      await fetch("/api/riwayat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -467,17 +781,28 @@ export function DrillBoard({
           subtes: subtesSlug,
           paketKe: paket,
           tipe,
-          benar,
-          salah: benar ? 0 : 1,
-          total: 1,
-          skor: benar ? 100 : 0,
+          benar: h.benar,
+          salah: h.total - h.benar,
+          total: h.total,
+          skor: h.skor,
+          waktu: tipe === "ujian" ? 30 * 60 - left : null,
         }),
-      }).catch(() => {
-        /* non-blokir */
       });
     } catch {
       /* non-blokir */
     }
+  }
+
+  /** Submit sesi: hitung, simulasikan menghitung, tampilkan hasil. */
+  function handleSubmit() {
+    if (result === "loading" || submittedRef.current) return;
+    setResult("loading");
+    const h = hitungHasil();
+    // Jeda singkat agar terasa "menghitung skor".
+    setTimeout(() => {
+      void simpanSesi(h);
+      setResult(h);
+    }, 1200);
   }
 
   // Timer khusus mode ujian.
@@ -496,10 +821,8 @@ export function DrillBoard({
   }
 
   function pick(key: string) {
-    // Jawaban pertama per soal yang dikirim ke DB; ganti jawaban tidak mengubah
-    // riwayat (hindari duplikat & spam). State picks tetap update untuk UI.
+    // Jawaban disimpan di state; riwayat DB dikirim agregat saat submit.
     setPicks((p) => ({ ...p, [q.no]: key }));
-    if (!sentRef.current.has(q.no)) simpanJawaban(q.no, key);
   }
 
   return (
@@ -782,20 +1105,20 @@ export function DrillBoard({
             </button>
             <button
               type="button"
-              onClick={() => goto(qi + 1)}
+              onClick={() => (qi === total - 1 ? handleSubmit() : goto(qi + 1))}
               className="min-w-0 flex-1 cursor-pointer font-bold transition hover:brightness-[0.97] md:flex-none md:max-w-[calc(18.3333cqw*var(--pm,1))]"
               style={{
                 width: "100%",
                 minHeight: cqm(47),
                 borderRadius: cqm(50),
-                backgroundColor: "#f5eafb",
-                border: `${cqm(2)} solid #cfb1ed`,
-                color: "#cfb1ed",
+                backgroundColor: qi === total - 1 ? "#1c1451" : "#f5eafb",
+                border: `${cqm(2)} solid ${qi === total - 1 ? "#1c1451" : "#cfb1ed"}`,
+                color: qi === total - 1 ? "#ffffff" : "#cfb1ed",
                 fontSize: cqm(24),
                 fontFamily: "inherit",
               }}
             >
-              Berikutnya
+              {qi === total - 1 ? "Submit" : "Berikutnya"}
             </button>
           </div>
         </div>
@@ -810,6 +1133,55 @@ export function DrillBoard({
 
       {/* ruang napas bawah agar konten tidak nempel layar (HP saja) */}
       <div className="h-10 shrink-0 md:h-0" aria-hidden />
+
+      {/* overlay hasil submit: loading lalu skor + analisa */}
+      {result === "loading" && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 60,
+            backgroundColor: "rgba(28, 20, 81, 0.55)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: cqm(24),
+          }}
+        >
+          <div
+            aria-hidden
+            style={{
+              width: cqm(88),
+              height: cqm(88),
+              borderRadius: "50%",
+              border: `${cqm(8)} solid rgba(255,255,255,0.25)`,
+              borderTopColor: "#f0f54b",
+              animation: "drillSpin 0.9s linear infinite",
+            }}
+          />
+          <p className="font-bold" style={{ fontSize: cqm(26), color: "#ffffff", margin: 0 }}>
+            Menghitung skor...
+          </p>
+        </div>
+      )}
+
+      {result && result !== "loading" && (
+        <ResultOverlay
+          hasil={result}
+          onBack={() => router.push(`/soal/${modeSlug}`)}
+          onRetry={() => {
+            setResult(null);
+            setQi(0);
+            setPicks({});
+            submittedRef.current = false;
+            setShowExp(false);
+            window.scrollTo({ top: 0 });
+          }}
+        />
+      )}
 
       {/* overlay corat-coret */}
       {doodleOpen && (
