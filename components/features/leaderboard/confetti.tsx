@@ -148,10 +148,50 @@ export function PodiumConfetti() {
     };
 
     const begin = () => {
-      if (startedAt >= 0) return;
+      if (!running || startedAt >= 0) return;
       startedAt = performance.now();
       last = startedAt;
       raf = requestAnimationFrame(tick);
+    };
+
+    /**
+     * Tunggu sampai posisi cap benar-benar final sebelum menyembur.
+     * Saat navigasi SPA, halaman baru masuk dengan animasi slide
+     * (.page-t-slide/.page-t-fade) — podium ikut bergeser. Kalau confetti
+     * mulai selama slide, pitanya menyembur dari posisi yang melenceng
+     * (belum di tempat akhir) lalu "mengejar" — terlihat gak pas.
+     */
+    const whenSettled = (el: Element, cb: () => void) => {
+      const anim = el.closest(".page-t-slide, .page-t-fade");
+      if (!anim) return cb();
+      // Animasi CSS yang masih berjalan pada wrapper page (WAAPI).
+      // playState bisa "idle" | "running" | "pending" | "paused" | "finished"
+      // (TS lib tak menyertakan "pending", jadi hitung yang bukan idle/finished).
+      const running = (anim.getAnimations?.() || []).filter(
+        (a) => a.playState !== "idle" && a.playState !== "finished",
+      );
+      if (running.length === 0) return cb();
+      let done = false;
+      const cleanup = () => {
+        running.forEach((a) => a.removeEventListener("finish", finish));
+      };
+      const finish = () => {
+        if (done) return;
+        done = true;
+        cleanup();
+        cb();
+      };
+      // Jaring pengaman: apa pun yang terjadi, jangan tunda lebih dari 700ms.
+      // (Kalau animasi tak pernah "finish" — mis. di-cancel React saat navigasi
+      // berikutnya — confetti tetap jalan, telat sedikit lebih baik dari macet.)
+      const bail = window.setTimeout(finish, 700);
+      running.forEach((a) => a.addEventListener("finish", finish));
+      // Fallback kalau event finish terlewat: mulai paling lambat dur+150ms.
+      const maxDur = running.reduce((m, a) => {
+        const d = (a.effect as KeyframeEffect | null)?.getTiming?.().duration || 0;
+        return Math.max(m, typeof d === "number" ? d : 0);
+      }, 0);
+      window.setTimeout(finish, maxDur + 150);
     };
 
     const first = document.querySelector("[data-podium-cap]");
@@ -160,8 +200,8 @@ export function PodiumConfetti() {
       io = new IntersectionObserver(
         (entries) => {
           if (entries.some((e) => e.isIntersecting)) {
-            begin();
             io?.disconnect();
+            whenSettled(entries.find((e) => e.isIntersecting)!.target, begin);
           }
         },
         { threshold: 0.15 },
