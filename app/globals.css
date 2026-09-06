@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Layout "desktop" SIAPIN hanya berlaku di layar lebar-landscape (≥768px & lebar>tinggi).
+   Di luar itu (HP, tablet portrait, desktop portrait/rasio ≥1:1) komponen memakai
+   varian HP-nya (satu kolom / susunan mobile) — lihat komponen /profile. */
+@custom-variant desk {
+  @media (min-width: 48rem) and (orientation: landscape) {
+    @slot;
+  }
+}
+
 /* ===== SIAPIN design tokens (extracted from Figma "ITechno - Web Development") ===== */
 @theme {
   /* Brand palette */
@@ -512,6 +521,37 @@
   }
 }
 
+/* ===== Popup Edit Profile: perbesar teks desktop (kecuali judul "Edit Profile") ===== */
+@media (min-width: 768px) {
+  /* inline style menang atas class → wajib !important */
+  .edit-profile-scope .ep-label {
+    font-size: calc(1.3889cqw * var(--pm, 1)) !important; /* ~18px @1440×0.9 */
+  }
+  .edit-profile-scope .ep-input {
+    font-size: calc(1.6975cqw * var(--pm, 1)) !important; /* ~22px @1440×0.9 */
+  }
+  .edit-profile-scope .ep-input::placeholder {
+    font-size: inherit;
+  }
+  .edit-profile-scope .ep-hint {
+    font-size: calc(1.2346cqw * var(--pm, 1)) !important; /* ~16px @1440×0.9 */
+  }
+  .edit-profile-scope .ep-save {
+    font-size: calc(1.2346cqw * var(--pm, 1)) !important; /* ~16px @1440×0.9 */
+  }
+}
+
+/* ===== Tombol Edit Profile / Login: hover lebih pekat + klik mengecil ===== */
+.edit-profile-btn:hover {
+  background-color: #eeb6b5 !important;
+}
+.edit-profile-btn:hover span {
+  color: #55504f !important;
+}
+.edit-profile-btn:active {
+  transform: scale(0.94);
+}
+
 /* ===== Popup soal: animasi muncul ===== */
 @keyframes soal-popup-fade {
   from { opacity: 0; }
@@ -521,15 +561,32 @@
   from { opacity: 0; transform: scale(0.92) translateY(14px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+/* animasi TUTUP (keluar): backdrop redup + panel mengecil ke bawah */
+@keyframes soal-popup-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes soal-popup-pop-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.94) translateY(10px); }
+}
 .soal-popup-backdrop {
   animation: soal-popup-fade 0.25s ease-out;
 }
 .soal-popup-panel {
   animation: soal-popup-pop 0.32s cubic-bezier(0.22, 1.2, 0.36, 1);
 }
+.soal-popup-backdrop-out {
+  animation: soal-popup-fade-out 0.22s ease-in forwards;
+}
+.soal-popup-panel-out {
+  animation: soal-popup-pop-out 0.22s ease-in forwards;
+}
 @media (prefers-reduced-motion: reduce) {
   .soal-popup-backdrop,
-  .soal-popup-panel {
+  .soal-popup-panel,
+  .soal-popup-backdrop-out,
+  .soal-popup-panel-out {
     animation: none;
   }
 }

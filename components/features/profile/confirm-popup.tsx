@@ -12,6 +12,8 @@ interface ConfirmPopupProps {
   confirmLabel: string;
   onConfirm: () => void;
   onClose: () => void;
+  /** true = sedang animasi keluar (backdrop redup, panel mengecil) */
+  closing?: boolean;
   children?: ReactNode;
 }
 
@@ -26,6 +28,7 @@ export function ConfirmPopup({
   confirmLabel = "Konfirmasi",
   onConfirm,
   onClose,
+  closing = false,
   children,
 }: ConfirmPopupProps) {
   useEffect(() => {
@@ -54,7 +57,7 @@ export function ConfirmPopup({
 
   return (
     <div
-      className="soal-popup-backdrop"
+      className={`soal-popup-backdrop${closing ? " soal-popup-backdrop-out" : ""}`}
       onClick={onClose}
       style={{
         position: "fixed",
@@ -71,7 +74,7 @@ export function ConfirmPopup({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="soal-popup-panel"
+        className={`soal-popup-panel${closing ? " soal-popup-panel-out" : ""}`}
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "calc(100vw - 48px)",

@@ -31,9 +31,8 @@ export default function ProfilePage() {
       <Navbar />
 
       {/* white sheet (Rectangle 159) — mulai y196; padding kiri 74 (konten desain x73/74)
-          flex-col: blok2 atas rapat alami; AiAndSettings memakai mt-auto (lihat di
-          dalam) sehingga saat viewport tinggi ia menempel ke dasar — konten tidak
-          numpuk di atas & tidak tersebar janggal antar kartu. */}
+          flex-col: blok2 tersusun rapat dari atas mengikuti alur normal (tanpa mt-auto),
+          sehingga saat viewport tinggi pun konten tetap rapat — tidak menempel ke dasar. */}
       <div
         className="profile-scope relative mx-auto flex w-full flex-1 flex-col bg-white"
         style={{
@@ -61,9 +60,8 @@ export default function ProfilePage() {
         </div>
 
         {/* AI Diagnostic + Lainnya: title y1003 - (740+231) = 32
-            mt-auto: saat viewport tinggi, blok ini menempel ke dasar sheet
-            (konten tidak numpuk di atas); paddingTop 32 menjaga jarak min. */}
-        <div style={{ marginTop: "auto", paddingTop: cqm(32) }}>
+            Tanpa mt-auto — konten rapat dari atas (lihat komentar sheet). */}
+        <div style={{ paddingTop: cqm(32) }}>
           <AiAndSettings />
         </div>
       </div>

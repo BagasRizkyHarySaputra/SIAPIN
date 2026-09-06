@@ -86,9 +86,9 @@ export function Achievement() {
         Achievment
       </h2>
 
-      {/* HP: 1 container untuk semua achievement */}
+      {/* HP: 1 container untuk semua achievement (juga dipakai desktop portrait) */}
       <div
-        className="flex w-full flex-col md:hidden"
+        className="flex w-full flex-col desk:hidden"
         style={{
           gap: cqm(20),
           marginTop: cqm(25),
@@ -149,8 +149,8 @@ export function Achievement() {
         ))}
       </div>
 
-      {/* Desktop: 3 kartu sejajar seperti Figma */}
-      <div className="hidden w-full md:flex" style={{ gap: cqm(40), marginTop: cqm(25) }}>
+      {/* Desktop (landscape ≥768px): 3 kartu sejajar seperti Figma */}
+      <div className="hidden w-full desk:flex" style={{ gap: cqm(40), marginTop: cqm(25) }}>
         {ACHIEVEMENTS.map((a) => (
           <div
             key={a.title}

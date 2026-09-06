@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { cqm } from "@/lib/cq";
 import { useAuth } from "@/lib/store/auth";
 
@@ -16,6 +17,7 @@ interface AccountCardProps {
 export function AccountCard({ onLoginClick, onEditClick }: AccountCardProps) {
   const { user } = useAuth();
   const loggedIn = Boolean(user);
+  const [pressed, setPressed] = useState(false);
 
   return (
     <div
@@ -74,7 +76,12 @@ export function AccountCard({ onLoginClick, onEditClick }: AccountCardProps) {
       <button
         type="button"
         onClick={loggedIn ? onEditClick : onLoginClick}
-        className="shrink-0"
+        onMouseDown={() => setPressed(true)}
+        onMouseUp={() => setPressed(false)}
+        onMouseLeave={() => setPressed(false)}
+        className={`edit-profile-btn shrink-0 font-bold${
+          pressed ? " edit-profile-btn-pressed" : ""
+        }`}
         style={{
           width: cqm(164),
           height: cqm(59),
@@ -85,11 +92,18 @@ export function AccountCard({ onLoginClick, onEditClick }: AccountCardProps) {
           alignItems: "center",
           justifyContent: "center",
           marginLeft: cqm(24),
+          transition:
+            "background-color 0.18s ease, transform 0.12s ease, box-shadow 0.12s ease",
+          transform: pressed ? "scale(0.94)" : "scale(1)",
         }}
       >
         <span
           className="font-bold"
-          style={{ fontSize: cqm(24), color: "#6c6363" }}
+          style={{
+            fontSize: cqm(24),
+            color: "#6c6363",
+            transition: "color 0.18s ease",
+          }}
         >
           {loggedIn ? "Edit Profile" : "Login"}
         </span>

@@ -179,14 +179,17 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
 
         <form
           onSubmit={submit}
+          className="flex w-full flex-col items-center md:flex-row md:items-center"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
             marginTop: cqm(28),
-            gap: cqm(32),
+            gap: cqm(40),
           }}
         >
+          {/* KIRI (desktop): avatar + tombol kamera */}
+          <div
+            className="flex flex-col items-center"
+            style={{ flexShrink: 0 }}
+          >
           {/* avatar + tombol kamera — klik untuk ganti foto */}
           <div style={{ position: "relative", width: cqm(129), height: cqm(129) }}>
             <button
@@ -266,7 +269,7 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
             />
           </div>
           <p
-            className="font-bold"
+            className="ep-hint font-bold"
             style={{
               margin: 0,
               marginTop: -cqm(16),
@@ -281,13 +284,20 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
               ? "Memproses…"
               : warn ?? "Tekan foto untuk ganti profil (khusus gambar, otomatis diperkecil)"}
           </p>
+          </div>
 
+          {/* KANAN (desktop): deretan field + tombol simpan */}
+          <div
+            className="flex w-full min-w-0 flex-col items-center md:items-stretch"
+            style={{ flex: 1, gap: cqm(24) }}
+          >
           {/* Nama Lengkap */}
           <Field label="Nama Lengkap">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               style={inputStyle}
+              className="ep-input"
               placeholder="Nama kamu"
             />
           </Field>
@@ -298,6 +308,7 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               style={inputStyle}
+              className="ep-input"
               placeholder="(kalau mau nambahin)"
             />
           </Field>
@@ -309,6 +320,7 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
               value={user?.email ?? ""}
               readOnly
               disabled
+              className="ep-input"
               style={{ ...inputStyle, opacity: 0.75, cursor: "not-allowed" }}
               placeholder="email dia saat login"
             />
@@ -318,7 +330,7 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
           <div style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
             <button
               type="submit"
-              className="cursor-pointer font-bold transition hover:brightness-[0.96]"
+              className="ep-save cursor-pointer font-bold transition hover:brightness-[0.96]"
               style={{
                 width: cqm(86),
                 height: cqm(34),
@@ -332,6 +344,7 @@ export function EditProfilePopup({ onClose }: { onClose: () => void }) {
             >
               Simpan
             </button>
+          </div>
           </div>
         </form>
       </div>
@@ -366,11 +379,12 @@ function Field({
     <div style={{ position: "relative", width: fieldW }}>
       {children}
       <span
-        className="font-bold"
+        className="ep-label font-bold"
         style={{
           position: "absolute",
-          top: -cqm(10),
+          top: 0,
           left: cqm(16),
+          transform: "translateY(-50%)",
           backgroundColor: "#f5c3c2",
           color: "#ffffff",
           fontSize: cqm(13),
@@ -379,6 +393,7 @@ function Field({
           paddingBlock: cqm(4),
           borderRadius: cqm(16),
           whiteSpace: "nowrap",
+          zIndex: 1,
         }}
       >
         {label}

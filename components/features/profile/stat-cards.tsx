@@ -19,11 +19,11 @@ export function StatCards() {
   ];
 
   return (
-    <div className="grid w-full grid-cols-2 md:grid-cols-3" style={{ gap: cqm(40) }}>
+    <div className="grid w-full grid-cols-2 desk:grid-cols-3" style={{ gap: cqm(40) }}>
       {CARD_META.map((meta, i) => (
         <div
           key={meta.label}
-          className={`flex min-w-0 flex-col items-center justify-center py-[calc(2.7778cqw*var(--pm,1))] md:flex-row md:justify-start md:py-0${i === 2 ? " col-span-2 md:col-span-1" : ""}`}
+          className={`flex min-w-0 flex-col items-center justify-center py-[calc(2.7778cqw*var(--pm,1))] desk:flex-row desk:justify-start desk:py-0${i === 2 ? " col-span-2 desk:col-span-1" : ""}`}
           style={{
             minHeight: cqm(170),
             borderRadius: cqm(20),
@@ -41,7 +41,7 @@ export function StatCards() {
             style={{ width: cqm(100), height: cqm(100), borderRadius: "50%" }}
           />
           <div
-            className="flex min-w-0 flex-col items-center text-center mt-[calc(1.6667cqw*var(--pm,1))] md:ml-[2.6389cqw] md:mt-0 md:items-start md:text-left"
+            className="flex min-w-0 flex-col items-center text-center mt-[calc(1.6667cqw*var(--pm,1))] desk:ml-[2.6389cqw] desk:mt-0 desk:items-start desk:text-left"
             style={{ gap: cqm(8) }}
           >
             <p

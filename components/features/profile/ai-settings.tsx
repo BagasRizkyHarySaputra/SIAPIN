@@ -17,7 +17,7 @@ function AiDiagnostic() {
   const progress = user?.stats?.progress ?? [];
 
   return (
-    <section className="w-full md:w-[40.2778cqw] md:shrink-0">
+    <section className="w-full desk:w-[40.2778cqw] desk:shrink-0">
       <h2
         className="font-bold"
         style={{ fontSize: cqm(32), lineHeight: 1.25, color: "#2a235c" }}
@@ -116,20 +116,33 @@ const MENU = [
   { label: "Log Out", icon: "logout" },
 ];
 
-type ConfirmKind = "logout" | "delete" | null;
+type ConfirmKind = "logout" | "delete" | "help" | null;
 
 function Settings() {
   const { logout, deleteAccount } = useAuth();
   const [confirm, setConfirm] = useState<ConfirmKind>(null);
+  const [pressed, setPressed] = useState<string | null>(null);
+  const [closing, setClosing] = useState(false);
+
+  const openConfirm = (kind: ConfirmKind) => setConfirm(kind);
+  const closeConfirm = () => {
+    setClosing(true);
+    // tunggu animasi keluar (0.22s) sebelum benar-benar dilepas
+    window.setTimeout(() => {
+      setClosing(false);
+      setConfirm(null);
+    }, 230);
+  };
 
   const handleClick = (label: string) => {
-    if (label === "Log Out") setConfirm("logout");
-    else if (label === "Hapus Akun") setConfirm("delete");
+    if (label === "Bantuan") openConfirm("help");
+    else if (label === "Log Out") openConfirm("logout");
+    else if (label === "Hapus Akun") openConfirm("delete");
   };
 
   return (
     <>
-      <section className="w-full md:w-[43.0556cqw] md:shrink-0">
+      <section className="w-full desk:w-[43.0556cqw] desk:shrink-0">
       <h2
         className="font-bold"
         style={{ fontSize: cqm(32), lineHeight: 1.25, color: "#2a235c" }}
@@ -145,26 +158,40 @@ function Settings() {
           borderRadius: cqm(30),
           backgroundColor: "#f5eafb",
           border: `${cqm(2)} solid rgba(132, 121, 138, 0.55)`, // #84798a
+          overflow: "hidden",
         }}
       >
         {MENU.map((m, i) => {
           const y = [30, 122, 214][i]; // 1098/1190/1282 - 1068
+          const active = pressed === m.label;
           return (
             <div
               key={m.label}
               onClick={() => handleClick(m.label)}
               role="button"
               tabIndex={0}
+              onMouseDown={() => setPressed(m.label)}
+              onMouseUp={() => setPressed(null)}
+              onMouseLeave={() => setPressed(null)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") handleClick(m.label);
+                if (e.key === "Enter" || e.key === " ") {
+                  setPressed(m.label);
+                  handleClick(m.label);
+                }
               }}
+              onKeyUp={() => setPressed(null)}
               style={{
                 position: "absolute",
                 left: 0,
                 right: 0,
                 top: cqm(y),
                 height: cqm(92), // tinggi baris menu (jarak antar baris 92px)
-                cursor: m.label === "Log Out" ? "pointer" : "default",
+                cursor: "pointer",
+                transition: "background-color 0.15s ease, filter 0.12s ease",
+                backgroundColor: active
+                  ? "rgba(132,121,138,0.14)"
+                  : "transparent",
+                filter: active ? "brightness(0.97)" : "none",
               }}
             >
               {/* circle ikon — center vertikal sejajar label & chevron */}
@@ -250,11 +277,42 @@ function Settings() {
       </div>
       </section>
 
+      {confirm === "help" && (
+        <ConfirmPopup
+          title="Bantuan"
+          message="Pusat bantuan SIAPIN masih disusun. Sementara itu, kamu bisa hubungi kami lewat menu ini."
+          confirmLabel="OK"
+          closing={closing}
+          onConfirm={closeConfirm}
+          onClose={closeConfirm}
+        >
+          <p
+            className="font-normal"
+            style={{
+              fontSize: cqm(18),
+              lineHeight: 1.3,
+              color: "#1c1451",
+              margin: 0,
+              marginTop: cqm(8),
+              textAlign: "center",
+              backgroundColor: "#f5eafb",
+              borderRadius: cqm(16),
+              padding: `${cqm(14)} ${cqm(18)}`,
+            }}
+          >
+            Email: dukungan@siapin.id
+            <br />
+            Jam operasional: Senin–Jumat, 08.00–17.00 WIB
+          </p>
+        </ConfirmPopup>
+      )}
+
       {confirm === "logout" && (
         <ConfirmPopup
           title="Log Out"
           message="Anda yakin ingin keluar dari akun anda?"
           confirmLabel="Konfirmasi"
+          closing={closing}
           onConfirm={async () => {
             setConfirm(null);
             // 1. Hapus sesi Auth.js (cookie) — kalau login via Google/credentials.
@@ -265,7 +323,7 @@ function Settings() {
             // 4. Balik ke beranda.
             window.location.href = "/";
           }}
-          onClose={() => setConfirm(null)}
+          onClose={closeConfirm}
         />
       )}
       {confirm === "delete" && (
@@ -273,6 +331,7 @@ function Settings() {
           title="Hapus Akun"
           message="Anda yakin ingin menghapus akun anda? Seluruh data (riwayat, diagnostik, leaderboard) akan dihapus permanen."
           confirmLabel="Konfirmasi"
+          closing={closing}
           onConfirm={async () => {
             setConfirm(null);
             // Tandai akun sedang dihapus → AuthBridge tidak akan auto-login
@@ -294,7 +353,7 @@ function Settings() {
             // 4. Balik ke beranda.
             window.location.href = "/";
           }}
-          onClose={() => setConfirm(null)}
+          onClose={closeConfirm}
         />
       )}
     </>
@@ -347,7 +406,7 @@ function LogoutIcon() {
 
 export function AiAndSettings() {
   return (
-    <div className="flex w-full flex-col md:flex-row" style={{ gap: cqm(78) }}>
+    <div className="flex w-full flex-col desk:flex-row" style={{ gap: cqm(78) }}>
       <AiDiagnostic />
       <Settings />
     </div>
