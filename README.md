@@ -32,15 +32,15 @@
 
 ## 📑 Daftar Isi
 
-1. [📌 Ketentuan Pengumpulan Karya](#-ketentuan-pengumpulan-karya-babak-penyisihan)
-2. [💭 Penjelasan Aplikasi](#-penjelasan-aplikasi)
-3. [🛠️ Teknologi yang Digunakan](#️-teknologi-yang-digunakan)
-4. [✨ Fitur Utama](#-fitur-utama)
-5. [🏗️ Filosofi & Arsitektur](#️-filosofi--arsitektur)
-6. [🔌 Cara Instalasi](#-cara-instalasi)
-7. [▶️ Cara Penggunaan](#️-cara-penggunaan)
-8. [📂 Struktur Proyek](#-struktur-proyek)
-9. [📚 Sumber Data & Kredit](#-sumber-data--kredit)
+1. [📌 Ketentuan Pengumpulan Karya](#ketentuan-pengumpulan-karya-babak-penyisihan)
+2. [💭 Penjelasan Aplikasi](#penjelasan-aplikasi)
+3. [🛠️ Teknologi yang Digunakan](#teknologi-yang-digunakan)
+4. [✨ Fitur Utama](#fitur-utama)
+5. [🏗️ Filosofi dan Arsitektur](#filosofi-dan-arsitektur)
+6. [🔌 Cara Instalasi](#cara-instalasi)
+7. [▶️ Cara Penggunaan](#cara-penggunaan)
+8. [📂 Struktur Proyek](#struktur-proyek)
+9. [📚 Sumber Data dan Kredit](#sumber-data-dan-kredit)
 
 ---
 
@@ -238,7 +238,7 @@ Dari situlah **SIAPIN** lahir — sebuah platform bimbel digital yang ingin **me
 
 ---
 
-## 🏗️ Filosofi & Arsitektur
+## 🏗️ Filosofi dan Arsitektur
 
 > *“Mudah diset-up, ringan dijalankan, mudah dirawat — supaya solusi ini benar-benar dipakai dan berkelanjutan.”*
 
@@ -466,7 +466,7 @@ BackupLog                     (log backup database)
 
 ---
 
-## 📚 Sumber Data & Kredit
+## 📚 Sumber Data dan Kredit
 
 <details>
 <summary><b>Bank Soal — 2.158 soal orisinal</b></summary>
